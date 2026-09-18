@@ -401,7 +401,7 @@ async function signupCustomer(e){
 async function loadCustomerProfile(){
   if(!customerUser)return;
   const {data,error}=await siteDb.from("customers")
-    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,alternate_phone,auth_user_id")
+    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,delivery_state,delivery_city,delivery_pincode,alternate_phone,gstin,auth_user_id")
     .eq("auth_user_id",customerUser.id).maybeSingle();
   customerProfile=error?null:data;
   renderCustomerNav();
