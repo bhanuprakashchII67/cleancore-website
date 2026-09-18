@@ -596,6 +596,7 @@ window.initCleanCoreCheckout=async function(){
     if(error){btn.disabled=false;status.textContent=error.message;return;}
     customerCart=[];saveCustomerCart();
     empty.classList.add("hidden");auth.classList.add("hidden");content.classList.add("hidden");
+    document.querySelector(".checkout-title")?.classList.add("hidden");
     const placedAt=order?.placed_at?new Date(order.placed_at):new Date();
     const successTitle=order?.invoice_no?"Congratulations! Your order was placed successfully.":"Congratulations! Your order was placed successfully.";
     success.classList.remove("hidden");
