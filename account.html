@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Account | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.8">
+<link rel="stylesheet" href="style.css?v=1.9">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -29,12 +29,13 @@
 </div>
 </div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=2.3"></script>
+<script src="website.js?v=2.4"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const db=window.supabase?.createClient("https://rwfamxkfqslorxcryjrp.supabase.co", "sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO");
   const notice=document.getElementById("accountLoginNotice"),content=document.getElementById("accountContent");
   const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(Number(n||0));
+  const esc=v=>String(v??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
   db.auth.getSession().then(async ({data})=>{
     const user=data.session?.user;
     if(!user){notice.classList.remove("hidden");return;}
@@ -42,15 +43,15 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!customer){notice.classList.remove("hidden");return;}
     content.classList.remove("hidden");
     document.getElementById("accountDetails").innerHTML=
-      '<div class="account-detail"><b>Full name</b><span>'+String(customer.name||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Mobile</b><span>'+String(customer.phone||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Email</b><span>'+String(customer.email||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Alternate mobile</b><span>'+String(customer.alternate_phone||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Delivery address</b><span>'+String(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span></div>';
+      '<div class="account-detail"><b>Full name</b><span>'+esc(customer.name||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Mobile</b><span>'+esc(customer.phone||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Email</b><span>'+esc(customer.email||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Alternate mobile</b><span>'+esc(customer.alternate_phone||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Delivery address</b><span>'+esc(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span></div>';
     const orders=await db.from("website_orders").select("order_no,status,total,created_at").eq("customer_id",customer.id).order("created_at",{ascending:false});
     const box=document.getElementById("accountOrders");
     if(orders.error){box.innerHTML='<p class="cc-status">Unable to load orders.</p>';return;}
-    box.innerHTML=orders.data?.length?orders.data.map(o=>'<div class="account-order"><div><b>'+o.order_no+'</b><span>'+new Date(o.created_at).toLocaleString("en-IN")+'</span></div><div><b>'+money(o.total)+'</b><span>'+o.status+'</span></div></div>').join(""):'<p class="cc-muted">No orders yet.</p>';
+    box.innerHTML=orders.data?.length?orders.data.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+new Date(o.created_at).toLocaleString("en-IN")+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status)+'</span></div></div>').join(""):'<p class="cc-muted">No orders yet.</p>';
   });
   document.getElementById("accountLogout").onclick=async()=>{await db.auth.signOut({scope:"local"});window.location.href="index.html";};
 });
