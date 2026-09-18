@@ -50,7 +50,12 @@ function removeCartItem(productId){
 }
 function renderCartCount(){
   const a=document.getElementById("ccCartLink");
-  if(a)a.textContent=cartCount()>0?"Cart ("+cartCount()+")":"Cart";
+  if(a){
+    const count=cartCount();
+    a.setAttribute("aria-label",count>0?"Cart ("+count+")":"Cart");
+    const label=a.querySelector(".customer-action-label");
+    if(label)label.textContent=count>0?"Cart ("+count+")":"Cart";
+  }
 }
 function renderCart(){
   const panel=document.getElementById("ccCartItems");
@@ -234,32 +239,27 @@ function bindWebsiteEnquiry(){
 
 function injectCustomerUI(){
   const nav=document.getElementById("navMenu");
-  const toggle=document.getElementById("menuToggle");
-  const headerNav=nav?.parentElement;
-  if(!headerNav)return;
+  const actions=document.getElementById("navUserActions");
+  if(!nav||!actions)return;
 
   if(!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
     a.id="ccCustomerLink";
-    a.href=customerUser?"account.html":"login.html";
-    a.className="customer-nav-link";
-    a.setAttribute("aria-label",customerUser?"My account":"Login");
-    a.innerHTML=customerUser
-      ? '<span class="cc-user-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="currentColor"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="currentColor"/></svg></span><span class="cc-account-label">My Account</span>'
-      : '<span class="cc-login-label">Login</span>';
-    if(toggle) {
-      if(toggle.nextSibling) headerNav.insertBefore(a,toggle.nextSibling);
-      else headerNav.appendChild(a);
-    } else headerNav.appendChild(a);
+    a.href=customerUser&&customerProfile?"account.html":"login.html";
+    a.className="customer-nav-action account-nav-action";
+    a.setAttribute("aria-label",customerUser&&customerProfile?"My Account":"Login");
+    a.innerHTML='<span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span><span class="customer-action-label">'+(customerUser&&customerProfile?"My Account":"Login")+'</span>';
+    actions.appendChild(a);
   }
 
-  if(nav&&!document.getElementById("ccCartLink")){
+  if(!document.getElementById("ccCartLink")){
     const cart=document.createElement("a");
     cart.id="ccCartLink";
     cart.href="checkout.html";
-    cart.className="customer-nav-link cc-cart-link";
-    cart.textContent=cartCount()>0?"Cart ("+cartCount()+")":"Cart";
-    nav.appendChild(cart);
+    cart.className="customer-nav-action cart-nav-action";
+    cart.setAttribute("aria-label","Cart");
+    cart.innerHTML='<span class="customer-cart-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h2l1.3 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.8L20 8H7"></path><circle cx="10" cy="19" r="1.4"></circle><circle cx="18" cy="19" r="1.4"></circle></svg></span><span class="customer-action-label">'+(cartCount()>0?"Cart ("+cartCount()+")":"Cart")+'</span>';
+    actions.appendChild(cart);
   }
 }
 function toastSite(message){
@@ -371,14 +371,12 @@ function renderCustomerNav(){
   if(a){
     const loggedIn=!!(customerUser&&customerProfile);
     a.href=loggedIn?"account.html":"login.html";
-    a.setAttribute("aria-label",loggedIn?"My account":"Login");
-    a.innerHTML=loggedIn
-      ? '<span class="cc-user-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="currentColor"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="currentColor"/></svg></span><span class="cc-account-label">My Account</span>'
-      : '<span class="cc-login-label">Login</span>';
+    a.setAttribute("aria-label",loggedIn?"My Account":"Login");
+    const label=a.querySelector(".customer-action-label");
+    if(label)label.textContent=loggedIn?"My Account":"Login";
   }
   renderCartCount();
 }
-
 function renderAccount(){
   document.getElementById("ccAccountName").textContent=customerProfile?.phone||"Customer account";
   const bits=[customerProfile?.email||"Email not added",customerProfile?.phone].filter(Boolean);
