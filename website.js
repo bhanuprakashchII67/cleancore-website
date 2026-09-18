@@ -189,7 +189,8 @@ async function loadPublicProducts(){
       const art=img
         ? '<div class="imgbox"><img class="prod-img" src="'+escSite(img)+'" alt="'+escSite(p.name)+'"></div>'
         : '<div class="imgbox product-placeholder"><div>'+escSite(String(p.name||"").trim().charAt(0).toUpperCase())+'</div></div>';
-      return '<article class="product">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3>'+escSite(p.name)+'</h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p><div class="price">'+siteMoney(p.selling_price)+' <small>/ '+escSite(p.unit)+'</small></div><button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button></div></article>';
+      const priceMarkup=location.pathname.toLowerCase().includes("products.html")?'<div class="price">'+siteMoney(p.selling_price)+' <small>/ '+escSite(p.unit)+'</small></div>':"";
+      return '<article class="product">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3>'+escSite(p.name)+'</h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p>'+priceMarkup+'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button></div></article>';
     }).join("");
   });
 }
