@@ -599,8 +599,8 @@ window.initCleanCoreCheckout=async function(){
     document.querySelector(".checkout-title")?.classList.add("hidden");
     const placedAt=order?.placed_at?new Date(order.placed_at):new Date();
     const successTitle=order?.invoice_no?"Congratulations! Your order was placed successfully.":"Congratulations! Your order was placed successfully.";
-    success.classList.remove("hidden");
-    success.innerHTML='<div class="cc-success"><h2>'+successTitle+'</h2><p>Thank you for ordering from CleanCore Chemical & Cleaning.</p><div class="order-success-grid"><div><span>Order number</span><strong>'+escSite(order?.order_no)+'</strong></div><div><span>Invoice number</span><strong>'+escSite(order?.invoice_no||"Generating")+'</strong></div><div><span>Order date & time</span><strong>'+escSite(placedAt.toLocaleString("en-IN"))+'</strong></div><div><span>Total</span><strong>'+siteMoney(order?.total)+'</strong></div></div><a class="btn btn-primary" href="index.html">Continue shopping</a></div>';
+    document.body.innerHTML='<main class="cc-order-success-only"><div class="cc-success"><h2>'+successTitle+'</h2><p>Thank you for ordering from CleanCore Chemical & Cleaning.</p><div class="order-success-grid"><div><span>Order number</span><strong>'+escSite(order?.order_no)+'</strong></div><div><span>Invoice number</span><strong>'+escSite(order?.invoice_no||"Generating")+'</strong></div><div><span>Order date & time</span><strong>'+escSite(placedAt.toLocaleString("en-IN"))+'</strong></div><div><span>Total</span><strong>'+siteMoney(order?.total)+'</strong></div></div><a class="btn btn-primary" href="index.html">Continue shopping</a></div></main>';
+    document.body.className="checkout-page";
     btn.disabled=false;
   });
 };
