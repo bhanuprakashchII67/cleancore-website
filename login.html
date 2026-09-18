@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.15">
+<link rel="stylesheet" href="style.css?v=1.16">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -12,83 +13,58 @@
 <a class="navcta" href="checkout.html">Cart</a>
 </nav></div></header>
 <main class="checkout-main">
-<div class="container">
-<div class="auth-page-wrap">
+<div class="container"><div class="auth-page-wrap">
 <section class="checkout-card auth-page-card">
 <div class="eyebrow">Customer account</div>
 <h1>Welcome back</h1>
-<p class="cc-muted">Login once with your mobile number. Your session will stay active while you shop.</p>
-<div id="loginOnlyView">
-<form id="ccLoginForm">
-<label>Mobile number<input id="ccLoginIdentifier" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
-<label>Password<input id="ccLoginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
-<p id="ccLoginStatus" class="cc-status" aria-live="polite"></p>
-<button class="btn btn-primary cc-wide" type="submit">Login <span aria-hidden="true">→</span></button>
+<p class="cc-muted">Login with your mobile number and password.</p>
+<form id="loginForm" novalidate>
+<label>Mobile number<input id="loginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
+<label>Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
+<p id="loginStatus" class="cc-status" aria-live="polite"></p>
+<button id="loginButton" class="btn btn-primary cc-wide" type="submit">Login <span aria-hidden="true">→</span></button>
 </form>
-<p class="auth-switch">New customer? <button type="button" id="showSignup">Create account</button></p>
-</div>
-<div id="signupOnlyView" class="hidden">
-<h2>Create your account</h2>
-<form id="ccSignupForm">
-<label>Mobile number<input id="ccSignupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
-<label>Password<input id="ccSignupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required></label>
-<p id="ccSignupStatus" class="cc-status" aria-live="polite"></p>
-<button class="btn btn-primary cc-wide" type="submit">Create account <span aria-hidden="true">→</span></button>
-</form>
-<p class="auth-switch">Already have an account? <button type="button" id="showLogin">Login</button></p>
-</div>
+<p class="auth-switch">New customer? <a href="signup.html">Create account</a></p>
 </section>
-</div>
-</div>
+</div></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+<script>
+const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
 const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const phoneRE=/^[6-9]\d{9}$/;
 const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
-const nextPage=()=>{const n=new URLSearchParams(location.search).get("next");return n==="checkout.html"||n==="account.html"||n==="index.html"?"./"+n:"./index.html";};
-async function customerAuth(body){
-  const res=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify(body)});
-  const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch(_){}
-  return res.ok?{data,error:null}:{data:null,error:{message:data?.error||data?.message||"Unable to complete authentication."}};
-}
-function show(view){
-  document.getElementById("loginOnlyView").classList.toggle("hidden",view!=="login");
-  document.getElementById("signupOnlyView").classList.toggle("hidden",view!=="signup");
-}
-document.addEventListener("DOMContentLoaded",()=>{
-  show(location.hash==="#signup"?"signup":"login");
-  document.getElementById("showSignup").onclick=()=>show("signup");
-  document.getElementById("showLogin").onclick=()=>show("login");
-  document.getElementById("ccLoginForm").addEventListener("submit",async e=>{
-    e.preventDefault();
-    const status=document.getElementById("ccLoginStatus"),btn=e.currentTarget.querySelector("button[type=submit]");
-    const phone=normalize(document.getElementById("ccLoginIdentifier").value),password=document.getElementById("ccLoginPassword").value;
-    if(!phoneRE.test(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
-    if(!password){status.textContent="Enter your password.";return;}
-    btn.disabled=true;status.textContent="Logging in…";
-    const {data,error}=await customerAuth({action:"login",identifier:phone,password});
-    if(error){status.textContent=error.message;btn.disabled=false;return;}
+const validPhone=v=>/^[6-9]\d{9}$/.test(v);
+const getNext=()=>{
+  const n=new URLSearchParams(location.search).get("next");
+  return n==="checkout.html"||n==="account.html"||n==="index.html" ? "./"+n : "./index.html";
+};
+document.getElementById("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const status=document.getElementById("loginStatus"),btn=document.getElementById("loginButton");
+  const phone=normalize(document.getElementById("loginPhone").value);
+  const password=document.getElementById("loginPassword").value;
+  if(!validPhone(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
+  if(!password){status.textContent="Enter your password.";return;}
+  btn.disabled=true;status.textContent="Logging in…";
+  try{
+    const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
+      body:JSON.stringify({action:"login",identifier:phone,password})
+    });
+    const raw=await response.text();let data=null;
+    try{data=raw?JSON.parse(raw):null}catch(_){}
+    if(!response.ok){status.textContent=data?.error||"Unable to login right now.";btn.disabled=false;return;}
     if(!data?.session){status.textContent="Login failed. Please try again.";btn.disabled=false;return;}
     const saved=await db.auth.setSession(data.session);
     if(saved.error){status.textContent=saved.error.message;btn.disabled=false;return;}
-    window.location.href=nextPage();
-  });
-  document.getElementById("ccSignupForm").addEventListener("submit",async e=>{
-    e.preventDefault();
-    const status=document.getElementById("ccSignupStatus"),btn=e.currentTarget.querySelector("button[type=submit]");
-    const phone=normalize(document.getElementById("ccSignupPhone").value),password=document.getElementById("ccSignupPassword").value;
-    if(!phoneRE.test(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
-    if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
-    btn.disabled=true;status.textContent="Creating your account…";
-    const {data,error}=await customerAuth({action:"signup",phone,email:"",password});
-    if(error){status.textContent=error.message;btn.disabled=false;return;}
-    if(!data?.session){status.textContent="Account created. Please login.";btn.disabled=false;show("login");return;}
-    const saved=await db.auth.setSession(data.session);
-    if(saved.error){status.textContent=saved.error.message;btn.disabled=false;return;}
-    window.location.href=nextPage();
-  });
-});</script>
+    window.location.replace(getNext());
+  }catch(err){
+    status.textContent=err?.message||"Unable to login right now.";
+    btn.disabled=false;
+  }
+});
+</script>
 </body>
 </html>
