@@ -104,3 +104,40 @@ button,a{touch-action:manipulation}
   .request-form{padding:20px}
   .request-form .btn{width:100%}
 }
+
+
+/* Customer login, account and Order Now */
+.customer-nav-link{font-weight:800}
+.cc-modal-open{overflow:hidden}
+.cc-layer{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:18px;background:#06182acc}
+.cc-modal{position:relative;width:min(520px,100%);max-height:90vh;overflow:auto;background:#fff;border:1px solid #dce5ee;border-radius:20px;padding:28px;box-shadow:0 30px 90px #001d3a55}
+.cc-close{position:absolute;right:12px;top:10px;border:0;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#526173}
+.cc-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:#0aa39b;margin-bottom:7px}
+.cc-modal h2{margin:0 36px 8px 0;color:#0b1f33}
+.cc-muted{color:#68778a;font-size:14px;line-height:1.55}
+.cc-status{min-height:20px;color:#a33;font-size:13px;margin:8px 0}
+.cc-wide{width:100%;margin-top:6px}
+.cc-switch{text-align:center;margin-top:16px;color:#68778a;font-size:13px}
+.cc-switch button{border:0;background:none;color:#087f8f;font-weight:800;cursor:pointer}
+.cc-account-actions{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0}
+.cc-account-actions .btn{flex:1 1 140px}
+.cc-product-summary{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:14px;border:1px solid #dce5ee;background:#f7fbfb;border-radius:12px;margin:14px 0}
+.cc-product-summary strong{display:block}
+.cc-product-summary span{display:block;color:#68778a;font-size:12px;margin-top:4px}
+.cc-order-total{font-size:17px;font-weight:900;text-align:right;margin:12px 0}
+.cc-loading{padding:12px 0;color:#68778a}
+.cc-order-row{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-top:1px solid #dce5ee}
+.cc-order-row>div{display:grid;gap:4px}
+.cc-order-row>div:last-child{text-align:right;justify-items:end}
+.cc-order-row span{font-size:12px;color:#68778a}
+.cc-status-pill{display:inline-block!important;width:max-content;padding:4px 8px;border-radius:999px;background:#e8f5f3;color:#087f8f;font-weight:800}
+.cc-success{padding:12px;border-radius:10px;background:#e8f7ed;color:#17633e;margin-bottom:12px}
+.cc-toast{position:fixed;left:50%;bottom:22px;z-index:240;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#0b1f33;color:#fff;padding:12px 16px;border-radius:10px;transition:.2s;font-weight:700}
+.cc-toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:800px){
+  .customer-nav-link{display:block}
+  .cc-layer{padding:10px;place-items:end center}
+  .cc-modal{width:100%;max-height:92vh;border-radius:18px 18px 0 0;padding:22px 18px}
+  .cc-account-actions .btn{flex:1 1 100%}
+  .cc-order-row{align-items:flex-start}
+}
