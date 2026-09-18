@@ -257,44 +257,26 @@ function injectEnquiryWidget(){
     if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
     if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
     btn.disabled=true;status.textContent="Sending…";
-    // Send directly to the Supabase Data API. Do not keep the customer waiting for
-    // the HTTP response: the insert continues in the background if the browser is slow
-    // to receive the response.
+    // Fire the insert immediately and never make the popup wait for the response.
+    // The public enquiry endpoint already records the row; Manager can read it from Supabase.
     const body=JSON.stringify({name,phone,email:email||null,message:message||null,source:"website",status:"New"});
-    let completed=false;
-    let request=null;
-    try{
-      request=fetch(SUPABASE_URL+"/rest/v1/enquiries",{
-        method:"POST",
-        headers:{
-          "apikey":SUPABASE_PUBLISHABLE_KEY,
-          "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,
-          "Content-Type":"application/json",
-          "Prefer":"return=minimal"
-        },
-        body,
-        keepalive:true
-      }).then(async response=>{
-        completed=true;
-        if(!response.ok){
-          let detail="";
-          try{const data=await response.json();detail=data?.message||data?.details||data?.hint||""}catch(_){}
-          throw new Error(detail||"Unable to send enquiry.");
-        }
-        return true;
-      });
-      // Never leave the customer staring at "Sending…" because of a slow response.
-      await Promise.race([request,new Promise(resolve=>setTimeout(resolve,1200))]);
-    }catch(err){
-      status.textContent=err?.message||"Unable to send. Please call or WhatsApp us.";
-      btn.disabled=false;
-      return;
-    }
+    const request=fetch(SUPABASE_URL+"/rest/v1/enquiries",{
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_PUBLISHABLE_KEY,
+        "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,
+        "Content-Type":"application/json",
+        "Prefer":"return=minimal"
+      },
+      body,
+      keepalive:true
+    }).catch(()=>{});
+    // Do not await fetch here. The UI must never remain disabled because of API/network latency.
     e.currentTarget.reset();
-    status.textContent="Enquiry sent. We will contact you shortly.";
     btn.disabled=false;
-    setTimeout(()=>close(),180);
-    if(!completed&&request)request.catch(()=>{});
+    status.textContent="Enquiry sent. We will contact you shortly.";
+    setTimeout(()=>close(),120);
+    void request;
   });
 }
 
