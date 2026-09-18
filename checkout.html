@@ -41,7 +41,18 @@
 <label>Full name<input id="checkoutName" type="text" autocomplete="name" placeholder="Enter your full name" required></label>
 <label>Email address<input id="checkoutEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
 <label>Alternative mobile number <small>(optional)</small><input id="checkoutAlternate" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit alternate number"></label>
-<label>Delivery address<textarea id="checkoutAddress" rows="5" autocomplete="street-address" placeholder="House / shop, street, area, city, pincode" required></textarea></label>
+<div class="address-fields">
+  <label>House / Flat / Shop No.<input id="checkoutHouse" type="text" autocomplete="address-line1" placeholder="House / Flat / Shop number" required></label>
+  <label>Street / Area / Locality<input id="checkoutStreet" type="text" autocomplete="address-line2" placeholder="Street, area or locality" required></label>
+  <div class="address-row">
+    <label>City<input id="checkoutCity" type="text" autocomplete="address-level2" placeholder="City" required></label>
+    <label>State<input id="checkoutState" type="text" autocomplete="address-level1" placeholder="State" required></label>
+  </div>
+  <div class="address-row">
+    <label>Pincode<input id="checkoutPincode" type="text" inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="6-digit pincode" required></label>
+    <label>Landmark <small>(optional)</small><input id="checkoutLandmark" type="text" placeholder="Nearby landmark"></label>
+  </div>
+</div>
 <p id="checkoutStatus" class="cc-status" aria-live="polite"></p>
 </form>
 </section>
