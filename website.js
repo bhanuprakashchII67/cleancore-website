@@ -302,6 +302,7 @@ async function loadCustomerOrders(showPanel=true){
   if(panel)panel.innerHTML='<div class="cc-loading">Loading your orders…</div>';
   const {data,error}=await siteDb.from("website_orders")
     .select("id,order_no,status,total,notes,created_at")
+    .eq("customer_id",customerProfile.id)
     .order("created_at",{ascending:false});
   if(error){if(panel)panel.innerHTML='<p class="cc-status">Unable to load orders right now.</p>';return;}
   const rows=(data||[]).map(o=>'<div class="cc-order-row"><div><strong>'+escSite(o.order_no)+'</strong><span>'+new Date(o.created_at).toLocaleString("en-IN")+'</span></div><div><b>'+siteMoney(o.total)+'</b><span class="cc-status-pill">'+escSite(o.status)+'</span></div></div>').join("");
