@@ -247,7 +247,7 @@ function injectEnquiryWidget(){
   document.getElementById("ccEnquiryClose").addEventListener("click",close);
   overlay.addEventListener("click",e=>{if(e.target===overlay)close()});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))close()});
-  document.getElementById("ccQuickEnquiryForm").addEventListener("submit",async e=>{
+  document.getElementById("ccQuickEnquiryForm").addEventListener("submit",e=>{
     e.preventDefault();
     const status=document.getElementById("ccQuickEnquiryStatus");
     const btn=e.currentTarget.querySelector("button[type=submit]");
@@ -258,7 +258,6 @@ function injectEnquiryWidget(){
     if(!name){status.textContent="Enter your name.";return}
     if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
     if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
-    btn.disabled=true;status.textContent="Sending…";
     // Fire the insert immediately and never make the popup wait for the response.
     // The public enquiry endpoint already records the row; Manager can read it from Supabase.
     const body=JSON.stringify({name,phone,email:email||null,message:message||null,source:"website",status:"New"});
@@ -273,11 +272,11 @@ function injectEnquiryWidget(){
       body,
       keepalive:true
     }).catch(()=>{});
-    // Do not await fetch here. The UI must never remain disabled because of API/network latency.
+    // Close synchronously; the network request continues in the background.
+    status.textContent="Enquiry sent. We will contact you shortly.";
     e.currentTarget.reset();
     btn.disabled=false;
-    status.textContent="Enquiry sent. We will contact you shortly.";
-    setTimeout(()=>close(),120);
+    close();
     void request;
   });
 }
