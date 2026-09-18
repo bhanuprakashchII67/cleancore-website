@@ -488,8 +488,9 @@ async function placeCustomerOrder(e){
 }
 
 function checkoutGstValues(){
-  const enabled=!!document.getElementById("checkoutGstEnabled")?.checked;
-  const rate=enabled?Number(document.getElementById("checkoutGstRate")?.value||0):0;
+  const gstin=String(document.getElementById("checkoutGstin")?.value||"").trim().toUpperCase().replace(/\s/g,"");
+  const enabled=!!gstin;
+  const rate=enabled?28:0;
   const subtotal=cartSubtotal();
   const gst=rate>0?Number((subtotal*rate/100).toFixed(2)):0;
   const state=String(document.getElementById("checkoutState")?.value||"").trim().toLowerCase();
@@ -497,7 +498,7 @@ function checkoutGstValues(){
   const cgst=intra?Number((gst/2).toFixed(2)):0;
   const sgst=intra?Number((gst-cgst).toFixed(2)):0;
   const igst=intra?0:gst;
-  return {enabled,rate,subtotal,gst,cgst,sgst,igst,total:Number((subtotal+gst).toFixed(2)),state};
+  return {enabled,rate,subtotal,gst,cgst,sgst,igst,total:Number((subtotal+gst).toFixed(2)),state,gstin};
 }
 function renderCheckoutTax(){
   const box=document.getElementById("checkoutTaxBreakdown");
@@ -539,16 +540,8 @@ window.initCleanCoreCheckout=async function(){
   set("checkoutHouse",parts[0]||"");set("checkoutStreet",parts[1]||"");set("checkoutCity",parts[2]||"");
   set("checkoutState",parts[3]||"");set("checkoutPincode",parts[4]||"");set("checkoutLandmark",parts[5]||"");
   set("checkoutGstin",customerProfile?.gstin||"");
-  const gstToggle=document.getElementById("checkoutGstEnabled");
-  const gstFields=document.getElementById("checkoutGstFields");
-  if(gstToggle&&!gstToggle.dataset.bound){
-    gstToggle.dataset.bound="1";
-    gstToggle.addEventListener("change",()=>{gstFields?.classList.toggle("hidden",!gstToggle.checked);renderCheckoutTax();});
-    document.getElementById("checkoutGstRate")?.addEventListener("change",renderCheckoutTax);
-    document.getElementById("checkoutGstin")?.addEventListener("input",e=>e.target.value=e.target.value.toUpperCase().replace(/\s/g,"").slice(0,15));
-    document.getElementById("checkoutState")?.addEventListener("input",renderCheckoutTax);
-  }
-  gstFields?.classList.toggle("hidden",!gstToggle?.checked);
+  document.getElementById("checkoutGstin")?.addEventListener("input",e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,"").slice(0,15);renderCheckoutTax();});
+  document.getElementById("checkoutState")?.addEventListener("input",renderCheckoutTax);
   customerCart=items;
   const sync=await refreshCheckoutCartPrices();
   if(!customerCart.length){empty.classList.remove("hidden");auth.classList.add("hidden");content.classList.add("hidden");return;}
@@ -565,16 +558,15 @@ window.initCleanCoreCheckout=async function(){
     const house=document.getElementById("checkoutHouse").value.trim(),street=document.getElementById("checkoutStreet").value.trim();
     const city=document.getElementById("checkoutCity").value.trim(),state=document.getElementById("checkoutState").value.trim();
     const pincode=document.getElementById("checkoutPincode").value.trim(),landmark=document.getElementById("checkoutLandmark").value.trim();
-    const gstEnabled=!!document.getElementById("checkoutGstEnabled")?.checked;
-    const gstRate=gstEnabled?Number(document.getElementById("checkoutGstRate")?.value||0):0;
     const gstin=document.getElementById("checkoutGstin")?.value.trim().toUpperCase()||"";
+    const gstEnabled=!!gstin;
+    const gstRate=gstEnabled?28:0;
     const address=[house,street,city,state,pincode,landmark].join(" | ");
     if(!name){status.textContent="Enter your full name.";return;}
     if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return;}
     if(alternate&&!phoneRE.test(alternate)){status.textContent="Enter a valid 10-digit alternate number.";return;}
     if(!house||!street||!city||!state||!/^[0-9]{6}$/.test(pincode)){status.textContent="Complete your delivery address and enter a valid 6-digit pincode.";return;}
-    if(gstEnabled&&!(gstRate>0&&gstRate<=100)){status.textContent="Select a valid GST rate.";return;}
-    if(gstEnabled&&gstin&&!/^[0-9A-Z]{15}$/.test(gstin)){status.textContent="Enter a valid 15-character GSTIN or leave it blank.";return;}
+    if(gstin&&!/^[0-9A-Z]{15}$/.test(gstin)){status.textContent="Enter a valid 15-character GSTIN or leave it blank.";return;}
     btn.disabled=true;status.textContent="Saving details and placing order…";
     const {data:profile,error:profileError}=await siteDb.rpc("update_website_customer_profile",{p_name:name,p_email:email,p_alternate_phone:alternate,p_delivery_address:address});
     if(profileError){btn.disabled=false;status.textContent=profileError.message;return;}
