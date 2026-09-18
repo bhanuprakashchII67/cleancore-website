@@ -109,6 +109,25 @@ function fillCheckoutCustomer(){
   document.getElementById("ccAlternatePhone").value=customerProfile?.alternate_phone||"";
   document.getElementById("ccOrderNotes").value=customerProfile?.delivery_address||"";
 }
+function getSafeNext(){
+  const next=new URLSearchParams(location.search).get("next")||"index.html";
+  return next==="checkout.html"||next==="account.html"||next==="index.html"?"./"+next:"./index.html";
+}
+async function refreshCheckoutCartPrices(){
+  const ids=[...new Set(customerCart.map(x=>x.product_id))];
+  if(!ids.length)return {removed:0};
+  const {data,error}=await siteDb.from("website_products").select("id,name,unit,selling_price,active").in("id",ids).eq("active",true);
+  if(error||!Array.isArray(data))return {removed:0};
+  const products=new Map(data.map(p=>[p.id,p]));
+  const before=customerCart.length;
+  customerCart=customerCart.map(x=>{
+    const p=products.get(x.product_id);
+    if(!p)return null;
+    return {...x,name:p.name,unit:p.unit,price:Number(p.selling_price||0)};
+  }).filter(Boolean);
+  saveCustomerCart();
+  return {removed:before-customerCart.length};
+}
 function renderCheckoutItems(){
   const box=document.getElementById("checkoutItems")||document.getElementById("ccCheckoutItems");
   if(!box)return;
@@ -302,8 +321,7 @@ async function loginCustomer(e){
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccLoginForm").reset();
-  const next=new URLSearchParams(location.search).get("next")||"index.html";
-  window.location.href=next;
+  window.location.href=getSafeNext();
 }
 
 async function signupCustomer(e){
@@ -327,8 +345,7 @@ async function signupCustomer(e){
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccSignupForm").reset();
-  const next=new URLSearchParams(location.search).get("next")||"index.html";
-  window.location.href=next;
+  window.location.href=getSafeNext();
 }
 
 async function loadCustomerProfile(){
@@ -419,7 +436,7 @@ async function placeCustomerOrder(e){
   showCustomerView("account");
 }
 
-window.initCleanCoreCheckout=function(){
+window.initCleanCoreCheckout=async function(){
   if(!location.pathname.toLowerCase().includes("checkout.html"))return;
   const empty=document.getElementById("checkoutEmpty");
   const auth=document.getElementById("checkoutAuthRequired");
@@ -451,7 +468,16 @@ window.initCleanCoreCheckout=function(){
   set("checkoutPincode",parts[4]||"");
   set("checkoutLandmark",parts[5]||"");
   customerCart=items;
+  const sync=await refreshCheckoutCartPrices();
+  if(!customerCart.length){
+    empty.classList.remove("hidden");auth.classList.add("hidden");content.classList.add("hidden");
+    return;
+  }
   renderCheckoutItems();
+  if(sync.removed){ 
+    const status=document.getElementById("checkoutStatus");
+    if(status)status.textContent="One or more unavailable items were removed from your cart.";
+  }
   const form=document.getElementById("checkoutForm");
   if(form.dataset.bound==="1")return;
   form.dataset.bound="1";
