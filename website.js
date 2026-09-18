@@ -206,6 +206,61 @@ function bindWebsiteEnquiry(){
   });
 }
 
+function injectEnquiryWidget(){
+  if(document.getElementById("ccEnquiryWidget"))return;
+  const root=document.createElement("div");
+  root.id="ccEnquiryWidget";
+  root.innerHTML=`
+    <button type="button" class="cc-enquiry-tab" id="ccEnquiryOpen" aria-label="Open enquiry form">
+      <span class="cc-enquiry-tab-icon" aria-hidden="true">?</span><span>Enquire</span>
+    </button>
+    <div class="cc-enquiry-overlay hidden" id="ccEnquiryOverlay" aria-hidden="true">
+      <section class="cc-enquiry-card" role="dialog" aria-modal="true" aria-labelledby="ccEnquiryTitle">
+        <button type="button" class="cc-enquiry-close" id="ccEnquiryClose" aria-label="Close enquiry">×</button>
+        <div class="eyebrow">QUICK ENQUIRY</div>
+        <h2 id="ccEnquiryTitle">How can we help?</h2>
+        <p class="cc-enquiry-sub">Send your details and our team will contact you.</p>
+        <div class="cc-enquiry-contact-row">
+          <a href="tel:+919182725773"><span class="cc-contact-icon" aria-hidden="true">☎</span> Call us</a>
+          <a href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20have%20an%20enquiry." target="_blank" rel="noopener"><span class="cc-contact-icon cc-wa-icon" aria-hidden="true">◉</span> WhatsApp</a>
+          <a href="mailto:cleancorehyd@gmail.com"><span class="cc-contact-icon" aria-hidden="true">✉</span> Email</a>
+        </div>
+        <form id="ccQuickEnquiryForm" class="cc-enquiry-form" novalidate>
+          <label>Name<input id="ccEnquiryName" type="text" autocomplete="name" placeholder="Your name" required></label>
+          <label>Mobile number<input id="ccEnquiryPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
+          <label>Email address<input id="ccEnquiryEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+          <label>Message / Note<textarea id="ccEnquiryMessage" rows="4" placeholder="Tell us what you need..."></textarea></label>
+          <p id="ccQuickEnquiryStatus" class="cc-enquiry-status" aria-live="polite"></p>
+          <button class="btn btn-primary cc-wide" type="submit">Send enquiry <span aria-hidden="true">→</span></button>
+        </form>
+      </section>
+    </div>`;
+  document.body.appendChild(root);
+  const overlay=document.getElementById("ccEnquiryOverlay");
+  const open=()=>{overlay.classList.remove("hidden");overlay.setAttribute("aria-hidden","false");document.body.classList.add("cc-modal-open");setTimeout(()=>document.getElementById("ccEnquiryName")?.focus(),50)};
+  const close=()=>{overlay.classList.add("hidden");overlay.setAttribute("aria-hidden","true");document.body.classList.remove("cc-modal-open")};
+  document.getElementById("ccEnquiryOpen").addEventListener("click",open);
+  document.getElementById("ccEnquiryClose").addEventListener("click",close);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)close()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))close()});
+  document.getElementById("ccQuickEnquiryForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const status=document.getElementById("ccQuickEnquiryStatus");
+    const btn=e.currentTarget.querySelector("button[type=submit]");
+    const name=document.getElementById("ccEnquiryName").value.trim();
+    const phone=normalizeSitePhone(document.getElementById("ccEnquiryPhone").value).slice(0,10);
+    const email=document.getElementById("ccEnquiryEmail").value.trim();
+    const message=document.getElementById("ccEnquiryMessage").value.trim();
+    if(!name){status.textContent="Enter your name.";return}
+    if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
+    if(email&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){status.textContent="Enter a valid email address.";return}
+    btn.disabled=true;status.textContent="Sending…";
+    const {error}=await siteDb.from("enquiries").insert({name,phone,email:email||null,message:message||null,source:"website",status:"New"});
+    if(error){status.textContent="Unable to send. Please call or WhatsApp us.";btn.disabled=false;return}
+    e.currentTarget.reset();status.textContent="Enquiry sent. We will contact you shortly.";btn.disabled=false;
+  });
+}
+
 function injectCustomerUI(){
   const nav=document.getElementById("navMenu");
   const actions=document.getElementById("navUserActions");
@@ -539,6 +594,7 @@ document.addEventListener("input",e=>{});
 
 document.addEventListener("DOMContentLoaded",()=>{
   injectCustomerUI();
+  injectEnquiryWidget();
   loadPublicProducts();
   populateEnquiryProducts();
   bindWebsiteEnquiry();
