@@ -86,9 +86,7 @@ function showCheckout(){
   window.location.href="checkout.html";
   return;
   if(!customerUser){
-    closeCart();
-    openCustomerPanel("login");
-    document.getElementById("ccLoginStatus").textContent="Login once to continue to checkout.";
+    window.location.href="login.html?next=checkout.html";
     return;
   }
   if(!customerCart.length){renderCart();return;}
@@ -202,17 +200,19 @@ function bindWebsiteEnquiry(){
 }
 
 function injectCustomerUI(){
-  if(document.getElementById("ccCustomerLayer"))return;
-
   const nav=document.getElementById("navMenu");
-  if(nav&&!document.getElementById("ccCustomerLink")){
+  if(!nav)return;
+
+  if(!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
     a.id="ccCustomerLink";
-    a.href="#";
+    a.href=customerUser?"account.html":"login.html";
     a.className="customer-nav-link";
-    a.textContent="Login";
-    a.addEventListener("click",e=>{e.preventDefault();openCustomerPanel(customerUser?"account":"login");});
+    a.textContent=customerUser?"My Account":"Login";
     nav.appendChild(a);
+  }
+
+  if(!document.getElementById("ccCartLink")){
     const cart=document.createElement("a");
     cart.id="ccCartLink";
     cart.href="checkout.html";
@@ -220,109 +220,7 @@ function injectCustomerUI(){
     cart.textContent=cartCount()>0?"Cart ("+cartCount()+")":"Cart";
     nav.appendChild(cart);
   }
-
-  const layer=document.createElement("div");
-  layer.id="ccCustomerLayer";
-  layer.className="cc-layer hidden";
-  layer.innerHTML=`
-    <div id="ccAuthModal" class="cc-modal cc-auth-modal" role="dialog" aria-modal="true" aria-labelledby="ccModalTitle">
-      <button type="button" class="cc-close" id="ccClose" aria-label="Close">×</button>
-
-      <div id="ccAuthHead" class="cc-auth-head">
-        <div class="cc-auth-icon">CC</div>
-        <div>
-          <div class="cc-eyebrow">Customer account</div>
-          <div class="cc-auth-sub">Secure access to your CleanCore orders</div>
-        </div>
-      </div>
-
-      <div id="ccAuthTabs" class="cc-auth-tabs" role="tablist" aria-label="Customer account">
-        <button type="button" id="ccTabLogin" class="cc-auth-tab active" role="tab">Login</button>
-        <button type="button" id="ccTabSignup" class="cc-auth-tab" role="tab">Create account</button>
-      </div>
-
-      <div id="ccLoginView" class="cc-view">
-        <h2 id="ccModalTitle">Welcome back</h2>
-        <p class="cc-muted">Enter your mobile number and password.</p>
-        <form id="ccLoginForm">
-          <label>Mobile number
-            <input id="ccLoginIdentifier" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required>
-          </label>
-          <label>Password
-            <input id="ccLoginPassword" type="password" autocomplete="current-password" placeholder="Your password" required>
-          </label>
-          <p id="ccLoginStatus" class="cc-status" aria-live="polite"></p>
-          <button class="btn btn-primary cc-wide cc-main-action" type="submit"><span>Login</span><span aria-hidden="true">→</span></button>
-        </form>
-      </div>
-
-      <div id="ccSignupView" class="cc-view hidden">
-        <h2>Create your account</h2>
-        <p class="cc-muted">Just your mobile number and a password. That's it.</p>
-        <form id="ccSignupForm">
-          <label>Mobile number
-            <input id="ccSignupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required>
-          </label>
-          <label>Password
-            <input id="ccSignupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required>
-          </label>
-          <p id="ccSignupStatus" class="cc-status" aria-live="polite"></p>
-          <button class="btn btn-primary cc-wide cc-main-action" type="submit"><span>Create account</span><span aria-hidden="true">→</span></button>
-        </form>
-      </div>
-
-      <div id="ccAccountView" class="cc-view hidden">
-        <div class="cc-eyebrow">My account</div>
-        <h2 id="ccAccountName">Customer account</h2>
-        <p id="ccAccountMeta" class="cc-muted"></p>
-        <div class="cc-account-actions">
-          <button type="button" id="ccAccountOrder" class="btn btn-primary">Order now</button>
-          <button type="button" id="ccAccountOrders" class="btn btn-secondary">My orders</button>
-          <button type="button" id="ccAccountLogout" class="btn">Logout</button>
-        </div>
-        <div id="ccOrdersPanel"></div>
-      </div>
-
-      <div id="ccOrderView" class="cc-view hidden">
-        <div class="cc-eyebrow">Secure checkout</div>
-        <h2>Review your order</h2>
-        <div class="cc-checkout-customer">
-          <div class="cc-checkout-section-title">Delivery information</div>
-          <label>Full name<input id="ccCustomerName" type="text" autocomplete="name" placeholder="Your full name" required></label>
-          <label>Email address<input id="ccCustomerEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
-          <label>Alternative mobile number <span class="cc-optional">(optional)</span><input id="ccAlternatePhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit alternate number"></label>
-          <label>Delivery address<textarea id="ccOrderNotes" rows="4" autocomplete="street-address" placeholder="House / shop, street, area, city, pincode" required></textarea></label>
-        </div>
-        <div id="ccCheckoutItems" class="cc-checkout-items"></div>
-        <form id="ccOrderForm">
-          <p id="ccOrderTotal" class="cc-order-total"></p>
-          <p id="ccOrderStatus" class="cc-status" aria-live="polite"></p>
-          <div class="cc-account-actions"><button type="button" id="ccOrderBack" class="btn">Back to cart</button><button class="btn btn-primary" type="submit">Place Order</button></div>
-        </form>
-      </div>
-    </div>
-    <aside id="ccCartDrawer" class="cc-cart-drawer hidden" aria-label="Shopping cart">
-      <div class="cc-cart-head"><div><div class="cc-eyebrow">Shopping cart</div><h2>Your cart</h2></div><button type="button" class="cc-close" id="ccCartClose" aria-label="Close cart">×</button></div>
-      <div id="ccCartItems" class="cc-cart-items"></div>
-      <div class="cc-cart-footer"><div class="cc-cart-total-row"><span>Subtotal</span><strong id="ccCartTotal">₹0.00</strong></div><p class="cc-cart-note">Final order confirmation will be handled by CleanCore.</p><button type="button" id="ccCartCheckout" class="btn btn-primary cc-wide">Proceed to checkout</button></div>
-    </aside>`;
-  document.body.appendChild(layer);
-
-  document.getElementById("ccClose").onclick=closeCustomerPanel;
-  document.getElementById("ccCartClose").onclick=closeCustomerPanel;
-  document.getElementById("ccCartCheckout").onclick=showCheckout;
-  layer.addEventListener("click",e=>{if(e.target===layer)closeCustomerPanel();});
-  document.getElementById("ccTabLogin").onclick=()=>openCustomerPanel("login");
-  document.getElementById("ccTabSignup").onclick=()=>openCustomerPanel("signup");
-  document.getElementById("ccLoginForm").addEventListener("submit",loginCustomer);
-  document.getElementById("ccSignupForm").addEventListener("submit",signupCustomer);
-  document.getElementById("ccAccountOrder").onclick=()=>openCart();
-  document.getElementById("ccAccountOrders").onclick=()=>loadCustomerOrders(true);
-  document.getElementById("ccAccountLogout").onclick=logoutCustomer;
-  document.getElementById("ccOrderBack").onclick=()=>{showCustomerView("account");openCart();};
-  document.getElementById("ccOrderForm").addEventListener("submit",placeCustomerOrder);
 }
-
 function toastSite(message){
   let el=document.getElementById("ccToast");
   if(!el){
@@ -391,8 +289,8 @@ async function loginCustomer(e){
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccLoginForm").reset();
-  renderCustomerNav();renderAccount();closeCustomerPanel();
-  if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
+  const next=new URLSearchParams(location.search).get("next")||"index.html";
+  window.location.href=next;
 }
 
 async function signupCustomer(e){
@@ -416,8 +314,8 @@ async function signupCustomer(e){
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccSignupForm").reset();
-  renderCustomerNav();renderAccount();closeCustomerPanel();
-  if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
+  const next=new URLSearchParams(location.search).get("next")||"index.html";
+  window.location.href=next;
 }
 
 async function loadCustomerProfile(){
@@ -431,7 +329,11 @@ async function loadCustomerProfile(){
 
 function renderCustomerNav(){
   const a=document.getElementById("ccCustomerLink");
-  if(a)a.textContent=customerUser&&customerProfile?"My Account":"Login";
+  if(a){
+    a.textContent=customerUser&&customerProfile?"My Account":"Login";
+    a.href=customerUser&&customerProfile?"account.html":"login.html";
+  }
+  renderCartCount();
 }
 
 function renderAccount(){
@@ -517,9 +419,7 @@ window.initCleanCoreCheckout=function(){
   if(!customerUser){
     auth.classList.remove("hidden");empty.classList.add("hidden");content.classList.add("hidden");
     document.getElementById("checkoutLoginBtn").onclick=()=>{
-      injectCustomerUI();
-      openCustomerPanel("login");
-      document.getElementById("ccLoginStatus").textContent="Login to continue checkout.";
+      window.location.href="login.html?next=checkout.html";
     };
     return;
   }
