@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CleanCore Team Portal</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="employee-portal.css?v=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="portal-shell">
+  <div id="portalLogin" class="portal-card login-card">
+    <div class="portal-brand"><div class="portal-mark">CC</div><div><b>CleanCore</b><span>Team Portal</span></div></div>
+    <div class="eyebrow">PRIVATE TEAM ACCESS</div>
+    <h1>Sign in</h1>
+    <p class="muted">Use the username and password provided by your Manager.</p>
+    <form id="portalLoginForm">
+      <label>Username<input id="portalUsername" autocomplete="username" placeholder="Your username" required></label>
+      <label>Password<input id="portalPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
+      <p id="portalLoginStatus" class="status" aria-live="polite"></p>
+      <button class="primary-btn" type="submit">Sign in</button>
+    </form>
+    <p class="tiny muted">This link is unique to your assigned team workspace.</p>
+  </div>
+
+  <div id="portalApp" class="hidden">
+    <header class="portal-topbar">
+      <div class="portal-brand"><div class="portal-mark">CC</div><div><b>CleanCore</b><span>Team Portal</span></div></div>
+      <div class="portal-user">
+        <div><strong id="portalEmployeeName">Employee</strong><span id="portalEmployeeMeta"></span></div>
+        <button id="portalLogout" class="secondary-btn">Logout</button>
+      </div>
+    </header>
+
+    <main class="portal-main">
+      <section class="hero-card">
+        <div>
+          <div class="eyebrow">ASSIGNED WORKSPACE</div>
+          <h1 id="portalTitle">Your workspace</h1>
+          <p id="portalAccessWindow" class="muted"></p>
+        </div>
+        <div class="hero-badge" id="portalTeamBadge">Team</div>
+      </section>
+
+      <section>
+        <div class="section-head"><div><h2>Available sections</h2><p class="muted">Only the sections assigned by your Manager are available here.</p></div></div>
+        <div id="portalModuleGrid" class="module-grid"></div>
+      </section>
+
+      <section class="data-card">
+        <div class="section-head"><div><h2 id="portalModuleTitle">Overview</h2><p id="portalModuleHint" class="muted">Select a section above.</p></div></div>
+        <div id="portalDataArea"></div>
+      </section>
+
+      <section class="access-card">
+        <div class="section-head"><div><h2>Request additional access</h2><p class="muted">Need another section? Raise a ticket here. The Manager will decide whether to grant it.</p></div></div>
+        <form id="portalAccessForm" class="access-form">
+          <label>Section you need
+            <select id="portalAccessModule"></select>
+          </label>
+          <label>Reason
+            <textarea id="portalAccessReason" rows="3" placeholder="Explain why you need this access." required></textarea>
+          </label>
+          <p id="portalAccessStatus" class="status" aria-live="polite"></p>
+          <button class="primary-btn" type="submit">Send access request</button>
+        </form>
+        <div id="portalAccessHistory"></div>
+      </section>
+    </main>
+  </div>
+</div>
+<script src="employee-portal.js?v=1.0"></script>
+</body>
+</html>
