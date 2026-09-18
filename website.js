@@ -575,10 +575,12 @@ function bindCustomerAuth(){
   siteDb.auth.onAuthStateChange(async(_event,session)=>{
     customerUser=session?.user||null;
     if(customerUser)await loadCustomerProfile();else{customerProfile=null;renderCustomerNav();}
+    if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
   });
   siteDb.auth.getSession().then(async({data})=>{
     customerUser=data.session?.user||null;
     if(customerUser)await loadCustomerProfile();else renderCustomerNav();
+    if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
   });
 }
 
