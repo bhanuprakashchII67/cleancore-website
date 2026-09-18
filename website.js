@@ -90,9 +90,10 @@ function getSafeNext(){
 async function refreshCheckoutCartPrices(){
   const ids=[...new Set(customerCart.map(x=>x.product_id))];
   if(!ids.length)return {removed:0};
-  const {data,error}=await siteDb.from("website_products").select("id,name,unit,selling_price,active").in("id",ids).eq("active",true);
+  const {data,error}=await siteDb.from("website_products").select("id,name,unit,selling_price,active,stock").in("id",ids).eq("active",true);
   if(error||!Array.isArray(data))return {removed:0};
-  const products=new Map(data.map(p=>[p.id,p]));
+  const available=data.filter(p=>Number(p.stock||0)>0);
+  const products=new Map(available.map(p=>[p.id,p]));
   const before=customerCart.length;
   customerCart=customerCart.map(x=>{
     const p=products.get(x.product_id);
@@ -152,7 +153,7 @@ function validSiteEmail(v){const email=String(v||"").trim();return !email||/^[^\
 async function loadPublicProducts(){
   if(!siteDb)return;
   const {data,error}=await siteDb.from("website_products")
-    .select("id,name,unit,selling_price,description,additional_details,image_urls,video_urls,active")
+    .select("id,name,unit,selling_price,description,additional_details,image_urls,video_urls,active,stock")
     .eq("active",true).order("name");
   if(error||!Array.isArray(data)||!data.length)return;
   publicProducts=data;
@@ -164,7 +165,7 @@ async function loadPublicProducts(){
         ? '<div class="imgbox"><img class="prod-img" src="'+escSite(img)+'" alt="'+escSite(p.name)+'"></div>'
         : '<div class="imgbox product-placeholder"><div>'+escSite(String(p.name||"").trim().charAt(0).toUpperCase())+'</div></div>';
       const priceMarkup=location.pathname.toLowerCase().includes("products.html")?'<div class="price">'+siteMoney(p.selling_price)+' <small>/ '+escSite(p.unit)+'</small></div>':"";
-      return '<article class="product">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3>'+escSite(p.name)+'</h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p>'+priceMarkup+'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button></div></article>';
+      const inStock=Number(p.stock||0)>0; const stockMarkup=inStock?"":"<div class="stock-out">Out of stock</div>"; const buttonMarkup=inStock?'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button>':'<button type="button" class="btn btn-secondary order-now" data-product-id="'+escSite(p.id)+'" disabled>Out of stock</button>'; return '<article class="product">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3>'+escSite(p.name)+'</h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p>'+priceMarkup+stockMarkup+buttonMarkup+'</div></article>';
     }).join("");
   });
 }
