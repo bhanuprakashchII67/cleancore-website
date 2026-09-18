@@ -257,12 +257,14 @@ function injectEnquiryWidget(){
     if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
     if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
     btn.disabled=true;status.textContent="Sending…";
-    // Use the Data API directly for the public enquiry form. This avoids waiting for the
-    // Supabase JS client's auth/session startup and keeps the submission lightweight.
+    // Send directly to the Supabase Data API. Do not keep the customer waiting for
+    // the HTTP response: the insert continues in the background if the browser is slow
+    // to receive the response.
+    const body=JSON.stringify({name,phone,email:email||null,message:message||null,source:"website",status:"New"});
+    let completed=false;
+    let request=null;
     try{
-      const controller=new AbortController();
-      const timer=setTimeout(()=>controller.abort(),8000);
-      const response=await fetch(SUPABASE_URL+"/rest/v1/enquiries",{
+      request=fetch(SUPABASE_URL+"/rest/v1/enquiries",{
         method:"POST",
         headers:{
           "apikey":SUPABASE_PUBLISHABLE_KEY,
@@ -270,21 +272,29 @@ function injectEnquiryWidget(){
           "Content-Type":"application/json",
           "Prefer":"return=minimal"
         },
-        body:JSON.stringify({name,phone,email:email||null,message:message||null,source:"website",status:"New"}),
-        signal:controller.signal
+        body,
+        keepalive:true
+      }).then(async response=>{
+        completed=true;
+        if(!response.ok){
+          let detail="";
+          try{const data=await response.json();detail=data?.message||data?.details||data?.hint||""}catch(_){}
+          throw new Error(detail||"Unable to send enquiry.");
+        }
+        return true;
       });
-      clearTimeout(timer);
-      if(!response.ok){
-        let detail="";
-        try{const body=await response.json();detail=body?.message||body?.details||body?.hint||""}catch(_){}
-        throw new Error(detail||"Unable to send enquiry.");
-      }
+      // Never leave the customer staring at "Sending…" because of a slow response.
+      await Promise.race([request,new Promise(resolve=>setTimeout(resolve,1200))]);
     }catch(err){
-      status.textContent=err?.name==="AbortError"?"The connection is taking too long. Please try again.":(err?.message||"Unable to send. Please call or WhatsApp us.");
+      status.textContent=err?.message||"Unable to send. Please call or WhatsApp us.";
       btn.disabled=false;
       return;
     }
-    e.currentTarget.reset();status.textContent="Enquiry sent. We will contact you shortly.";btn.disabled=false;
+    e.currentTarget.reset();
+    status.textContent="Enquiry sent. We will contact you shortly.";
+    btn.disabled=false;
+    setTimeout(()=>close(),180);
+    if(!completed&&request)request.catch(()=>{});
   });
 }
 
