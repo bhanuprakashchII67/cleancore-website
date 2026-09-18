@@ -147,8 +147,8 @@ async function invokeCustomerAuth(body){
     return {data:null,error:{message:e?.message||"Unable to reach customer authentication service."}};
   }
 }
-function normalizeSitePhone(v){return String(v||"").replace(/\D/g,"").replace(/^91/,"");}
-
+function normalizeSitePhone(v){const digits=String(v||"").replace(/\D/g,"");return digits.length===12&&digits.startsWith("91")?digits.slice(2):digits;}
+function validSiteEmail(v){const email=String(v||"").trim();return !email||/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);}
 async function loadPublicProducts(){
   if(!siteDb)return;
   const {data,error}=await siteDb.from("website_products")
@@ -199,6 +199,8 @@ function bindWebsiteEnquiry(){
       status:"New"
     };
     if(!payload.name){msg.textContent="Enter your name.";return;}
+    if(!validSiteEmail(payload.email)){msg.textContent="Enter a valid email address.";return;}
+    // Always record the enquiry. Existing customers/leads may submit again; enquiries are not de-duplicated.
     const {error}=await siteDb.from("enquiries").insert(payload);
     if(error){msg.textContent="Unable to send right now. Please use the order form or contact CleanCore.";return;}
     form.reset();
@@ -253,10 +255,11 @@ function injectEnquiryWidget(){
     const message=document.getElementById("ccEnquiryMessage").value.trim();
     if(!name){status.textContent="Enter your name.";return}
     if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
-    if(email&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){status.textContent="Enter a valid email address.";return}
+    if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
     btn.disabled=true;status.textContent="Sending…";
+    // Always record the enquiry, even when this phone/email already exists in Manager customers.
     const {error}=await siteDb.from("enquiries").insert({name,phone,email:email||null,message:message||null,source:"website",status:"New"});
-    if(error){status.textContent="Unable to send. Please call or WhatsApp us.";btn.disabled=false;return}
+    if(error){status.textContent=error.message||"Unable to send. Please call or WhatsApp us.";btn.disabled=false;return}
     e.currentTarget.reset();status.textContent="Enquiry sent. We will contact you shortly.";btn.disabled=false;
   });
 }
@@ -297,8 +300,7 @@ function toastSite(message){
 
 function showCustomerView(name){
   closeCart();
-  const map={login:"ccLoginView",signup:"ccSignupView",account:"ccAccountView",order:"ccOrderView"};
-  Object.entries(map).forEach(([key,id])=>document.getElementById(id)?.classList.toggle("hidden",key!==name));
+  const map={login:"ccLoginView",signup:"ccSignupView",account:"ccAccountView",order:"ccOrderView"};  Object.entries(map).forEach(([key,id])=>document.getElementById(id)?.classList.toggle("hidden",key!==name));
   const auth=name==="login"||name==="signup";
   document.getElementById("ccAuthHead")?.classList.toggle("hidden",!auth);
   document.getElementById("ccAuthTabs")?.classList.toggle("hidden",!auth);
@@ -447,8 +449,7 @@ async function placeCustomerOrder(e){
   const email=document.getElementById("ccCustomerEmail").value.trim();
   const alternate=document.getElementById("ccAlternatePhone").value.trim();
   const address=document.getElementById("ccOrderNotes").value.trim();
-  if(!name){status.textContent="Enter your full name.";return;}
-  if(email&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){status.textContent="Enter a valid email address.";return;}
+    if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
   if(alternate&&!phoneRE.test(normalizeSitePhone(alternate))){status.textContent="Enter a valid 10-digit alternate number.";return;}
   if(!address){status.textContent="Enter your delivery address.";return;}
   status.textContent="Saving your details…";
@@ -530,7 +531,7 @@ window.initCleanCoreCheckout=async function(){
     const landmark=document.getElementById("checkoutLandmark").value.trim();
     const address=[house,street,city,state,pincode,landmark].join(" | ");
     if(!name){status.textContent="Enter your full name.";return;}
-    if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent="Enter a valid email address.";return;}
+    if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
     if(alternate&&!phoneRE.test(alternate)){status.textContent="Enter a valid 10-digit alternate number.";return;}
     if(!house||!street||!city||!state||!/^[0-9]{6}$/.test(pincode)){status.textContent="Complete your delivery address and enter a valid 6-digit pincode.";return;}
     btn.disabled=true;status.textContent="Saving details and placing order…";
