@@ -262,3 +262,19 @@ button,a{touch-action:manipulation}
 .address-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .address-fields input{min-height:48px}
 @media(max-width:600px){.address-row{grid-template-columns:1fr;gap:0}}
+
+.auth-page-wrap{max-width:520px;margin:0 auto}
+.auth-page-card h1{font-size:42px;line-height:1.1;letter-spacing:-1.5px;color:var(--navy);margin:4px 0 8px}
+.auth-page-card>p{margin-bottom:24px}
+.auth-switch{text-align:center;margin-top:18px;color:var(--muted);font-size:13px}
+.auth-switch button{border:0;background:none;color:var(--teal2);font-weight:900;cursor:pointer}
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.account-detail{padding:13px 0;border-bottom:1px solid var(--line)}
+.account-detail b{display:block;color:var(--navy);font-size:13px;margin-bottom:3px}
+.account-detail span{color:var(--muted);font-size:14px;line-height:1.5}
+.account-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.account-actions .btn{flex:1}
+.account-order{display:flex;justify-content:space-between;gap:18px;padding:14px 0;border-bottom:1px solid var(--line)}
+.account-order span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.account-order>div:last-child{text-align:right}
+@media(max-width:800px){.account-grid{grid-template-columns:1fr}.auth-page-card h1{font-size:36px}}
