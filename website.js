@@ -257,9 +257,33 @@ function injectEnquiryWidget(){
     if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
     if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
     btn.disabled=true;status.textContent="Sending…";
-    // Always record the enquiry, even when this phone/email already exists in Manager customers.
-    const {error}=await siteDb.from("enquiries").insert({name,phone,email:email||null,message:message||null,source:"website",status:"New"});
-    if(error){status.textContent=error.message||"Unable to send. Please call or WhatsApp us.";btn.disabled=false;return}
+    // Use the Data API directly for the public enquiry form. This avoids waiting for the
+    // Supabase JS client's auth/session startup and keeps the submission lightweight.
+    try{
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),8000);
+      const response=await fetch(SUPABASE_URL+"/rest/v1/enquiries",{
+        method:"POST",
+        headers:{
+          "apikey":SUPABASE_PUBLISHABLE_KEY,
+          "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,
+          "Content-Type":"application/json",
+          "Prefer":"return=minimal"
+        },
+        body:JSON.stringify({name,phone,email:email||null,message:message||null,source:"website",status:"New"}),
+        signal:controller.signal
+      });
+      clearTimeout(timer);
+      if(!response.ok){
+        let detail="";
+        try{const body=await response.json();detail=body?.message||body?.details||body?.hint||""}catch(_){}
+        throw new Error(detail||"Unable to send enquiry.");
+      }
+    }catch(err){
+      status.textContent=err?.name==="AbortError"?"The connection is taking too long. Please try again.":(err?.message||"Unable to send. Please call or WhatsApp us.");
+      btn.disabled=false;
+      return;
+    }
     e.currentTarget.reset();status.textContent="Enquiry sent. We will contact you shortly.";btn.disabled=false;
   });
 }
