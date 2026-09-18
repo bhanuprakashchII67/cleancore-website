@@ -83,12 +83,30 @@ function closeCart(){
   document.getElementById("ccAuthModal")?.classList.remove("hidden");
 }
 function showCheckout(){
-  if(!customerUser||!customerProfile){closeCart();openCustomerPanel("login");document.getElementById("ccLoginStatus").textContent="Login to continue to checkout.";return;}
+  if(!customerUser){
+    closeCart();
+    openCustomerPanel("login");
+    document.getElementById("ccLoginStatus").textContent="Login once to continue to checkout.";
+    return;
+  }
   if(!customerCart.length){renderCart();return;}
+  if(!customerProfile){
+    loadCustomerProfile().then(()=>{
+      if(customerProfile)showCheckout();
+      else {closeCart();openCustomerPanel("login");}
+    });
+    return;
+  }
   closeCart();
   showCustomerView("order");
-  document.getElementById("ccOrderNotes").value=customerProfile?.delivery_address||"";
+  fillCheckoutCustomer();
   renderCheckoutSummary();
+}
+function fillCheckoutCustomer(){
+  document.getElementById("ccCustomerName").value=customerProfile?.name==="Customer"?"":(customerProfile?.name||"");
+  document.getElementById("ccCustomerEmail").value=customerProfile?.email||"";
+  document.getElementById("ccAlternatePhone").value=customerProfile?.alternate_phone||"";
+  document.getElementById("ccOrderNotes").value=customerProfile?.delivery_address||"";
 }
 function renderCheckoutSummary(){
   const box=document.getElementById("ccCheckoutItems");
@@ -267,9 +285,15 @@ function injectCustomerUI(){
       <div id="ccOrderView" class="cc-view hidden">
         <div class="cc-eyebrow">Secure checkout</div>
         <h2>Review your order</h2>
+        <div class="cc-checkout-customer">
+          <div class="cc-checkout-section-title">Delivery information</div>
+          <label>Full name<input id="ccCustomerName" type="text" autocomplete="name" placeholder="Your full name" required></label>
+          <label>Email address<input id="ccCustomerEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+          <label>Alternative mobile number <span class="cc-optional">(optional)</span><input id="ccAlternatePhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit alternate number"></label>
+          <label>Delivery address<textarea id="ccOrderNotes" rows="4" autocomplete="street-address" placeholder="House / shop, street, area, city, pincode" required></textarea></label>
+        </div>
         <div id="ccCheckoutItems" class="cc-checkout-items"></div>
         <form id="ccOrderForm">
-          <label>Delivery / order note<textarea id="ccOrderNotes" rows="4" placeholder="Delivery address or any special instruction"></textarea></label>
           <p id="ccOrderTotal" class="cc-order-total"></p>
           <p id="ccOrderStatus" class="cc-status" aria-live="polite"></p>
           <div class="cc-account-actions"><button type="button" id="ccOrderBack" class="btn">Back to cart</button><button class="btn btn-primary" type="submit">Place Order</button></div>
@@ -319,6 +343,7 @@ function showCustomerView(name){
 }
 
 function openCustomerPanel(view="login",startOrder=false){
+  closeCart();
   const layer=document.getElementById("ccCustomerLayer");
   if(!layer)return;
   layer.classList.remove("hidden");
@@ -393,7 +418,7 @@ async function signupCustomer(e){
 async function loadCustomerProfile(){
   if(!customerUser)return;
   const {data,error}=await siteDb.from("customers")
-    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,auth_user_id")
+    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,alternate_phone,auth_user_id")
     .eq("auth_user_id",customerUser.id).maybeSingle();
   customerProfile=error?null:data;
   renderCustomerNav();
@@ -450,9 +475,24 @@ async function placeCustomerOrder(e){
   if(!customerUser||!customerProfile||!customerCart.length)return;
   const status=document.getElementById("ccOrderStatus");
   status.textContent="Placing order…";
+  const name=document.getElementById("ccCustomerName").value.trim();
+  const email=document.getElementById("ccCustomerEmail").value.trim();
+  const alternate=document.getElementById("ccAlternatePhone").value.trim();
+  const address=document.getElementById("ccOrderNotes").value.trim();
+  if(!name){status.textContent="Enter your full name.";return;}
+  if(email&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){status.textContent="Enter a valid email address.";return;}
+  if(alternate&&!phoneRE.test(normalizeSitePhone(alternate))){status.textContent="Enter a valid 10-digit alternate number.";return;}
+  if(!address){status.textContent="Enter your delivery address.";return;}
+  status.textContent="Saving your details…";
+  const {data:profileData,error:profileError}=await siteDb.rpc("update_website_customer_profile",{
+    p_name:name,p_email:email,p_alternate_phone:normalizeSitePhone(alternate),p_delivery_address:address
+  });
+  if(profileError){status.textContent=profileError.message;return;}
+  customerProfile={...customerProfile,...(profileData||{})};
+  status.textContent="Placing order…";
   const {data,error}=await siteDb.rpc("place_website_cart_order",{
     p_items:customerCart.map(x=>({product_id:x.product_id,quantity:Number(x.quantity)})),
-    p_notes:document.getElementById("ccOrderNotes").value.trim()
+    p_notes:address
   });
   if(error){status.textContent=error.message;return;}
   const order=data||{};
