@@ -416,7 +416,7 @@ button,a{touch-action:manipulation}
 
 
 /* Full-width order success state */
-.checkout-notice.checkout-success{max-width:none;padding:0;background:transparent;border:0;box-shadow:none;text-align:stretch}
-.checkout-notice.checkout-success .cc-success{width:100%;box-sizing:border-box;margin:0;padding:30px;border-radius:18px;text-align:center;background:#e8f7ed;color:#17633e}
-.checkout-notice.checkout-success .cc-success h2{color:#123b2a}
-@media(max-width:600px){.checkout-notice.checkout-success .cc-success{padding:22px 16px;border-radius:14px}}
+.checkout-notice#checkoutSuccess{max-width:none;padding:0;background:transparent;border:0;box-shadow:none;text-align:stretch}
+.checkout-notice#checkoutSuccess .cc-success{width:100%;box-sizing:border-box;margin:0;padding:30px;border-radius:18px;text-align:center;background:#e8f7ed;color:#17633e}
+.checkout-notice#checkoutSuccess .cc-success h2{color:#123b2a}
+@media(max-width:600px){.checkout-notice#checkoutSuccess .cc-success{padding:22px 16px;border-radius:14px}}
