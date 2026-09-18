@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.10">
+<link rel="stylesheet" href="style.css?v=1.11">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -45,6 +45,10 @@
 <script src="website.js?v=2.5"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
+  if(location.hash==="#signup"){
+    document.getElementById("loginOnlyView")?.classList.add("hidden");
+    document.getElementById("signupOnlyView")?.classList.remove("hidden");
+  }
   document.getElementById("showSignup")?.addEventListener("click",()=>{
     document.getElementById("loginOnlyView")?.classList.add("hidden");
     document.getElementById("signupOnlyView")?.classList.remove("hidden");
