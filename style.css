@@ -337,3 +337,31 @@ button,a{touch-action:manipulation}
   .cc-user-avatar{width:38px;height:38px}
   nav .customer-nav-link + .menu-toggle{margin-left:0}
 }
+
+/* Compact responsive account controls */
+.nav-user-actions{display:flex;align-items:center;gap:8px;margin-left:10px}
+.customer-nav-action{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:7px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--navy);font-size:13px;font-weight:800}
+.customer-nav-action:hover{border-color:#c9d9de;color:var(--teal2)}
+.customer-face,.customer-cart-icon{width:22px;height:22px;display:grid;place-items:center}
+.customer-face svg,.customer-cart-icon svg{width:20px;height:20px}
+.customer-face svg{stroke:currentColor;stroke-width:1.8}
+.customer-cart-icon svg{stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.account-nav-action{padding-inline:9px}
+.cart-nav-action{padding-inline:10px}
+@media(max-width:800px){
+  nav{position:relative}
+  .nav-user-actions{margin-left:auto;gap:6px;order:3;flex:0 0 auto}
+  .menu-toggle{order:2}
+  .nav-user-actions{order:3}
+  .customer-nav-action{width:40px;height:40px;min-height:40px;padding:0;border-radius:10px}
+  .customer-nav-action .customer-action-label{display:none}
+  .customer-nav-action .customer-face,.customer-nav-action .customer-cart-icon{width:21px;height:21px}
+  .navlinks{top:70px}
+}
+@media(min-width:801px){
+  .menu-toggle{display:none}
+}
+@media(max-width:420px){
+  .nav-user-actions{gap:5px}
+  .customer-nav-action{width:38px;height:38px;min-height:38px}
+}
