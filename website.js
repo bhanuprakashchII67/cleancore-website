@@ -488,30 +488,31 @@ async function placeCustomerOrder(e){
 }
 
 function checkoutGstValues(){
-  const gstin=String(document.getElementById("checkoutGstin")?.value||"").trim().toUpperCase().replace(/\s/g,"");
-  const enabled=!!gstin;
+  const enabled=!!document.getElementById("checkoutGstEnabled")?.checked;
   const rate=enabled?28:0;
-  const subtotal=cartSubtotal();
-  const gst=rate>0?Number((subtotal*rate/100).toFixed(2)):0;
+  const total=cartSubtotal();
+  const gst=enabled?Number((total*rate/(100+rate)).toFixed(2)):0;
+  const taxable=enabled?Number((total-gst).toFixed(2)):total;
   const state=String(document.getElementById("checkoutState")?.value||"").trim().toLowerCase();
   const intra=state.replace(/[^a-z]/g,"")==="telangana";
   const cgst=intra?Number((gst/2).toFixed(2)):0;
   const sgst=intra?Number((gst-cgst).toFixed(2)):0;
   const igst=intra?0:gst;
-  return {enabled,rate,subtotal,gst,cgst,sgst,igst,total:Number((subtotal+gst).toFixed(2)),state,gstin};
+  return {enabled,rate,total,taxable,gst,cgst,sgst,igst,state};
 }
 function renderCheckoutTax(){
   const box=document.getElementById("checkoutTaxBreakdown");
   const total=document.getElementById("checkoutTotal");
   if(!box||!total)return;
   const x=checkoutGstValues();
-  if(!x.enabled||x.gst<=0){box.innerHTML="";total.textContent=siteMoney(x.subtotal);return;}
-  const rows=x.intra
-    ? "<div><span>CGST ("+x.rate/2+"%)</span><b>"+siteMoney(x.cgst)+"</b></div><div><span>SGST ("+x.rate/2+"%)</span><b>"+siteMoney(x.sgst)+"</b></div>"
-    : "<div><span>IGST ("+x.rate+"%)</span><b>"+siteMoney(x.igst)+"</b></div>";
-  box.innerHTML="<div><span>Taxable value</span><b>"+siteMoney(x.subtotal)+"</b></div>"+rows;
   total.textContent=siteMoney(x.total);
+  if(!x.enabled){box.innerHTML="";return;}
+  const rows=x.intra
+    ? "<div><span>Taxable value</span><b>"+siteMoney(x.taxable)+"</b></div><div><span>CGST ("+x.rate/2+"%)</span><b>"+siteMoney(x.cgst)+"</b></div><div><span>SGST ("+x.rate/2+"%)</span><b>"+siteMoney(x.sgst)+"</b></div>"
+    : "<div><span>Taxable value</span><b>"+siteMoney(x.taxable)+"</b></div><div><span>IGST ("+x.rate+"%)</span><b>"+siteMoney(x.igst)+"</b></div>";
+  box.innerHTML=rows+"<div><span>GST included in total</span><b>"+siteMoney(x.gst)+"</b></div>";
 }
+
 window.initCleanCoreCheckout=async function(){
   if(!location.pathname.toLowerCase().includes("checkout.html"))return;
   const empty=document.getElementById("checkoutEmpty");
@@ -540,8 +541,18 @@ window.initCleanCoreCheckout=async function(){
   set("checkoutHouse",parts[0]||"");set("checkoutStreet",parts[1]||"");set("checkoutCity",parts[2]||"");
   set("checkoutState",parts[3]||"");set("checkoutPincode",parts[4]||"");set("checkoutLandmark",parts[5]||"");
   set("checkoutGstin",customerProfile?.gstin||"");
-  document.getElementById("checkoutGstin")?.addEventListener("input",e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,"").slice(0,15);renderCheckoutTax();});
-  document.getElementById("checkoutState")?.addEventListener("input",renderCheckoutTax);
+  set("checkoutBusinessName",customerProfile?.business_name||"");
+  set("checkoutBillingAddress",customerProfile?.billing_address||"");
+  const gstToggle=document.getElementById("checkoutGstEnabled");
+  const gstFields=document.getElementById("checkoutGstFields");
+  const syncGstFields=()=>{const on=!!gstToggle?.checked;gstFields?.classList.toggle("hidden",!on);renderCheckoutTax();};
+  if(gstToggle&&!gstToggle.dataset.bound){
+    gstToggle.dataset.bound="1";
+    gstToggle.addEventListener("change",syncGstFields);
+    document.getElementById("checkoutGstin")?.addEventListener("input",e=>e.target.value=e.target.value.toUpperCase().replace(/\s/g,"").slice(0,15));
+    document.getElementById("checkoutState")?.addEventListener("input",renderCheckoutTax);
+  }
+  gstFields?.classList.toggle("hidden",!gstToggle?.checked);
   customerCart=items;
   const sync=await refreshCheckoutCartPrices();
   if(!customerCart.length){empty.classList.remove("hidden");auth.classList.add("hidden");content.classList.add("hidden");return;}
@@ -558,17 +569,21 @@ window.initCleanCoreCheckout=async function(){
     const house=document.getElementById("checkoutHouse").value.trim(),street=document.getElementById("checkoutStreet").value.trim();
     const city=document.getElementById("checkoutCity").value.trim(),state=document.getElementById("checkoutState").value.trim();
     const pincode=document.getElementById("checkoutPincode").value.trim(),landmark=document.getElementById("checkoutLandmark").value.trim();
+    const gstEnabled=!!document.getElementById("checkoutGstEnabled")?.checked;
     const gstin=document.getElementById("checkoutGstin")?.value.trim().toUpperCase()||"";
-    const gstEnabled=!!gstin;
+    const businessName=document.getElementById("checkoutBusinessName")?.value.trim()||"";
+    const billingAddress=document.getElementById("checkoutBillingAddress")?.value.trim()||"";
     const gstRate=gstEnabled?28:0;
     const address=[house,street,city,state,pincode,landmark].join(" | ");
     if(!name){status.textContent="Enter your full name.";return;}
     if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return;}
     if(alternate&&!phoneRE.test(alternate)){status.textContent="Enter a valid 10-digit alternate number.";return;}
     if(!house||!street||!city||!state||!/^[0-9]{6}$/.test(pincode)){status.textContent="Complete your delivery address and enter a valid 6-digit pincode.";return;}
-    if(gstin&&!/^[0-9A-Z]{15}$/.test(gstin)){status.textContent="Enter a valid 15-character GSTIN or leave it blank.";return;}
+    if(gstEnabled&&!/^[0-9A-Z]{15}$/.test(gstin)){status.textContent="Enter a valid 15-character GSTIN.";return;}
+    if(gstEnabled&&!businessName){status.textContent="Enter your business name for the GST invoice.";return;}
+    if(gstEnabled&&!billingAddress){status.textContent="Enter your full billing address for the GST invoice.";return;}
     btn.disabled=true;status.textContent="Saving details and placing order…";
-    const {data:profile,error:profileError}=await siteDb.rpc("update_website_customer_profile",{p_name:name,p_email:email,p_alternate_phone:alternate,p_delivery_address:address});
+    const {data:profile,error:profileError}=await siteDb.rpc("update_website_customer_profile",{p_name:name,p_email:email,p_alternate_phone:alternate,p_delivery_address:address,p_business_name:businessName,p_billing_address:billingAddress,p_gstin:gstEnabled?gstin:""});
     if(profileError){btn.disabled=false;status.textContent=profileError.message;return;}
     customerProfile={...customerProfile,...(profile||{})};
     const currentItems=loadCustomerCart();
