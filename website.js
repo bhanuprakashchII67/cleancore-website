@@ -234,18 +234,24 @@ function bindWebsiteEnquiry(){
 
 function injectCustomerUI(){
   const nav=document.getElementById("navMenu");
-  if(!nav)return;
+  const toggle=document.getElementById("menuToggle");
+  const headerNav=nav?.parentElement;
+  if(!headerNav)return;
 
   if(!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
     a.id="ccCustomerLink";
     a.href=customerUser?"account.html":"login.html";
     a.className="customer-nav-link";
-    a.textContent=customerUser?"My Account":"Login";
-    nav.appendChild(a);
+    a.setAttribute("aria-label",customerUser?"My account":"Login");
+    a.innerHTML=customerUser
+      ? '<span class="cc-user-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="currentColor"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="currentColor"/></svg></span><span class="cc-account-label">My Account</span>'
+      : '<span class="cc-login-label">Login</span>';
+    if(toggle) headerNav.insertBefore(a,toggle);
+    else headerNav.appendChild(a);
   }
 
-  if(!document.getElementById("ccCartLink")){
+  if(nav&&!document.getElementById("ccCartLink")){
     const cart=document.createElement("a");
     cart.id="ccCartLink";
     cart.href="checkout.html";
@@ -361,8 +367,12 @@ async function loadCustomerProfile(){
 function renderCustomerNav(){
   const a=document.getElementById("ccCustomerLink");
   if(a){
-    a.textContent=customerUser&&customerProfile?"My Account":"Login";
-    a.href=customerUser&&customerProfile?"account.html":"login.html";
+    const loggedIn=!!(customerUser&&customerProfile);
+    a.href=loggedIn?"account.html":"login.html";
+    a.setAttribute("aria-label",loggedIn?"My account":"Login");
+    a.innerHTML=loggedIn
+      ? '<span class="cc-user-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="currentColor"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="currentColor"/></svg></span><span class="cc-account-label">My Account</span>'
+      : '<span class="cc-login-label">Login</span>';
   }
   renderCartCount();
 }
