@@ -88,34 +88,53 @@ function injectCustomerUI(){
   layer.id="ccCustomerLayer";
   layer.className="cc-layer hidden";
   layer.innerHTML=`
-    <div class="cc-modal" role="dialog" aria-modal="true" aria-labelledby="ccModalTitle">
+    <div class="cc-modal cc-auth-modal" role="dialog" aria-modal="true" aria-labelledby="ccModalTitle">
       <button type="button" class="cc-close" id="ccClose" aria-label="Close">×</button>
 
+      <div id="ccAuthHead" class="cc-auth-head">
+        <div class="cc-auth-icon">CC</div>
+        <div>
+          <div class="cc-eyebrow">Customer account</div>
+          <div class="cc-auth-sub">Secure access to your CleanCore orders</div>
+        </div>
+      </div>
+
+      <div id="ccAuthTabs" class="cc-auth-tabs" role="tablist" aria-label="Customer account">
+        <button type="button" id="ccTabLogin" class="cc-auth-tab active" role="tab">Login</button>
+        <button type="button" id="ccTabSignup" class="cc-auth-tab" role="tab">Create account</button>
+      </div>
+
       <div id="ccLoginView" class="cc-view">
-        <div class="cc-eyebrow">Customer account</div>
-        <h2 id="ccModalTitle">Login</h2>
-        <p class="cc-muted">Login with your phone number and password.</p>
+        <h2 id="ccModalTitle">Welcome back</h2>
+        <p class="cc-muted">Use your phone number or email with your password.</p>
         <form id="ccLoginForm">
-          <label>Phone number<input id="ccLoginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
-          <label>Password<input id="ccLoginPassword" type="password" autocomplete="current-password" required></label>
+          <label>Phone number or email
+            <input id="ccLoginIdentifier" type="text" inputmode="email" autocomplete="username" placeholder="9876543210 or you@example.com" required>
+          </label>
+          <label>Password
+            <input id="ccLoginPassword" type="password" autocomplete="current-password" placeholder="Your password" required>
+          </label>
           <p id="ccLoginStatus" class="cc-status" aria-live="polite"></p>
-          <button class="btn btn-primary cc-wide" type="submit">Login</button>
+          <button class="btn btn-primary cc-wide cc-main-action" type="submit"><span>Login</span><span aria-hidden="true">→</span></button>
         </form>
-        <div class="cc-switch">New customer? <button type="button" id="ccShowSignup">Create account</button></div>
       </div>
 
       <div id="ccSignupView" class="cc-view hidden">
-        <div class="cc-eyebrow">New customer</div>
-        <h2>Create account</h2>
-        <p class="cc-muted">Only phone number and password are required. Email is optional.</p>
+        <h2>Create your account</h2>
+        <p class="cc-muted">Phone number is required. Email is optional.</p>
         <form id="ccSignupForm">
-          <label>Phone number<input id="ccSignupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
-          <label>Email <span class="cc-optional">(optional)</span><input id="ccSignupEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
-          <label>Password<input id="ccSignupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required></label>
+          <label>Phone number
+            <input id="ccSignupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required>
+          </label>
+          <label>Email <span class="cc-optional">(optional)</span>
+            <input id="ccSignupEmail" type="email" autocomplete="email" placeholder="you@example.com">
+          </label>
+          <label>Password
+            <input id="ccSignupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required>
+          </label>
           <p id="ccSignupStatus" class="cc-status" aria-live="polite"></p>
-          <button class="btn btn-primary cc-wide" type="submit">Create account</button>
+          <button class="btn btn-primary cc-wide cc-main-action" type="submit"><span>Create account</span><span aria-hidden="true">→</span></button>
         </form>
-        <div class="cc-switch">Already have an account? <button type="button" id="ccShowLogin">Login</button></div>
       </div>
 
       <div id="ccAccountView" class="cc-view hidden">
@@ -150,8 +169,8 @@ function injectCustomerUI(){
 
   document.getElementById("ccClose").onclick=closeCustomerPanel;
   layer.addEventListener("click",e=>{if(e.target===layer)closeCustomerPanel();});
-  document.getElementById("ccShowSignup").onclick=()=>openCustomerPanel("signup");
-  document.getElementById("ccShowLogin").onclick=()=>openCustomerPanel("login");
+  document.getElementById("ccTabLogin").onclick=()=>openCustomerPanel("login");
+  document.getElementById("ccTabSignup").onclick=()=>openCustomerPanel("signup");
   document.getElementById("ccLoginForm").addEventListener("submit",loginCustomer);
   document.getElementById("ccSignupForm").addEventListener("submit",signupCustomer);
   document.getElementById("ccAccountOrder").onclick=()=>openCustomerPanel("account",true);
@@ -190,8 +209,12 @@ function toastSite(message){
 
 function showCustomerView(name){
   const map={login:"ccLoginView",signup:"ccSignupView",account:"ccAccountView",order:"ccOrderView"};
-  Object.values(map).forEach(id=>document.getElementById(id)?.classList.add("hidden"));
-  if(map[name])document.getElementById(map[name])?.classList.remove("hidden");
+  Object.entries(map).forEach(([key,id])=>document.getElementById(id)?.classList.toggle("hidden",key!==name));
+  const auth=name==="login"||name==="signup";
+  document.getElementById("ccAuthHead")?.classList.toggle("hidden",!auth);
+  document.getElementById("ccAuthTabs")?.classList.toggle("hidden",!auth);
+  document.getElementById("ccTabLogin")?.classList.toggle("active",name==="login");
+  document.getElementById("ccTabSignup")?.classList.toggle("active",name==="signup");
 }
 
 function openCustomerPanel(view="login",startOrder=false){
