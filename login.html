@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.13">
+<link rel="stylesheet" href="style.css?v=1.14">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -42,22 +42,53 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=2.7"></script>
-<script>
+<script>const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const phoneRE=/^[6-9]\d{9}$/;
+const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
+const nextPage=()=>{const n=new URLSearchParams(location.search).get("next");return n==="checkout.html"||n==="account.html"||n==="index.html"?"./"+n:"./index.html";};
+async function customerAuth(body){
+  const res=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify(body)});
+  const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch(_){}
+  return res.ok?{data,error:null}:{data:null,error:{message:data?.error||data?.message||"Unable to complete authentication."}};
+}
+function show(view){
+  document.getElementById("loginOnlyView").classList.toggle("hidden",view!=="login");
+  document.getElementById("signupOnlyView").classList.toggle("hidden",view!=="signup");
+}
 document.addEventListener("DOMContentLoaded",()=>{
-  if(location.hash==="#signup"){
-    document.getElementById("loginOnlyView")?.classList.add("hidden");
-    document.getElementById("signupOnlyView")?.classList.remove("hidden");
-  }
-  document.getElementById("showSignup")?.addEventListener("click",()=>{
-    document.getElementById("loginOnlyView")?.classList.add("hidden");
-    document.getElementById("signupOnlyView")?.classList.remove("hidden");
+  show(location.hash==="#signup"?"signup":"login");
+  document.getElementById("showSignup").onclick=()=>show("signup");
+  document.getElementById("showLogin").onclick=()=>show("login");
+  document.getElementById("ccLoginForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const status=document.getElementById("ccLoginStatus"),btn=e.currentTarget.querySelector("button[type=submit]");
+    const phone=normalize(document.getElementById("ccLoginIdentifier").value),password=document.getElementById("ccLoginPassword").value;
+    if(!phoneRE.test(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
+    if(!password){status.textContent="Enter your password.";return;}
+    btn.disabled=true;status.textContent="Logging in…";
+    const {data,error}=await customerAuth({action:"login",identifier:phone,password});
+    if(error){status.textContent=error.message;btn.disabled=false;return;}
+    if(!data?.session){status.textContent="Login failed. Please try again.";btn.disabled=false;return;}
+    const saved=await db.auth.setSession(data.session);
+    if(saved.error){status.textContent=saved.error.message;btn.disabled=false;return;}
+    window.location.href=nextPage();
   });
-  document.getElementById("showLogin")?.addEventListener("click",()=>{
-    document.getElementById("signupOnlyView")?.classList.add("hidden");
-    document.getElementById("loginOnlyView")?.classList.remove("hidden");
+  document.getElementById("ccSignupForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const status=document.getElementById("ccSignupStatus"),btn=e.currentTarget.querySelector("button[type=submit]");
+    const phone=normalize(document.getElementById("ccSignupPhone").value),password=document.getElementById("ccSignupPassword").value;
+    if(!phoneRE.test(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
+    if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
+    btn.disabled=true;status.textContent="Creating your account…";
+    const {data,error}=await customerAuth({action:"signup",phone,email:"",password});
+    if(error){status.textContent=error.message;btn.disabled=false;return;}
+    if(!data?.session){status.textContent="Account created. Please login.";btn.disabled=false;show("login");return;}
+    const saved=await db.auth.setSession(data.session);
+    if(saved.error){status.textContent=saved.error.message;btn.disabled=false;return;}
+    window.location.href=nextPage();
   });
-});
-</script>
+});</script>
 </body>
 </html>
