@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Checkout | CleanCore Chemical & Cleaning</title>
 <meta name="description" content="CleanCore customer checkout.">
-<link rel="stylesheet" href="style.css?v=1.8">
+<link rel="stylesheet" href="style.css?v=1.9">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -59,7 +59,7 @@
 
 <aside class="checkout-card checkout-summary">
 <div class="checkout-card-head"><span>2</span><div><h2>Order summary</h2><p>Review your cart before placing the order.</p></div></div>
-<div id="checkoutItems"></div>
+<div id="checkoutItems" class="checkout-items"></div>
 <div class="checkout-total"><span>Total</span><strong id="checkoutTotal">₹0.00</strong></div>
 <button type="submit" form="checkoutForm" id="checkoutPlaceBtn" class="btn btn-primary cc-wide">Place order</button>
 <a href="products.html" class="checkout-back">← Continue shopping</a>
@@ -70,7 +70,7 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=2.3"></script>
+<script src="website.js?v=2.4"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>window.initCleanCoreCheckout?.());
 </script>
