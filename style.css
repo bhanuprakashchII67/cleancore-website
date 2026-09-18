@@ -141,3 +141,12 @@ button,a{touch-action:manipulation}
   .cc-account-actions .btn{flex:1 1 100%}
   .cc-order-row{align-items:flex-start}
 }
+
+/* Customer auth modal cleanup */
+.cc-layer.hidden,.cc-view.hidden{display:none!important}
+.cc-modal{width:min(480px,100%);padding:28px}
+.cc-modal form label{display:grid;gap:7px;margin:14px 0;font-weight:700;font-size:14px}
+.cc-modal input,.cc-modal textarea{width:100%;min-height:46px;border:1px solid #d7e1eb;border-radius:10px;padding:11px 12px;font:inherit;background:#fff}
+.cc-optional{font-weight:600;color:#7a8795;font-size:12px}
+.cc-switch{margin-top:18px;text-align:center}
+@media(max-width:800px){.cc-modal{max-width:none;padding:22px 18px}}
