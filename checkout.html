@@ -53,6 +53,14 @@
     <label>Landmark <small>(optional)</small><input id="checkoutLandmark" type="text" placeholder="Nearby landmark"></label>
   </div>
 </div>
+<div class="gst-checkout-box">
+  <label class="gst-toggle"><input id="checkoutGstEnabled" type="checkbox"> <span><strong>Need GST invoice</strong><small>GST will be calculated separately on the order.</small></span></label>
+  <div id="checkoutGstFields" class="gst-fields hidden">
+    <label>GSTIN <small>(optional for unregistered customers)</small><input id="checkoutGstin" type="text" maxlength="15" autocomplete="off" placeholder="15-character GSTIN"></label>
+    <label>GST rate<select id="checkoutGstRate"><option value="28" selected>28%</option><option value="18">18%</option><option value="12">12%</option><option value="5">5%</option></select></label>
+    <p class="gst-note">Select the applicable rate for the product/HSN. Common cleaning preparations under HSN 3402 may attract 28%; verify the applicable HSN/rate for your product.</p>
+  </div>
+</div>
 <p id="checkoutStatus" class="cc-status" aria-live="polite"></p>
 </form>
 </section>
@@ -70,7 +78,7 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.6"></script>
+<script src="website.js?v=3.7"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>window.initCleanCoreCheckout?.());
 </script>
