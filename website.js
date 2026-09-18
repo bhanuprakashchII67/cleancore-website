@@ -11,6 +11,25 @@ let customerProfile=null;
 let pendingOrderProduct=null;
 
 function siteMoney(n){return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));}
+
+async function invokeCustomerAuth(body){
+  try{
+    const result=await siteDb.functions.invoke("customer-auth",{body});
+    if(!result.error)return result;
+    let message=result.error.message||"Unable to complete the request.";
+    try{
+      const ctx=result.error.context;
+      if(ctx){
+        const clone=ctx.clone?ctx.clone():ctx;
+        const payload=await clone.json();
+        if(payload?.error)message=payload.error;
+      }
+    }catch(_){}
+    return {data:null,error:{message}};
+  }catch(e){
+    return {data:null,error:{message:e?.message||"Unable to complete the request."}};
+  }
+}
 function normalizeSitePhone(v){return String(v||"").replace(/\D/g,"").replace(/^91/,"");}
 
 async function loadPublicProducts(){
@@ -233,9 +252,7 @@ async function loginCustomer(e){
   const password=document.getElementById("ccLoginPassword").value;
   if(!identifier||!password){status.textContent="Enter your phone number/email and password.";return;}
 
-  const {data,error}=await siteDb.functions.invoke("customer-auth",{
-    body:{action:"login",identifier,password}
-  });
+  const {data,error}=await invokeCustomerAuth({action:"login",identifier,password});
   if(error){status.textContent=error.message||"Unable to login right now.";return;}
   if(data?.error){status.textContent=data.error;return;}
   if(!data?.session){status.textContent="Login failed. Please try again.";return;}
@@ -259,9 +276,7 @@ async function signupCustomer(e){
   const password=document.getElementById("ccSignupPassword").value;
   if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
 
-  const {data,error}=await siteDb.functions.invoke("customer-auth",{
-    body:{action:"signup",phone,email,password}
-  });
+  const {data,error}=await invokeCustomerAuth({action:"signup",phone,email,password});
   if(error){status.textContent=error.message||"Unable to create account right now.";return;}
   if(data?.error){status.textContent=data.error;return;}
   if(!data?.session){status.textContent="Account created, but login could not be started. Please login.";return;}
