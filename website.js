@@ -224,10 +224,10 @@ function injectCustomerUI(){
 
       <div id="ccLoginView" class="cc-view">
         <h2 id="ccModalTitle">Welcome back</h2>
-        <p class="cc-muted">Use your phone number or email with your password.</p>
+        <p class="cc-muted">Enter your mobile number and password.</p>
         <form id="ccLoginForm">
-          <label>Phone number or email
-            <input id="ccLoginIdentifier" type="text" inputmode="email" autocomplete="username" placeholder="9876543210 or you@example.com" required>
+          <label>Mobile number
+            <input id="ccLoginIdentifier" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required>
           </label>
           <label>Password
             <input id="ccLoginPassword" type="password" autocomplete="current-password" placeholder="Your password" required>
@@ -239,13 +239,10 @@ function injectCustomerUI(){
 
       <div id="ccSignupView" class="cc-view hidden">
         <h2>Create your account</h2>
-        <p class="cc-muted">Phone number is required. Email is optional.</p>
+        <p class="cc-muted">Just your mobile number and a password. That's it.</p>
         <form id="ccSignupForm">
-          <label>Phone number
+          <label>Mobile number
             <input id="ccSignupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required>
-          </label>
-          <label>Email <span class="cc-optional">(optional)</span>
-            <input id="ccSignupEmail" type="email" autocomplete="email" placeholder="you@example.com">
           </label>
           <label>Password
             <input id="ccSignupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required>
@@ -352,9 +349,10 @@ async function loginCustomer(e){
   e.preventDefault();
   const status=document.getElementById("ccLoginStatus");
   status.textContent="";
-  const identifier=document.getElementById("ccLoginIdentifier").value.trim();
+  const identifier=normalizeSitePhone(document.getElementById("ccLoginIdentifier").value);
   const password=document.getElementById("ccLoginPassword").value;
-  if(!identifier||!password){status.textContent="Enter your phone number/email and password.";return;}
+  if(!phoneRE.test(identifier)){status.textContent="Enter your 10-digit mobile number.";return;}
+  if(!password){status.textContent="Enter your password.";return;}
 
   const {data,error}=await invokeCustomerAuth({action:"login",identifier,password});
   if(error){status.textContent=error.message||"Unable to login right now.";return;}
@@ -375,7 +373,7 @@ async function signupCustomer(e){
   status.textContent="";
   const phone=normalizeSitePhone(document.getElementById("ccSignupPhone").value);
   if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return;}
-  const email=document.getElementById("ccSignupEmail").value.trim();
+  const email="";
   const password=document.getElementById("ccSignupPassword").value;
   if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
 
