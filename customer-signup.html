@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Customer Signup | CleanCore</title>
+<link rel="stylesheet" href="style.css?v=1.16">
+</head>
+<body class="checkout-page">
+<header><div class="container"><nav>
+<a class="brand" href="index.html"><div class="mark">C</div><div>CleanCore <span>Chemical & Cleaning</span></div></a>
+<div class="navlinks" style="display:flex"><a href="products.html">Products</a><a href="index.html">Home</a></div>
+<a class="navcta" href="checkout.html">Cart</a>
+</nav></div></header>
+<main class="checkout-main">
+<div class="container"><div class="auth-page-wrap">
+<section class="checkout-card auth-page-card">
+<div class="eyebrow">Customer account</div>
+<h1>Create your account</h1>
+<p class="cc-muted">Just your mobile number and a password.</p>
+<form id="signupForm" novalidate>
+<label>Mobile number<input id="signupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
+<label>Password<input id="signupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required></label>
+<p id="signupStatus" class="cc-status" aria-live="polite"></p>
+<button id="signupButton" class="btn btn-primary cc-wide" type="submit">Create account <span aria-hidden="true">→</span></button>
+</form>
+<p class="auth-switch">Already have an account? <a href="login.html">Login</a></p>
+</section>
+</div></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
+const validPhone=v=>/^[6-9]\d{9}$/.test(v);
+const getNext=()=>{
+  const n=new URLSearchParams(location.search).get("next");
+  return n==="checkout.html"||n==="account.html"||n==="index.html" ? "./"+n : "./index.html";
+};
+document.getElementById("signupForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const status=document.getElementById("signupStatus"),btn=document.getElementById("signupButton");
+  const phone=normalize(document.getElementById("signupPhone").value);
+  const password=document.getElementById("signupPassword").value;
+  if(!validPhone(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
+  if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
+  btn.disabled=true;status.textContent="Creating your account…";
+  try{
+    const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
+      body:JSON.stringify({action:"signup",phone,email:"",password})
+    });
+    const raw=await response.text();let data=null;
+    try{data=raw?JSON.parse(raw):null}catch(_){}
+    if(!response.ok){status.textContent=data?.error||"Unable to create account.";btn.disabled=false;return;}
+    if(!data?.session){status.textContent="Account created. Please login.";btn.disabled=false;return;}
+    const saved=await db.auth.setSession(data.session);
+    if(saved.error){status.textContent=saved.error.message;btn.disabled=false;return;}
+    window.location.replace(getNext());
+  }catch(err){
+    status.textContent=err?.message||"Unable to create account.";
+    btn.disabled=false;
+  }
+});
+</script>
+</body>
+</html>
