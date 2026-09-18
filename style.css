@@ -427,3 +427,7 @@ button,a{touch-action:manipulation}
 .checkout-notice#checkoutSuccess .cc-success{width:100%!important;box-sizing:border-box!important;margin:0!important;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;color:#17633e!important}
 .checkout-notice#checkoutSuccess .cc-success h2{color:#123b2a!important}
 @media(max-width:600px){.checkout-notice#checkoutSuccess{margin:16px 0 0!important;padding:22px 16px!important;border-radius:14px!important}}
+
+
+/* Checkout state visibility */
+.checkout-grid.hidden,.checkout-title.hidden{display:none!important}
