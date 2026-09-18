@@ -397,3 +397,9 @@ button,a{touch-action:manipulation}
  .cc-enquiry-card h2{font-size:24px}
  .cc-enquiry-contact-row{gap:6px}
 }
+
+.site-refresh-action{cursor:pointer}
+.site-refresh-action:disabled{opacity:.6;cursor:wait}
+.site-refresh-action.is-refreshing span:first-child{display:inline-block;animation:ccSpin .7s linear infinite}
+@keyframes ccSpin{to{transform:rotate(360deg)}}
+@media(max-width:800px){.site-refresh-action{display:inline-flex!important}}
