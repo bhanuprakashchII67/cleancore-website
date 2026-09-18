@@ -369,3 +369,31 @@ button,a{touch-action:manipulation}
 .auth-switch a,.auth-switch button{color:#0066ff!important;text-decoration:none;font-weight:800;cursor:pointer}.auth-switch a:hover,.auth-switch button:hover{text-decoration:underline}
 
 .auth-link-blue{display:inline-block!important;color:#0066ff!important;font-weight:800!important;text-decoration:none!important;cursor:pointer!important;pointer-events:auto!important}.auth-link-blue:hover,.auth-link-blue:focus{text-decoration:underline!important;color:#0052cc!important}
+
+/* Floating enquiry assistant */
+.cc-enquiry-tab{position:fixed;right:0;top:46%;z-index:1200;display:flex;align-items:center;gap:7px;padding:12px 10px 12px 12px;border:0;border-radius:12px 0 0 12px;background:var(--teal2,#159f98);color:#fff;font:800 12px/1 'Poppins',Arial,sans-serif;box-shadow:0 8px 24px rgba(10,32,48,.22);cursor:pointer;writing-mode:vertical-rl;text-orientation:mixed}
+.cc-enquiry-tab-icon{display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#fff;color:var(--teal2,#159f98);font-size:14px}
+.cc-enquiry-overlay{position:fixed;inset:0;z-index:1300;display:grid;place-items:center;padding:20px;background:rgba(5,20,32,.48);backdrop-filter:blur(3px)}
+.cc-enquiry-overlay.hidden{display:none!important}
+.cc-enquiry-card{position:relative;width:min(440px,100%);max-height:min(90vh,760px);overflow:auto;padding:28px;border-radius:22px;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.24)}
+.cc-enquiry-close{position:absolute;right:16px;top:12px;width:36px;height:36px;border:0;background:transparent;color:#506273;font-size:28px;line-height:1;cursor:pointer}
+.cc-enquiry-card h2{margin:5px 0 7px;color:var(--navy,#0b2033);font-size:28px}
+.cc-enquiry-sub{margin:0 0 18px;color:#64778a;font-size:14px}
+.cc-enquiry-contact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}
+.cc-enquiry-contact-row a{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 5px;border:1px solid #d9e5e8;border-radius:10px;color:var(--navy,#0b2033);font-size:11px;font-weight:800;text-decoration:none}
+.cc-enquiry-contact-row a:hover{border-color:#159f98;color:#159f98}
+.cc-contact-icon{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;font-size:13px}
+.cc-wa-icon{color:#159f98}
+.cc-enquiry-form{display:grid;gap:12px}
+.cc-enquiry-form label{display:grid;gap:6px;color:#21374b;font-size:12px;font-weight:800}
+.cc-enquiry-form input,.cc-enquiry-form textarea{width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid #d5e1e5;border-radius:11px;background:#fff;color:#102337;font:500 14px 'Poppins',Arial,sans-serif;outline:none}
+.cc-enquiry-form input:focus,.cc-enquiry-form textarea:focus{border-color:#159f98;box-shadow:0 0 0 3px rgba(21,159,152,.1)}
+.cc-enquiry-form textarea{resize:vertical;min-height:90px}
+.cc-enquiry-status{min-height:18px;margin:0;color:#159f98;font-size:12px;font-weight:700}
+@media(max-width:600px){
+ .cc-enquiry-tab{top:auto;bottom:28%;padding:10px 8px 10px 9px;border-radius:10px 0 0 10px}
+ .cc-enquiry-overlay{padding:12px;align-items:end}
+ .cc-enquiry-card{width:100%;max-height:88vh;padding:22px 18px;border-radius:20px 20px 12px 12px}
+ .cc-enquiry-card h2{font-size:24px}
+ .cc-enquiry-contact-row{gap:6px}
+}
