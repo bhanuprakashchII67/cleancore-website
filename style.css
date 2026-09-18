@@ -300,3 +300,21 @@ button,a{touch-action:manipulation}
  .checkout-item-controls>strong{justify-self:end}
  .checkout-remove{grid-column:1/-1;justify-self:start}
 }
+
+.home-account-actions{margin-top:22px;padding:16px 18px;border:1px solid #dce8ea;border-radius:16px;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.home-account-copy{display:grid;gap:3px}
+.home-account-copy strong{color:var(--navy);font-size:14px}
+.home-account-copy span{color:var(--muted);font-size:12px}
+.home-account-buttons{display:flex;gap:8px;flex:0 0 auto}
+.home-account-buttons .btn{min-width:110px}
+@media(max-width:800px){
+  .home-account-actions{display:block;padding:14px;margin-top:18px}
+  .home-account-copy strong{font-size:14px}
+  .home-account-copy span{display:block;margin-top:3px;font-size:12px}
+  .home-account-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .home-account-buttons .btn{width:100%;min-width:0}
+}
+@media(max-width:420px){
+  .home-account-buttons{grid-template-columns:1fr}
+  .home-account-buttons .btn{min-height:46px}
+}
