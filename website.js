@@ -225,14 +225,21 @@ async function loginCustomer(e){
   e.preventDefault();
   const status=document.getElementById("ccLoginStatus");
   status.textContent="";
-  const phone=normalizeSitePhone(document.getElementById("ccLoginPhone").value);
+  const identifier=document.getElementById("ccLoginIdentifier").value.trim();
   const password=document.getElementById("ccLoginPassword").value;
-  if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return;}
-  const {data,error}=await siteDb.auth.signInWithPassword({phone:"+91"+phone,password});
-  if(error){status.textContent=error.message;return;}
-  customerUser=data.user;
-  await loadCustomerProfile();
-  if(!customerProfile){status.textContent="Customer profile could not be loaded. Please try again.";return;}
+  if(!identifier||!password){status.textContent="Enter your phone number/email and password.";return;}
+
+  const {data,error}=await siteDb.functions.invoke("customer-auth",{
+    body:{action:"login",identifier,password}
+  });
+  if(error){status.textContent=error.message||"Unable to login right now.";return;}
+  if(data?.error){status.textContent=data.error;return;}
+  if(!data?.session){status.textContent="Login failed. Please try again.";return;}
+
+  const {error:setError}=await siteDb.auth.setSession(data.session);
+  if(setError){status.textContent=setError.message;return;}
+  customerUser=data.user||data.session.user;
+  customerProfile=data.customer||null;
   document.getElementById("ccLoginForm").reset();
   renderCustomerNav();renderAccount();switchToOrderAfterLogin();
   if(!pendingOrderProduct)showCustomerView("account");
@@ -248,25 +255,20 @@ async function signupCustomer(e){
   const password=document.getElementById("ccSignupPassword").value;
   if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
 
-  const {data,error}=await siteDb.auth.signUp({
-    phone:"+91"+phone,
-    password,
-    options:{data:{customer_email:email}}
+  const {data,error}=await siteDb.functions.invoke("customer-auth",{
+    body:{action:"signup",phone,email,password}
   });
-  if(error){status.textContent=error.message;return;}
+  if(error){status.textContent=error.message||"Unable to create account right now.";return;}
+  if(data?.error){status.textContent=data.error;return;}
+  if(!data?.session){status.textContent="Account created, but login could not be started. Please login.";return;}
 
-  if(data?.session&&data?.user){
-    customerUser=data.user;
-    await loadCustomerProfile();
-    if(customerProfile){
-      document.getElementById("ccSignupForm").reset();
-      renderCustomerNav();renderAccount();switchToOrderAfterLogin();
-      if(!pendingOrderProduct)showCustomerView("account");
-      return;
-    }
-  }
-
-  status.textContent="Account created. Check the verification code sent to your phone, then login.";
+  const {error:setError}=await siteDb.auth.setSession(data.session);
+  if(setError){status.textContent=setError.message;return;}
+  customerUser=data.user||data.session.user;
+  customerProfile=data.customer||null;
+  document.getElementById("ccSignupForm").reset();
+  renderCustomerNav();renderAccount();switchToOrderAfterLogin();
+  if(!pendingOrderProduct)showCustomerView("account");
 }
 
 async function loadCustomerProfile(){
@@ -284,8 +286,8 @@ function renderCustomerNav(){
 }
 
 function renderAccount(){
-  document.getElementById("ccAccountName").textContent=customerProfile?.name||("Customer "+normalizeSitePhone(customerUser?.phone||""));
-  const bits=[customerProfile?.phone,customerProfile?.email].filter(Boolean);
+  document.getElementById("ccAccountName").textContent=customerProfile?.phone||"Customer account";
+  const bits=[customerProfile?.email||"Email not added",customerProfile?.phone].filter(Boolean);
   document.getElementById("ccAccountMeta").textContent=bits.join(" • ");
   document.getElementById("ccOrdersPanel").innerHTML="";
 }
@@ -307,7 +309,7 @@ function openOrder(product){
   pendingOrderProduct=product;
   if(!customerUser||!customerProfile){
     openCustomerPanel("login");
-    document.getElementById("ccLoginStatus").textContent="Login or create a customer account to place this order.";
+    document.getElementById("ccLoginStatus").textContent="Login with your phone number or email to place this order.";
     return;
   }
   openCustomerPanel("account");
