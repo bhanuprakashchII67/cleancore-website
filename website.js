@@ -30,7 +30,6 @@ async function loadPublicProducts(){
       return '<article class="product">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3>'+escSite(p.name)+'</h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p><div class="price">'+siteMoney(p.selling_price)+' <small>/ '+escSite(p.unit)+'</small></div><button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Order Now</button></div></article>';
     }).join("");
   });
-  bindStaticOrderButtons();
 }
 
 function populateEnquiryProducts(){
@@ -178,24 +177,6 @@ function injectCustomerUI(){
   document.getElementById("ccAccountLogout").onclick=logoutCustomer;
   document.getElementById("ccOrderBack").onclick=()=>openCustomerPanel("account");
   document.getElementById("ccOrderForm").addEventListener("submit",placeCustomerOrder);
-}
-
-function bindStaticOrderButtons(){
-  document.querySelectorAll(".order-now").forEach(btn=>{
-    if(btn.dataset.bound)return;
-    btn.dataset.bound="1";
-    btn.addEventListener("click",()=>{
-      const id=btn.dataset.productId;
-      if(id){
-        const p=publicProducts.find(x=>x.id===id);
-        if(p)openOrder(p);
-      }else if(btn.dataset.productName){
-        const p=publicProducts.find(x=>x.name===btn.dataset.productName);
-        if(p)openOrder(p);
-        else toastSite("Product information is loading. Please try again.");
-      }
-    });
-  });
 }
 
 function toastSite(message){
@@ -413,5 +394,4 @@ document.addEventListener("DOMContentLoaded",()=>{
   populateEnquiryProducts();
   bindWebsiteEnquiry();
   bindCustomerAuth();
-  bindStaticOrderButtons();
 });
