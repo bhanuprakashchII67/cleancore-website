@@ -458,12 +458,8 @@ async function loadCustomerOrders(showPanel=true){
 function openOrder(product){
   if(!product)return;
   addToCart(product,1);
-  if(!customerUser||!customerProfile){
-    openCustomerPanel("login");
-    document.getElementById("ccLoginStatus").textContent="Item added to cart. Login to continue, or close this window and keep shopping.";
-    return;
-  }
-  openCart();
+  toastSite(product.name+" added to cart");
+  // Add to Cart never opens authentication. Login is requested only at checkout.
 }
 
 function showOrderForm(product){
