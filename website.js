@@ -487,12 +487,38 @@ async function placeCustomerOrder(e){
   showCustomerView("account");
 }
 
+function checkoutGstValues(){
+  const enabled=!!document.getElementById("checkoutGstEnabled")?.checked;
+  const rate=enabled?Number(document.getElementById("checkoutGstRate")?.value||0):0;
+  const subtotal=cartSubtotal();
+  const gst=rate>0?Number((subtotal*rate/100).toFixed(2)):0;
+  const state=String(document.getElementById("checkoutState")?.value||"").trim().toLowerCase();
+  const intra=state.replace(/[^a-z]/g,"")==="telangana";
+  const cgst=intra?Number((gst/2).toFixed(2)):0;
+  const sgst=intra?Number((gst-cgst).toFixed(2)):0;
+  const igst=intra?0:gst;
+  return {enabled,rate,subtotal,gst,cgst,sgst,igst,total:Number((subtotal+gst).toFixed(2)),state};
+}
+function renderCheckoutTax(){
+  const box=document.getElementById("checkoutTaxBreakdown");
+  const total=document.getElementById("checkoutTotal");
+  if(!box||!total)return;
+  const x=checkoutGstValues();
+  if(!x.enabled||x.gst<=0){box.innerHTML="";total.textContent=siteMoney(x.subtotal);return;}
+  const rows=x.intra
+    ? "<div><span>CGST ("+x.rate/2+"%)</span><b>"+siteMoney(x.cgst)+"</b></div><div><span>SGST ("+x.rate/2+"%)</span><b>"+siteMoney(x.sgst)+"</b></div>"
+    : "<div><span>IGST ("+x.rate+"%)</span><b>"+siteMoney(x.igst)+"</b></div>";
+  box.innerHTML="<div><span>Taxable value</span><b>"+siteMoney(x.subtotal)+"</b></div>"+rows;
+  total.textContent=siteMoney(x.total);
+}
 window.initCleanCoreCheckout=async function(){
   if(!location.pathname.toLowerCase().includes("checkout.html"))return;
   const empty=document.getElementById("checkoutEmpty");
   const auth=document.getElementById("checkoutAuthRequired");
   const content=document.getElementById("checkoutContent");
+  const success=document.getElementById("checkoutSuccess");
   if(!empty||!auth||!content)return;
+  if(success&&!success.classList.contains("hidden"))return;
   customerCart=loadCustomerCart();
   const items=customerCart;
   if(!items.length){
@@ -500,9 +526,7 @@ window.initCleanCoreCheckout=async function(){
   }
   if(!customerUser){
     auth.classList.remove("hidden");empty.classList.add("hidden");content.classList.add("hidden");
-    document.getElementById("checkoutLoginBtn").onclick=()=>{
-      window.location.href="login.html?next=checkout.html";
-    };
+    document.getElementById("checkoutLoginBtn").onclick=()=>{window.location.href="customer-login.html?next=checkout.html";};
     return;
   }
   auth.classList.add("hidden");empty.classList.add("hidden");content.classList.remove("hidden");
@@ -512,58 +536,66 @@ window.initCleanCoreCheckout=async function(){
   set("checkoutAlternate",customerProfile?.alternate_phone);
   const addr=String(customerProfile?.delivery_address||"");
   const parts=addr.split(" | ");
-  set("checkoutHouse",parts[0]||"");
-  set("checkoutStreet",parts[1]||"");
-  set("checkoutCity",parts[2]||"");
-  set("checkoutState",parts[3]||"");
-  set("checkoutPincode",parts[4]||"");
-  set("checkoutLandmark",parts[5]||"");
+  set("checkoutHouse",parts[0]||"");set("checkoutStreet",parts[1]||"");set("checkoutCity",parts[2]||"");
+  set("checkoutState",parts[3]||"");set("checkoutPincode",parts[4]||"");set("checkoutLandmark",parts[5]||"");
+  set("checkoutGstin",customerProfile?.gstin||"");
+  const gstToggle=document.getElementById("checkoutGstEnabled");
+  const gstFields=document.getElementById("checkoutGstFields");
+  if(gstToggle&&!gstToggle.dataset.bound){
+    gstToggle.dataset.bound="1";
+    gstToggle.addEventListener("change",()=>{gstFields?.classList.toggle("hidden",!gstToggle.checked);renderCheckoutTax();});
+    document.getElementById("checkoutGstRate")?.addEventListener("change",renderCheckoutTax);
+    document.getElementById("checkoutGstin")?.addEventListener("input",e=>e.target.value=e.target.value.toUpperCase().replace(/\s/g,"").slice(0,15));
+    document.getElementById("checkoutState")?.addEventListener("input",renderCheckoutTax);
+  }
+  gstFields?.classList.toggle("hidden",!gstToggle?.checked);
   customerCart=items;
   const sync=await refreshCheckoutCartPrices();
-  if(!customerCart.length){
-    empty.classList.remove("hidden");auth.classList.add("hidden");content.classList.add("hidden");
-    return;
-  }
-  renderCheckoutItems();
-  if(sync.removed){ 
-    const status=document.getElementById("checkoutStatus");
-    if(status)status.textContent="One or more unavailable items were removed from your cart.";
-  }
+  if(!customerCart.length){empty.classList.remove("hidden");auth.classList.add("hidden");content.classList.add("hidden");return;}
+  renderCheckoutItems();renderCheckoutTax();
+  if(sync.removed){const status=document.getElementById("checkoutStatus");if(status)status.textContent="One or more unavailable items were removed from your cart.";}
   const form=document.getElementById("checkoutForm");
   if(form.dataset.bound==="1")return;
   form.dataset.bound="1";
   form.addEventListener("submit",async e=>{
     e.preventDefault();
     const status=document.getElementById("checkoutStatus"),btn=document.getElementById("checkoutPlaceBtn");
-    const name=document.getElementById("checkoutName").value.trim();
-    const email=document.getElementById("checkoutEmail").value.trim();
+    const name=document.getElementById("checkoutName").value.trim(),email=document.getElementById("checkoutEmail").value.trim();
     const alternate=normalizeSitePhone(document.getElementById("checkoutAlternate").value.trim());
-    const house=document.getElementById("checkoutHouse").value.trim();
-    const street=document.getElementById("checkoutStreet").value.trim();
-    const city=document.getElementById("checkoutCity").value.trim();
-    const state=document.getElementById("checkoutState").value.trim();
-    const pincode=document.getElementById("checkoutPincode").value.trim();
-    const landmark=document.getElementById("checkoutLandmark").value.trim();
+    const house=document.getElementById("checkoutHouse").value.trim(),street=document.getElementById("checkoutStreet").value.trim();
+    const city=document.getElementById("checkoutCity").value.trim(),state=document.getElementById("checkoutState").value.trim();
+    const pincode=document.getElementById("checkoutPincode").value.trim(),landmark=document.getElementById("checkoutLandmark").value.trim();
+    const gstEnabled=!!document.getElementById("checkoutGstEnabled")?.checked;
+    const gstRate=gstEnabled?Number(document.getElementById("checkoutGstRate")?.value||0):0;
+    const gstin=document.getElementById("checkoutGstin")?.value.trim().toUpperCase()||"";
     const address=[house,street,city,state,pincode,landmark].join(" | ");
     if(!name){status.textContent="Enter your full name.";return;}
-    if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
+    if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return;}
     if(alternate&&!phoneRE.test(alternate)){status.textContent="Enter a valid 10-digit alternate number.";return;}
     if(!house||!street||!city||!state||!/^[0-9]{6}$/.test(pincode)){status.textContent="Complete your delivery address and enter a valid 6-digit pincode.";return;}
+    if(gstEnabled&&!(gstRate>0&&gstRate<=100)){status.textContent="Select a valid GST rate.";return;}
+    if(gstEnabled&&gstin&&!/^[0-9A-Z]{15}$/.test(gstin)){status.textContent="Enter a valid 15-character GSTIN or leave it blank.";return;}
     btn.disabled=true;status.textContent="Saving details and placing order…";
     const {data:profile,error:profileError}=await siteDb.rpc("update_website_customer_profile",{p_name:name,p_email:email,p_alternate_phone:alternate,p_delivery_address:address});
     if(profileError){btn.disabled=false;status.textContent=profileError.message;return;}
     customerProfile={...customerProfile,...(profile||{})};
     const currentItems=loadCustomerCart();
     if(!currentItems.length){btn.disabled=false;status.textContent="Your cart is empty.";return;}
-    const {data:order,error}=await siteDb.rpc("place_website_cart_order",{p_items:currentItems.map(x=>({product_id:x.product_id,quantity:Number(x.quantity)})),p_notes:address});
+    const {data:order,error}=await siteDb.rpc("place_website_cart_order",{
+      p_items:currentItems.map(x=>({product_id:x.product_id,quantity:Number(x.quantity)})),
+      p_notes:address,p_gst_enabled:gstEnabled,p_gst_rate:gstRate,p_gstin:gstin
+    });
     if(error){btn.disabled=false;status.textContent=error.message;return;}
     customerCart=[];saveCustomerCart();
-    document.getElementById("checkoutContent").classList.add("hidden");
-    const success=document.getElementById("checkoutSuccess");
+    empty.classList.add("hidden");auth.classList.add("hidden");content.classList.add("hidden");
+    const placedAt=order?.placed_at?new Date(order.placed_at):new Date();
+    const successTitle=order?.invoice_no?"Congratulations! Your order was placed successfully.":"Congratulations! Your order was placed successfully.";
     success.classList.remove("hidden");
-    success.innerHTML='<div class="cc-success"><h2>Order placed successfully</h2><p>Order number: <strong>'+escSite(order?.order_no)+'</strong></p><p>Total: <strong>'+siteMoney(order?.total)+'</strong></p><a class="btn btn-primary" href="index.html">Continue shopping</a></div>';
+    success.innerHTML='<div class="cc-success"><h2>'+successTitle+'</h2><p>Thank you for ordering from CleanCore Chemical & Cleaning.</p><div class="order-success-grid"><div><span>Order number</span><strong>'+escSite(order?.order_no)+'</strong></div><div><span>Invoice number</span><strong>'+escSite(order?.invoice_no||"Generating")+'</strong></div><div><span>Order date & time</span><strong>'+escSite(placedAt.toLocaleString("en-IN"))+'</strong></div><div><span>Total</span><strong>'+siteMoney(order?.total)+'</strong></div></div><a class="btn btn-primary" href="index.html">Continue shopping</a></div>';
+    btn.disabled=false;
   });
 };
+
 
 function logoutCustomer(){
   siteDb.auth.signOut({scope:"local"}).finally(()=>{
