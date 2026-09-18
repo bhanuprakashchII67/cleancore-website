@@ -215,10 +215,9 @@ function injectCustomerUI(){
     nav.appendChild(a);
     const cart=document.createElement("a");
     cart.id="ccCartLink";
-    cart.href="#";
+    cart.href="checkout.html";
     cart.className="customer-nav-link cc-cart-link";
     cart.textContent=cartCount()>0?"Cart ("+cartCount()+")":"Cart";
-    cart.addEventListener("click",e=>{e.preventDefault();window.location.href="checkout.html";});
     nav.appendChild(cart);
   }
 
