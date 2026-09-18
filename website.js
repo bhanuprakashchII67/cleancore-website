@@ -218,7 +218,7 @@ function injectCustomerUI(){
     cart.href="#";
     cart.className="customer-nav-link cc-cart-link";
     cart.textContent=cartCount()>0?"Cart ("+cartCount()+")":"Cart";
-    cart.addEventListener("click",e=>{e.preventDefault();openCart();});
+    cart.addEventListener("click",e=>{e.preventDefault();window.location.href="checkout.html";});
     nav.appendChild(cart);
   }
 
