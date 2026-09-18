@@ -247,8 +247,10 @@ function injectCustomerUI(){
     a.innerHTML=customerUser
       ? '<span class="cc-user-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="currentColor"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="currentColor"/></svg></span><span class="cc-account-label">My Account</span>'
       : '<span class="cc-login-label">Login</span>';
-    if(toggle) headerNav.insertBefore(a,toggle);
-    else headerNav.appendChild(a);
+    if(toggle) {
+      if(toggle.nextSibling) headerNav.insertBefore(a,toggle.nextSibling);
+      else headerNav.appendChild(a);
+    } else headerNav.appendChild(a);
   }
 
   if(nav&&!document.getElementById("ccCartLink")){
