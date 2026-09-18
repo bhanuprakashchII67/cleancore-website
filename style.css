@@ -150,3 +150,27 @@ button,a{touch-action:manipulation}
 .cc-optional{font-weight:600;color:#7a8795;font-size:12px}
 .cc-switch{margin-top:18px;text-align:center}
 @media(max-width:800px){.cc-modal{max-width:none;padding:22px 18px}}
+
+
+/* Refined customer authentication popup */
+.cc-auth-modal{width:min(470px,calc(100vw - 28px));padding:28px 30px 30px;border-radius:24px}
+.cc-auth-head{display:flex;align-items:center;gap:12px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #e5edf2}
+.cc-auth-icon{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:#0b1f33;color:#fff;font-weight:900;letter-spacing:.04em;box-shadow:0 8px 20px #0b1f3320}
+.cc-auth-sub{font-size:12px;color:#6b7b8c;margin-top:2px}
+.cc-auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;background:#f0f5f7;border-radius:12px;margin:0 0 22px}
+.cc-auth-tab{border:0;background:transparent;border-radius:9px;padding:11px 10px;color:#607082;font:inherit;font-weight:800;cursor:pointer}
+.cc-auth-tab.active{background:#fff;color:#0b1f33;box-shadow:0 3px 12px #0b1f3315}
+.cc-auth-modal h2{font-size:28px;line-height:1.15;margin:0 0 8px}
+.cc-auth-modal .cc-muted{margin:0 0 18px}
+.cc-auth-modal form label{color:#233347}
+.cc-auth-modal input{background:#fff;color:#122033;border:1px solid #d6e1e9;box-shadow:inset 0 1px 2px #0b1f3307}
+.cc-auth-modal input:focus{outline:0;border-color:#159a91;box-shadow:0 0 0 3px #159a9120}
+.cc-main-action{display:flex;align-items:center;justify-content:center;gap:10px}
+.cc-main-action span:last-child{font-size:18px}
+.cc-status{min-height:20px}
+@media(max-width:560px){
+  .cc-auth-modal{width:calc(100vw - 18px);padding:22px 18px 24px;border-radius:20px}
+  .cc-auth-modal h2{font-size:24px}
+  .cc-auth-head{padding-bottom:13px;margin-bottom:13px}
+  .cc-auth-sub{font-size:11px}
+}
