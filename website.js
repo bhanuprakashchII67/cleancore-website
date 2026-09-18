@@ -532,7 +532,14 @@ window.initCleanCoreCheckout=function(){
   set("checkoutName",customerProfile?.name==="Customer"?"":customerProfile?.name);
   set("checkoutEmail",customerProfile?.email);
   set("checkoutAlternate",customerProfile?.alternate_phone);
-  set("checkoutAddress",customerProfile?.delivery_address);
+  const addr=String(customerProfile?.delivery_address||"");
+  const parts=addr.split(" | ");
+  set("checkoutHouse",parts[0]||"");
+  set("checkoutStreet",parts[1]||"");
+  set("checkoutCity",parts[2]||"");
+  set("checkoutState",parts[3]||"");
+  set("checkoutPincode",parts[4]||"");
+  set("checkoutLandmark",parts[5]||"");
   document.getElementById("checkoutItems").innerHTML=items.map(x=>'<div class="checkout-item"><div><strong>'+escSite(x.name)+'</strong><span>'+escSite(x.unit)+' × '+x.quantity+'</span></div><strong>'+siteMoney(Number(x.price)*Number(x.quantity))+'</strong></div>').join("");
   document.getElementById("checkoutTotal").textContent=siteMoney(items.reduce((n,x)=>n+Number(x.price)*Number(x.quantity),0));
   const form=document.getElementById("checkoutForm");
@@ -544,11 +551,17 @@ window.initCleanCoreCheckout=function(){
     const name=document.getElementById("checkoutName").value.trim();
     const email=document.getElementById("checkoutEmail").value.trim();
     const alternate=normalizeSitePhone(document.getElementById("checkoutAlternate").value.trim());
-    const address=document.getElementById("checkoutAddress").value.trim();
+    const house=document.getElementById("checkoutHouse").value.trim();
+    const street=document.getElementById("checkoutStreet").value.trim();
+    const city=document.getElementById("checkoutCity").value.trim();
+    const state=document.getElementById("checkoutState").value.trim();
+    const pincode=document.getElementById("checkoutPincode").value.trim();
+    const landmark=document.getElementById("checkoutLandmark").value.trim();
+    const address=[house,street,city,state,pincode,landmark].join(" | ");
     if(!name){status.textContent="Enter your full name.";return;}
     if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent="Enter a valid email address.";return;}
     if(alternate&&!phoneRE.test(alternate)){status.textContent="Enter a valid 10-digit alternate number.";return;}
-    if(!address){status.textContent="Enter your delivery address.";return;}
+    if(!house||!street||!city||!state||!/^[0-9]{6}$/.test(pincode)){status.textContent="Complete your delivery address and enter a valid 6-digit pincode.";return;}
     btn.disabled=true;status.textContent="Saving details and placing order…";
     const {data:profile,error:profileError}=await siteDb.rpc("update_website_customer_profile",{p_name:name,p_email:email,p_alternate_phone:alternate,p_delivery_address:address});
     if(profileError){btn.disabled=false;status.textContent=profileError.message;return;}
