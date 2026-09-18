@@ -73,41 +73,10 @@ function renderCart(){
   if(total)total.textContent=siteMoney(cartSubtotal());
   if(checkout)checkout.disabled=false;
 }
-function openCart(){
-  const layer=document.getElementById("ccCustomerLayer");
-  const modal=document.getElementById("ccAuthModal");
-  const drawer=document.getElementById("ccCartDrawer");
-  if(!layer||!drawer)return;
-  layer.classList.remove("hidden");
-  document.body.classList.add("cc-modal-open");
-  modal?.classList.add("hidden");
-  drawer.classList.remove("hidden");
-  renderCart();
-}
-function closeCart(){
-  document.getElementById("ccCartDrawer")?.classList.add("hidden");
-  document.getElementById("ccAuthModal")?.classList.remove("hidden");
-}
-function showCheckout(){
-  window.location.href="checkout.html";
-  return;
-  if(!customerUser){
-    window.location.href="customer-login.html?next=checkout.html";
-    return;
-  }
-  if(!customerCart.length){renderCart();return;}
-  if(!customerProfile){
-    loadCustomerProfile().then(()=>{
-      if(customerProfile)showCheckout();
-      else {closeCart();openCustomerPanel("login");}
-    });
-    return;
-  }
-  closeCart();
-  showCustomerView("order");
-  fillCheckoutCustomer();
-  renderCheckoutSummary();
-}
+function openCart(){ window.location.href="checkout.html"; }
+function closeCart(){}
+function showCheckout(){ window.location.href="checkout.html"; }
+
 function fillCheckoutCustomer(){
   document.getElementById("ccCustomerName").value=customerProfile?.name==="Customer"?"":(customerProfile?.name||"");
   document.getElementById("ccCustomerEmail").value=customerProfile?.email||"";
