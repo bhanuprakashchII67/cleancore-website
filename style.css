@@ -407,3 +407,5 @@ button,a{touch-action:manipulation}
 .gst-fields label{display:grid;gap:6px;font-size:12px;font-weight:800}.gst-fields input,.gst-fields select{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #d5e1e5;border-radius:10px;background:#fff;font:600 13px 'Poppins',Arial,sans-serif}
 .gst-note{grid-column:1/-1;margin:0;color:#6c7c8c;font-size:11px;line-height:1.5}
 @media(max-width:600px){.gst-fields{grid-template-columns:1fr}}
+
+.checkout-tax-breakdown{display:grid;gap:7px;margin:14px 0;padding:12px 0;border-top:1px solid #e1e8ec;border-bottom:1px solid #e1e8ec;font-size:13px}.checkout-tax-breakdown>div{display:flex;justify-content:space-between;gap:16px}.order-success-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0;text-align:left}.order-success-grid>div{padding:12px;border:1px solid #d9e8df;border-radius:10px;background:#f8fcf9;display:grid;gap:4px}.order-success-grid span{font-size:11px;color:#6d7f73}.order-success-grid strong{font-size:13px;word-break:break-word}@media(max-width:600px){.order-success-grid{grid-template-columns:1fr}}
