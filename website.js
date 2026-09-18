@@ -150,11 +150,11 @@ async function invokeCustomerAuth(body){
 function normalizeSitePhone(v){const digits=String(v||"").replace(/\D/g,"");return digits.length===12&&digits.startsWith("91")?digits.slice(2):digits;}
 function validSiteEmail(v){const email=String(v||"").trim();return !email||/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);}
 async function loadPublicProducts(){
-  if(!siteDb)return false;
+  if(!siteDb)return;
   const {data,error}=await siteDb.from("website_products")
     .select("id,name,unit,selling_price,description,additional_details,image_urls,video_urls,active")
     .eq("active",true).order("name");
-  if(error||!Array.isArray(data)||!data.length)return false;
+  if(error||!Array.isArray(data)||!data.length)return;
   publicProducts=data;
   document.querySelectorAll(".product-grid").forEach((grid,index)=>{
     const list=(location.pathname.toLowerCase().includes("products.html")||index>0)?data:data.slice(0,4);
@@ -167,16 +167,14 @@ async function loadPublicProducts(){
       return '<article class="product">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3>'+escSite(p.name)+'</h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p>'+priceMarkup+'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button></div></article>';
     }).join("");
   });
-  return true;
 }
 
 function populateEnquiryProducts(){
   const select=document.getElementById("websiteProduct");
   if(!select||!siteDb)return;
-  return siteDb.from("website_products").select("id,name,unit,selling_price,active").eq("active",true).order("name").then(({data})=>{
+  siteDb.from("website_products").select("id,name,unit,selling_price,active").eq("active",true).order("name").then(({data})=>{
     if(!Array.isArray(data))return;
     select.innerHTML='<option value="">Select product</option>'+data.map(p=>'<option value="'+escSite(p.name)+'">'+escSite(p.name)+' — '+siteMoney(p.selling_price)+' / '+escSite(p.unit)+'</option>').join("");
-    return true;
   });
 }
 
@@ -286,17 +284,6 @@ function injectCustomerUI(){
   const actions=document.getElementById("navUserActions");
   if(!nav||!actions)return;
 
-  if(!document.getElementById("ccSiteRefresh")){
-    const refresh=document.createElement("button");
-    refresh.id="ccSiteRefresh";
-    refresh.type="button";
-    refresh.className="customer-nav-action site-refresh-action";
-    refresh.setAttribute("aria-label","Refresh website data");
-    refresh.innerHTML='<span aria-hidden="true">↻</span><span class="customer-action-label">Refresh</span>';
-    refresh.addEventListener("click",refreshWebsiteData);
-    actions.appendChild(refresh);
-  }
-
   if(!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
     a.id="ccCustomerLink";
@@ -315,21 +302,6 @@ function injectCustomerUI(){
     cart.setAttribute("aria-label","Cart");
     cart.innerHTML='<span class="customer-cart-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h2l1.3 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.8L20 8H7"></path><circle cx="10" cy="19" r="1.4"></circle><circle cx="18" cy="19" r="1.4"></circle></svg></span><span class="customer-action-label">'+(cartCount()>0?"Cart ("+cartCount()+")":"Cart")+'</span>';
     actions.appendChild(cart);
-  }
-}
-async function refreshWebsiteData(){
-  const btn=document.getElementById("ccSiteRefresh");
-  if(btn){btn.disabled=true;btn.classList.add("is-refreshing");}
-  try{
-    await loadPublicProducts();
-    await populateEnquiryProducts();
-    renderCartCount();
-    if(location.pathname.toLowerCase().includes("checkout.html"))await window.initCleanCoreCheckout?.();
-    toastSite("Website data refreshed");
-  }catch(e){
-    toastSite("Refresh failed. Please try again.");
-  }finally{
-    if(btn){btn.disabled=false;btn.classList.remove("is-refreshing");}
   }
 }
 function toastSite(message){
