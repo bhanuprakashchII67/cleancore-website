@@ -14,20 +14,24 @@ function siteMoney(n){return new Intl.NumberFormat("en-IN",{style:"currency",cur
 
 async function invokeCustomerAuth(body){
   try{
-    const result=await siteDb.functions.invoke("customer-auth",{body});
-    if(!result.error)return result;
-    let message=result.error.message||"Unable to complete the request.";
-    try{
-      const ctx=result.error.context;
-      if(ctx){
-        const clone=ctx.clone?ctx.clone():ctx;
-        const payload=await clone.json();
-        if(payload?.error)message=payload.error;
-      }
-    }catch(_){}
-    return {data:null,error:{message}};
+    const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_PUBLISHABLE_KEY,
+        "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY
+      },
+      body:JSON.stringify(body)
+    });
+    const raw=await response.text();
+    let payload=null;
+    try{payload=raw?JSON.parse(raw):null}catch(_){}
+    if(!response.ok){
+      return {data:null,error:{message:payload?.error||payload?.message||("Customer auth failed ("+response.status+").")}};
+    }
+    return {data:payload,error:null};
   }catch(e){
-    return {data:null,error:{message:e?.message||"Unable to complete the request."}};
+    return {data:null,error:{message:e?.message||"Unable to reach customer authentication service."}};
   }
 }
 function normalizeSitePhone(v){return String(v||"").replace(/\D/g,"").replace(/^91/,"");}
