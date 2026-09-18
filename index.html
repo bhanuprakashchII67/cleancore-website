@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CleanCore Chemical & Cleaning | Hyderabad</title><meta name="description" content="B2B cleaning chemicals in Hyderabad."><link rel="stylesheet" href="style.css"></head><body><header><div class="container"><nav>
 <a class="brand" href="index.html"><div class="mark">C</div><div>CleanCore <span>Chemical & Cleaning</span></div></a>
-<div class="navlinks"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+<div class="navlinks" id="navMenu"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
 <a class="navcta" href="contact.html">Request a Quote</a></nav></div></header>
 <section class="hero"><div class="container hero-grid"><div><div class="eyebrow">B2B Cleaning Chemicals · Hyderabad</div><h1>Professional cleaning chemicals for business.</h1><p>CleanCore Chemical & Cleaning supplies practical cleaning liquid solutions for professional cleaning operations, commercial facilities and businesses across Hyderabad.</p><div class="buttons"><a class="btn btn-primary" href="products.html">View Products</a><a class="btn btn-secondary" href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%27d%20like%20to%20know%20about%20your%20cleaning%20products.">WhatsApp Us</a></div></div>
 <div class="hero-card"><h3>Cleaning range</h3><div class="mini"><span class="dot"></span><div>Dishwash Liquid<br><small>5 Litre Can · ₹349</small></div></div><div class="mini"><span class="dot"></span><div>Floor Cleaner<br><small>5 Litre Can · ₹349</small></div></div><div class="mini"><span class="dot"></span><div>Toilet Cleaner<br><small>5 Litre Can · ₹349</small></div></div><div class="mini"><span class="dot"></span><div>Glass Cleaner<br><small>5 Litre Can · ₹349</small></div></div><div class="mini"><span class="dot"></span><div>Hand Wash<br><small>5 Litre Can · ₹349</small></div></div><div class="mini"><span class="dot"></span><div>Hard Surface Cleaner<br><small>5 Litre Can · ₹349</small></div></div><div class="mini"><span class="dot"></span><div>All-in-One Cleaner<br><small>5 Litre Can · ₹349</small></div></div></div></div></section>
@@ -103,4 +104,23 @@
       <a class="btn btn-primary" href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20want%20to%20order%20All-in-One%20Cleaner%20-%205%20Litre%20Can%20at%20Rs%20349.">Order on WhatsApp</a>
     </div></article></div></div></section>
 <section class="band"><div class="container"><div class="section-head"><div class="eyebrow">Built for B2B</div><h2>Supply for professional cleaning requirements.</h2></div><div class="three"><div class="box"><h3>Business supply</h3><p>Focused on commercial and professional cleaning requirements.</p></div><div class="box"><h3>Simple ordering</h3><p>Choose a product, confirm quantity and contact us directly.</p></div><div class="box"><h3>Hyderabad</h3><p>Serving businesses and cleaning operations across Hyderabad.</p></div></div></div></section>
-<section class="contact"><div class="container contact-grid"><div><div class="eyebrow" style="color:#72d5cd">Need a quote?</div><h2>Tell us what your business needs.</h2><p>Contact CleanCore for product information, availability and business supply enquiries.</p><div class="buttons" style="margin-top:25px"><a class="btn btn-primary" href="tel:+919182725773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773">WhatsApp</a></div></div><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Service Area</strong>Hyderabad, Telangana</div><div class="contact-line"><strong>Products</strong>Cleaning liquids for professional use</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Hyderabad</div><div><a href="tel:+919182725773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer></body></html>
+<section class="contact"><div class="container contact-grid"><div><div class="eyebrow" style="color:#72d5cd">Need a quote?</div><h2>Tell us what your business needs.</h2><p>Contact CleanCore for product information, availability and business supply enquiries.</p><div class="buttons" style="margin-top:25px"><a class="btn btn-primary" href="tel:+919182725773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773">WhatsApp</a></div></div><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Service Area</strong>Hyderabad, Telangana</div><div class="contact-line"><strong>Products</strong>Cleaning liquids for professional use</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Hyderabad</div><div><a href="tel:+919182725773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer><script>
+(function(){
+  const b=document.getElementById("menuToggle"),m=document.getElementById("navMenu");
+  if(!b||!m)return;
+  b.addEventListener("click",function(){
+    const open=m.classList.toggle("open");
+    b.classList.toggle("open",open);
+    b.setAttribute("aria-expanded",String(open));
+    b.setAttribute("aria-label",open?"Close navigation":"Open navigation");
+  });
+  m.querySelectorAll("a").forEach(a=>a.addEventListener("click",function(){
+    m.classList.remove("open");b.classList.remove("open");
+    b.setAttribute("aria-expanded","false");
+    b.setAttribute("aria-label","Open navigation");
+  }));
+  window.addEventListener("resize",function(){
+    if(window.innerWidth>800){m.classList.remove("open");b.classList.remove("open");b.setAttribute("aria-expanded","false")}
+  });
+})();
+</script></body></html>
