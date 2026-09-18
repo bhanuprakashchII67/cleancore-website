@@ -397,3 +397,13 @@ button,a{touch-action:manipulation}
  .cc-enquiry-card h2{font-size:24px}
  .cc-enquiry-contact-row{gap:6px}
 }
+
+/* GST checkout */
+.gst-checkout-box{margin-top:16px;padding:15px;border:1px solid #dbe6ec;border-radius:14px;background:#f8fbfc}
+.gst-toggle{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.gst-toggle input{width:18px;height:18px;margin-top:2px;accent-color:#159f98}
+.gst-toggle span{display:grid;gap:3px}.gst-toggle strong{font-size:14px}.gst-toggle small{color:#718296;font-size:11px}
+.gst-fields{display:grid;grid-template-columns:1fr 150px;gap:12px;margin-top:13px}.gst-fields.hidden{display:none!important}
+.gst-fields label{display:grid;gap:6px;font-size:12px;font-weight:800}.gst-fields input,.gst-fields select{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #d5e1e5;border-radius:10px;background:#fff;font:600 13px 'Poppins',Arial,sans-serif}
+.gst-note{grid-column:1/-1;margin:0;color:#6c7c8c;font-size:11px;line-height:1.5}
+@media(max-width:600px){.gst-fields{grid-template-columns:1fr}}
