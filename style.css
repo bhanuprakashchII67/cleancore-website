@@ -318,3 +318,22 @@ button,a{touch-action:manipulation}
   .home-account-buttons{grid-template-columns:1fr}
   .home-account-buttons .btn{min-height:46px}
 }
+
+/* Compact customer header control */
+.customer-nav-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:800;color:var(--navy)}
+.cc-login-label{font-size:13px}
+.cc-account-label{font-size:13px}
+.cc-user-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:#fff;box-shadow:0 4px 12px #0b1f3318}
+.cc-user-avatar svg{width:18px;height:18px}
+.cc-cart-link{font-weight:900}
+@media(min-width:801px){
+  .customer-nav-link{min-height:40px}
+  .cc-user-avatar{width:32px;height:32px}
+}
+@media(max-width:800px){
+  .customer-nav-link{display:inline-flex!important;min-height:40px;width:auto;padding:5px 7px;border-radius:10px}
+  .cc-login-label{font-size:12px}
+  .cc-account-label{display:none}
+  .cc-user-avatar{width:38px;height:38px}
+  nav .customer-nav-link + .menu-toggle{margin-left:0}
+}
