@@ -9,6 +9,95 @@ let publicProducts=[];
 let customerUser=null;
 let customerProfile=null;
 let pendingOrderProduct=null;
+let customerCart=loadCustomerCart();
+
+function loadCustomerCart(){
+  try{
+    const raw=localStorage.getItem("cleancore_cart");
+    const parsed=raw?JSON.parse(raw):[];
+    return Array.isArray(parsed)?parsed.filter(x=>x&&x.product_id&&Number(x.quantity)>0):[];
+  }catch(_){return [];}
+}
+function saveCustomerCart(){
+  try{localStorage.setItem("cleancore_cart",JSON.stringify(customerCart));}catch(_){}
+  renderCartCount();
+}
+function cartCount(){return customerCart.reduce((n,x)=>n+Number(x.quantity||0),0);}
+function cartSubtotal(){
+  return customerCart.reduce((n,x)=>n+Number(x.price||0)*Number(x.quantity||0),0);
+}
+function addToCart(product,quantity=1){
+  if(!product)return;
+  const q=Math.max(1,Math.floor(Number(quantity)||1));
+  const existing=customerCart.find(x=>x.product_id===product.id);
+  if(existing)existing.quantity+=q;
+  else customerCart.push({product_id:product.id,name:product.name,unit:product.unit,price:Number(product.selling_price||0),quantity:q});
+  saveCustomerCart();
+}
+function updateCartQuantity(productId,delta){
+  const item=customerCart.find(x=>x.product_id===productId);
+  if(!item)return;
+  item.quantity=Math.max(0,Number(item.quantity||0)+delta);
+  customerCart=customerCart.filter(x=>x.quantity>0);
+  saveCustomerCart();
+  renderCart();
+}
+function removeCartItem(productId){
+  customerCart=customerCart.filter(x=>x.product_id!==productId);
+  saveCustomerCart();
+  renderCart();
+}
+function renderCartCount(){
+  const a=document.getElementById("ccCartLink");
+  if(a)a.textContent=cartCount()>0?"Cart ("+cartCount()+")":"Cart";
+}
+function renderCart(){
+  const panel=document.getElementById("ccCartItems");
+  const total=document.getElementById("ccCartTotal");
+  const checkout=document.getElementById("ccCartCheckout");
+  if(!panel)return;
+  if(!customerCart.length){
+    panel.innerHTML='<div class="cc-cart-empty"><div class="cc-cart-empty-icon">🛒</div><h3>Your cart is empty</h3><p>Browse products and add items to your cart.</p><button type="button" class="btn btn-primary" id="ccContinueShopping">Continue shopping</button></div>';
+    if(total)total.textContent=siteMoney(0);
+    if(checkout)checkout.disabled=true;
+    document.getElementById("ccContinueShopping")?.addEventListener("click",closeCustomerPanel);
+    return;
+  }
+  panel.innerHTML=customerCart.map(item=>'<div class="cc-cart-item"><div class="cc-cart-item-main"><strong>'+escSite(item.name)+'</strong><span>'+escSite(item.unit)+' · '+siteMoney(item.price)+'</span></div><div class="cc-cart-item-actions"><button type="button" data-cart-dec="'+escSite(item.product_id)+'" aria-label="Decrease quantity">−</button><b>'+item.quantity+'</b><button type="button" data-cart-inc="'+escSite(item.product_id)+'" aria-label="Increase quantity">+</button><button type="button" class="cc-cart-remove" data-cart-remove="'+escSite(item.product_id)+'">Remove</button></div></div>').join("");
+  if(total)total.textContent=siteMoney(cartSubtotal());
+  if(checkout)checkout.disabled=!customerUser||!customerProfile;
+}
+function openCart(){
+  const layer=document.getElementById("ccCustomerLayer");
+  const modal=document.getElementById("ccAuthModal");
+  const drawer=document.getElementById("ccCartDrawer");
+  if(!layer||!drawer)return;
+  layer.classList.remove("hidden");
+  document.body.classList.add("cc-modal-open");
+  modal?.classList.add("hidden");
+  drawer.classList.remove("hidden");
+  renderCart();
+}
+function closeCart(){
+  document.getElementById("ccCartDrawer")?.classList.add("hidden");
+  document.getElementById("ccAuthModal")?.classList.remove("hidden");
+}
+function showCheckout(){
+  if(!customerUser||!customerProfile){closeCart();openCustomerPanel("login");document.getElementById("ccLoginStatus").textContent="Login to continue to checkout.";return;}
+  if(!customerCart.length){renderCart();return;}
+  closeCart();
+  showCustomerView("order");
+  document.getElementById("ccOrderNotes").value=customerProfile?.delivery_address||"";
+  renderCheckoutSummary();
+}
+function renderCheckoutSummary(){
+  const box=document.getElementById("ccCheckoutItems");
+  if(!box)return;
+  box.innerHTML=customerCart.map(item=>'<div class="cc-checkout-row"><span>'+escSite(item.name)+' × '+item.quantity+'</span><strong>'+siteMoney(Number(item.price)*Number(item.quantity))+'</strong></div>').join("");
+  document.getElementById("ccOrderTotal").textContent="Order total: "+siteMoney(cartSubtotal());
+  document.getElementById("ccOrderStatus").textContent="";
+}
+
 
 function siteMoney(n){return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));}
 
@@ -104,13 +193,20 @@ function injectCustomerUI(){
     a.textContent="Login";
     a.addEventListener("click",e=>{e.preventDefault();openCustomerPanel(customerUser?"account":"login");});
     nav.appendChild(a);
+    const cart=document.createElement("a");
+    cart.id="ccCartLink";
+    cart.href="#";
+    cart.className="customer-nav-link cc-cart-link";
+    cart.textContent=cartCount()>0?"Cart ("+cartCount()+")":"Cart";
+    cart.addEventListener("click",e=>{e.preventDefault();openCart();});
+    nav.appendChild(cart);
   }
 
   const layer=document.createElement("div");
   layer.id="ccCustomerLayer";
   layer.className="cc-layer hidden";
   layer.innerHTML=`
-    <div class="cc-modal cc-auth-modal" role="dialog" aria-modal="true" aria-labelledby="ccModalTitle">
+    <div id="ccAuthModal" class="cc-modal cc-auth-modal" role="dialog" aria-modal="true" aria-labelledby="ccModalTitle">
       <button type="button" class="cc-close" id="ccClose" aria-label="Close">×</button>
 
       <div id="ccAuthHead" class="cc-auth-head">
@@ -172,33 +268,36 @@ function injectCustomerUI(){
       </div>
 
       <div id="ccOrderView" class="cc-view hidden">
-        <div class="cc-eyebrow">Place order</div>
-        <h2>Order Now</h2>
-        <div class="cc-product-summary">
-          <div><strong id="ccOrderProductName"></strong><span id="ccOrderProductMeta"></span></div>
-          <strong id="ccOrderPrice"></strong>
-        </div>
+        <div class="cc-eyebrow">Secure checkout</div>
+        <h2>Review your order</h2>
+        <div id="ccCheckoutItems" class="cc-checkout-items"></div>
         <form id="ccOrderForm">
-          <label>Quantity<input id="ccOrderQuantity" type="number" min="1" step="1" value="1" required></label>
-          <label>Delivery / order note<textarea id="ccOrderNotes" rows="3" placeholder="Delivery address or any special instruction"></textarea></label>
+          <label>Delivery / order note<textarea id="ccOrderNotes" rows="4" placeholder="Delivery address or any special instruction"></textarea></label>
           <p id="ccOrderTotal" class="cc-order-total"></p>
           <p id="ccOrderStatus" class="cc-status" aria-live="polite"></p>
-          <div class="cc-account-actions"><button type="button" id="ccOrderBack" class="btn">Back</button><button class="btn btn-primary" type="submit">Place Order</button></div>
+          <div class="cc-account-actions"><button type="button" id="ccOrderBack" class="btn">Back to cart</button><button class="btn btn-primary" type="submit">Place Order</button></div>
         </form>
       </div>
-    </div>`;
+    </div>
+    <aside id="ccCartDrawer" class="cc-cart-drawer hidden" aria-label="Shopping cart">
+      <div class="cc-cart-head"><div><div class="cc-eyebrow">Shopping cart</div><h2>Your cart</h2></div><button type="button" class="cc-close" id="ccCartClose" aria-label="Close cart">×</button></div>
+      <div id="ccCartItems" class="cc-cart-items"></div>
+      <div class="cc-cart-footer"><div class="cc-cart-total-row"><span>Subtotal</span><strong id="ccCartTotal">₹0.00</strong></div><p class="cc-cart-note">Final order confirmation will be handled by CleanCore.</p><button type="button" id="ccCartCheckout" class="btn btn-primary cc-wide">Proceed to checkout</button></div>
+    </aside>`;
   document.body.appendChild(layer);
 
   document.getElementById("ccClose").onclick=closeCustomerPanel;
+  document.getElementById("ccCartClose").onclick=closeCustomerPanel;
+  document.getElementById("ccCartCheckout").onclick=showCheckout;
   layer.addEventListener("click",e=>{if(e.target===layer)closeCustomerPanel();});
   document.getElementById("ccTabLogin").onclick=()=>openCustomerPanel("login");
   document.getElementById("ccTabSignup").onclick=()=>openCustomerPanel("signup");
   document.getElementById("ccLoginForm").addEventListener("submit",loginCustomer);
   document.getElementById("ccSignupForm").addEventListener("submit",signupCustomer);
-  document.getElementById("ccAccountOrder").onclick=()=>openCustomerPanel("account",true);
+  document.getElementById("ccAccountOrder").onclick=()=>openCart();
   document.getElementById("ccAccountOrders").onclick=()=>loadCustomerOrders(true);
   document.getElementById("ccAccountLogout").onclick=logoutCustomer;
-  document.getElementById("ccOrderBack").onclick=()=>openCustomerPanel("account");
+  document.getElementById("ccOrderBack").onclick=()=>{showCustomerView("account");openCart();};
   document.getElementById("ccOrderForm").addEventListener("submit",placeCustomerOrder);
 }
 
@@ -212,6 +311,7 @@ function toastSite(message){
 }
 
 function showCustomerView(name){
+  closeCart();
   const map={login:"ccLoginView",signup:"ccSignupView",account:"ccAccountView",order:"ccOrderView"};
   Object.entries(map).forEach(([key,id])=>document.getElementById(id)?.classList.toggle("hidden",key!==name));
   const auth=name==="login"||name==="signup";
@@ -266,8 +366,7 @@ async function loginCustomer(e){
   customerUser=data.user||data.session.user;
   customerProfile=data.customer||null;
   document.getElementById("ccLoginForm").reset();
-  renderCustomerNav();renderAccount();switchToOrderAfterLogin();
-  if(!pendingOrderProduct)showCustomerView("account");
+  renderCustomerNav();renderAccount();closeCustomerPanel();
 }
 
 async function signupCustomer(e){
@@ -290,8 +389,7 @@ async function signupCustomer(e){
   customerUser=data.user||data.session.user;
   customerProfile=data.customer||null;
   document.getElementById("ccSignupForm").reset();
-  renderCustomerNav();renderAccount();switchToOrderAfterLogin();
-  if(!pendingOrderProduct)showCustomerView("account");
+  renderCustomerNav();renderAccount();closeCustomerPanel();
 }
 
 async function loadCustomerProfile(){
@@ -330,52 +428,40 @@ async function loadCustomerOrders(showPanel=true){
 }
 
 function openOrder(product){
-  pendingOrderProduct=product;
+  if(!product)return;
+  addToCart(product,1);
   if(!customerUser||!customerProfile){
     openCustomerPanel("login");
-    document.getElementById("ccLoginStatus").textContent="Login with your phone number or email to place this order.";
+    document.getElementById("ccLoginStatus").textContent="Item added to cart. Login to continue, or close this window and keep shopping.";
     return;
   }
-  openCustomerPanel("account");
-  showOrderForm(product);
+  openCart();
 }
 
 function showOrderForm(product){
-  if(!product)return;
-  pendingOrderProduct=product;
-  document.getElementById("ccOrderProductName").textContent=product.name;
-  document.getElementById("ccOrderProductMeta").textContent=product.unit;
-  document.getElementById("ccOrderPrice").textContent=siteMoney(product.selling_price);
-  document.getElementById("ccOrderQuantity").value=1;
-  document.getElementById("ccOrderNotes").value=customerProfile?.delivery_address||"";
-  document.getElementById("ccOrderStatus").textContent="";
-  updateOrderTotal();
-  showCustomerView("order");
+  if(product)addToCart(product,1);
+  openCart();
 }
 
 function updateOrderTotal(){
-  const q=Math.max(1,Number(document.getElementById("ccOrderQuantity")?.value||1));
-  const p=pendingOrderProduct;
-  if(p)document.getElementById("ccOrderTotal").textContent="Order total: "+siteMoney(Number(p.selling_price||0)*q);
+  document.getElementById("ccOrderTotal").textContent="Order total: "+siteMoney(cartSubtotal());
 }
 
 async function placeCustomerOrder(e){
   e.preventDefault();
-  if(!customerUser||!customerProfile||!pendingOrderProduct)return;
+  if(!customerUser||!customerProfile||!customerCart.length)return;
   const status=document.getElementById("ccOrderStatus");
-  const qty=Number(document.getElementById("ccOrderQuantity").value||0);
-  if(!Number.isInteger(qty)||qty<1){status.textContent="Enter a valid quantity.";return;}
   status.textContent="Placing order…";
-  const {data,error}=await siteDb.rpc("place_website_order",{
-    p_product_id:pendingOrderProduct.id,
-    p_quantity:qty,
+  const {data,error}=await siteDb.rpc("place_website_cart_order",{
+    p_items:customerCart.map(x=>({product_id:x.product_id,quantity:Number(x.quantity)})),
     p_notes:document.getElementById("ccOrderNotes").value.trim()
   });
   if(error){status.textContent=error.message;return;}
   const order=data||{};
-  pendingOrderProduct=null;
+  customerCart=[];
+  saveCustomerCart();
   await loadCustomerOrders(false);
-  document.getElementById("ccOrdersPanel").insertAdjacentHTML("afterbegin",'<div class="cc-success">Order placed successfully. Order number: <strong>'+escSite(order.order_no)+'</strong> • Total: <strong>'+siteMoney(order.total)+'</strong></div>');
+  document.getElementById("ccOrdersPanel").innerHTML='<div class="cc-success">Order placed successfully. Order number: <strong>'+escSite(order.order_no)+'</strong> • Total: <strong>'+siteMoney(order.total)+'</strong></div>';
   showCustomerView("account");
 }
 
@@ -398,6 +484,12 @@ function bindCustomerAuth(){
 }
 
 document.addEventListener("click",e=>{
+  const inc=e.target.closest?.("[data-cart-inc]");
+  const dec=e.target.closest?.("[data-cart-dec]");
+  const rem=e.target.closest?.("[data-cart-remove]");
+  if(inc){updateCartQuantity(inc.dataset.cartInc,1);return;}
+  if(dec){updateCartQuantity(dec.dataset.cartDec,-1);return;}
+  if(rem){removeCartItem(rem.dataset.cartRemove);return;}
   const btn=e.target.closest?.(".order-now");
   if(btn){
     e.preventDefault();
@@ -406,7 +498,7 @@ document.addEventListener("click",e=>{
     if(product)openOrder(product);
   }
 });
-document.addEventListener("input",e=>{if(e.target?.id==="ccOrderQuantity")updateOrderTotal();});
+document.addEventListener("input",e=>{});
 
 document.addEventListener("DOMContentLoaded",()=>{
   injectCustomerUI();
@@ -414,4 +506,5 @@ document.addEventListener("DOMContentLoaded",()=>{
   populateEnquiryProducts();
   bindWebsiteEnquiry();
   bindCustomerAuth();
+  renderCartCount();
 });
