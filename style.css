@@ -431,3 +431,10 @@ button,a{touch-action:manipulation}
 
 /* Checkout state visibility */
 .checkout-grid.hidden,.checkout-title.hidden{display:none!important}
+
+
+/* Final checkout success screen: nothing else remains visible */
+.cc-order-success-only{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px;box-sizing:border-box;background:#f6f8f9}
+.cc-order-success-only .cc-success{width:min(1120px,100%);box-sizing:border-box;margin:0;padding:34px;border-radius:20px;background:#e8f7ed;color:#17633e;text-align:center;box-shadow:0 10px 30px rgba(11,31,51,.05)}
+.cc-order-success-only .cc-success h2{color:#123b2a;margin-bottom:8px}
+@media(max-width:600px){.cc-order-success-only{padding:16px}.cc-order-success-only .cc-success{padding:22px 16px;border-radius:14px}}
