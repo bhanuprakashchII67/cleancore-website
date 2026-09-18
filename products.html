@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Products | CleanCore Chemical & Cleaning</title><link rel="stylesheet" href="style.css"></head><body><header><div class="container"><nav>
 <a class="brand" href="index.html"><div class="mark">C</div><div>CleanCore <span>Chemical & Cleaning</span></div></a>
-<div class="navlinks"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+<div class="navlinks" id="navMenu"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
 <a class="navcta" href="contact.html">Request a Quote</a></nav></div></header><section class="hero"><div class="container"><div class="eyebrow">Product Catalogue</div><h1>Cleaning products for business.</h1><p>Every listed product is ₹349 per 5 Litre Can.</p></div></section><section><div class="container"><div class="product-grid"><article class="product"><div class="imgbox"><svg class="prod-img" viewBox="0 0 420 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dishwash Liquid">
       <rect width="420" height="250" rx="20" fill="#eef7f6"/>
       <circle cx="330" cy="48" r="75" fill="#d9efec"/>
@@ -98,4 +99,23 @@
       <span class="tag">5 Litre Can</span><h3>All-in-One Cleaner</h3><p>A versatile option for multiple general cleaning applications.</p>
       <div class="price">₹349 <small>/ 5 Litre</small></div>
       <a class="btn btn-primary" href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20want%20to%20order%20All-in-One%20Cleaner%20-%205%20Litre%20Can%20at%20Rs%20349.">Order on WhatsApp</a>
-    </div></article></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Hyderabad</div><div><a href="tel:+919182725773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer></body></html>
+    </div></article></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Hyderabad</div><div><a href="tel:+919182725773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer><script>
+(function(){
+  const b=document.getElementById("menuToggle"),m=document.getElementById("navMenu");
+  if(!b||!m)return;
+  b.addEventListener("click",function(){
+    const open=m.classList.toggle("open");
+    b.classList.toggle("open",open);
+    b.setAttribute("aria-expanded",String(open));
+    b.setAttribute("aria-label",open?"Close navigation":"Open navigation");
+  });
+  m.querySelectorAll("a").forEach(a=>a.addEventListener("click",function(){
+    m.classList.remove("open");b.classList.remove("open");
+    b.setAttribute("aria-expanded","false");
+    b.setAttribute("aria-label","Open navigation");
+  }));
+  window.addEventListener("resize",function(){
+    if(window.innerWidth>800){m.classList.remove("open");b.classList.remove("open");b.setAttribute("aria-expanded","false")}
+  });
+})();
+</script></body></html>
