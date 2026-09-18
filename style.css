@@ -256,3 +256,9 @@ button,a{touch-action:manipulation}
  .checkout-summary{position:static}
  .checkout-card{padding:20px}
 }
+
+.address-fields{margin-top:4px}
+.address-fields label{margin:12px 0!important}
+.address-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.address-fields input{min-height:48px}
+@media(max-width:600px){.address-row{grid-template-columns:1fr;gap:0}}
