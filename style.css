@@ -367,3 +367,5 @@ button,a{touch-action:manipulation}
 }
 
 .auth-switch a,.auth-switch button{color:#0066ff!important;text-decoration:none;font-weight:800;cursor:pointer}.auth-switch a:hover,.auth-switch button:hover{text-decoration:underline}
+
+.auth-link-blue{display:inline-block!important;color:#0066ff!important;font-weight:800!important;text-decoration:none!important;cursor:pointer!important;pointer-events:auto!important}.auth-link-blue:hover,.auth-link-blue:focus{text-decoration:underline!important;color:#0052cc!important}
