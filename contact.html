@@ -1,4 +1,24 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Contact | CleanCore Chemical & Cleaning</title><link rel="stylesheet" href="style.css"></head><body><header><div class="container"><nav>
 <a class="brand" href="index.html"><div class="mark">C</div><div>CleanCore <span>Chemical & Cleaning</span></div></a>
-<div class="navlinks"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
-<a class="navcta" href="contact.html">Request a Quote</a></nav></div></header><section class="hero"><div class="container"><div class="eyebrow">Contact</div><h1>Let's discuss your cleaning chemical requirement.</h1><p>Call or WhatsApp CleanCore Chemical & Cleaning for product information, quantity and supply enquiries.</p><div class="buttons"><a class="btn btn-primary" href="tel:+919182725773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%27d%20like%20a%20quote.">WhatsApp Us</a><a class="btn btn-secondary" href="mailto:cleancorehyd@gmail.com">Email Us</a></div></div></section><section><div class="container"><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Location / Service Area</strong>Hyderabad, Telangana</div><div class="contact-line"><strong>Price</strong>₹349 per 5 Litre Can for listed products</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Hyderabad</div><div><a href="tel:+919182725773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer></body></html>
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+<div class="navlinks" id="navMenu"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
+<a class="navcta" href="contact.html">Request a Quote</a></nav></div></header><section class="hero"><div class="container"><div class="eyebrow">Contact</div><h1>Let's discuss your cleaning chemical requirement.</h1><p>Call or WhatsApp CleanCore Chemical & Cleaning for product information, quantity and supply enquiries.</p><div class="buttons"><a class="btn btn-primary" href="tel:+919182725773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%27d%20like%20a%20quote.">WhatsApp Us</a><a class="btn btn-secondary" href="mailto:cleancorehyd@gmail.com">Email Us</a></div></div></section><section><div class="container"><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Location / Service Area</strong>Hyderabad, Telangana</div><div class="contact-line"><strong>Price</strong>₹349 per 5 Litre Can for listed products</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Hyderabad</div><div><a href="tel:+919182725773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer><script>
+(function(){
+  const b=document.getElementById("menuToggle"),m=document.getElementById("navMenu");
+  if(!b||!m)return;
+  b.addEventListener("click",function(){
+    const open=m.classList.toggle("open");
+    b.classList.toggle("open",open);
+    b.setAttribute("aria-expanded",String(open));
+    b.setAttribute("aria-label",open?"Close navigation":"Open navigation");
+  });
+  m.querySelectorAll("a").forEach(a=>a.addEventListener("click",function(){
+    m.classList.remove("open");b.classList.remove("open");
+    b.setAttribute("aria-expanded","false");
+    b.setAttribute("aria-label","Open navigation");
+  }));
+  window.addEventListener("resize",function(){
+    if(window.innerWidth>800){m.classList.remove("open");b.classList.remove("open");b.setAttribute("aria-expanded","false")}
+  });
+})();
+</script></body></html>
