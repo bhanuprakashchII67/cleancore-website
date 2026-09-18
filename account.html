@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Account | CleanCore</title>
+<link rel="stylesheet" href="style.css?v=1.8">
+</head>
+<body class="checkout-page">
+<header><div class="container"><nav>
+<a class="brand" href="index.html"><div class="mark">C</div><div>CleanCore <span>Chemical & Cleaning</span></div></a>
+<div class="navlinks" style="display:flex"><a href="products.html">Products</a><a href="index.html">Home</a><a href="checkout.html">Cart</a></div>
+<a class="navcta" href="products.html">Continue shopping</a>
+</nav></div></header>
+<main class="checkout-main"><div class="container">
+<div id="accountLoginNotice" class="checkout-notice hidden"><h2>Please login</h2><p>Login to view your CleanCore account and orders.</p><a class="btn btn-primary" href="login.html">Login</a></div>
+<div id="accountContent" class="hidden">
+<div class="checkout-title"><div class="eyebrow">Customer account</div><h1>My Account</h1><p>Your saved details and order history.</p></div>
+<div class="account-grid">
+<section class="checkout-card">
+<div class="checkout-card-head"><span>1</span><div><h2>Customer details</h2><p>Saved for faster checkout.</p></div></div>
+<div id="accountDetails"></div>
+<div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
+</section>
+<section class="checkout-card">
+<div class="checkout-card-head"><span>2</span><div><h2>My orders</h2><p>Your recent CleanCore website orders.</p></div></div>
+<div id="accountOrders"><div class="cc-loading">Loading orders…</div></div>
+</section>
+</div>
+</div>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="website.js?v=2.3"></script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const db=window.supabase?.createClient("https://rwfamxkfqslorxcryjrp.supabase.co", "sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO");
+  const notice=document.getElementById("accountLoginNotice"),content=document.getElementById("accountContent");
+  const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(Number(n||0));
+  db.auth.getSession().then(async ({data})=>{
+    const user=data.session?.user;
+    if(!user){notice.classList.remove("hidden");return;}
+    const {data:customer}=await db.from("customers").select("name,phone,email,alternate_phone,business_name,delivery_address").eq("auth_user_id",user.id).maybeSingle();
+    if(!customer){notice.classList.remove("hidden");return;}
+    content.classList.remove("hidden");
+    document.getElementById("accountDetails").innerHTML=
+      '<div class="account-detail"><b>Full name</b><span>'+String(customer.name||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Mobile</b><span>'+String(customer.phone||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Email</b><span>'+String(customer.email||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Alternate mobile</b><span>'+String(customer.alternate_phone||"Not added")+'</span></div>'+
+      '<div class="account-detail"><b>Delivery address</b><span>'+String(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span></div>';
+    const orders=await db.from("website_orders").select("order_no,status,total,created_at").eq("customer_id",customer.id).order("created_at",{ascending:false});
+    const box=document.getElementById("accountOrders");
+    if(orders.error){box.innerHTML='<p class="cc-status">Unable to load orders.</p>';return;}
+    box.innerHTML=orders.data?.length?orders.data.map(o=>'<div class="account-order"><div><b>'+o.order_no+'</b><span>'+new Date(o.created_at).toLocaleString("en-IN")+'</span></div><div><b>'+money(o.total)+'</b><span>'+o.status+'</span></div></div>').join(""):'<p class="cc-muted">No orders yet.</p>';
+  });
+  document.getElementById("accountLogout").onclick=async()=>{await db.auth.signOut({scope:"local"});window.location.href="index.html";};
+});
+</script>
+</body>
+</html>
