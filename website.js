@@ -72,6 +72,7 @@ function bindWebsiteEnquiry(){
 
 function injectCustomerUI(){
   if(document.getElementById("ccCustomerLayer"))return;
+
   const nav=document.getElementById("navMenu");
   if(nav&&!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
@@ -89,12 +90,13 @@ function injectCustomerUI(){
   layer.innerHTML=`
     <div class="cc-modal" role="dialog" aria-modal="true" aria-labelledby="ccModalTitle">
       <button type="button" class="cc-close" id="ccClose" aria-label="Close">×</button>
+
       <div id="ccLoginView" class="cc-view">
         <div class="cc-eyebrow">Customer account</div>
-        <h2 id="ccModalTitle">Login to order</h2>
-        <p class="cc-muted">Use your email and password to place orders and see your order history.</p>
+        <h2 id="ccModalTitle">Login</h2>
+        <p class="cc-muted">Login with your phone number and password.</p>
         <form id="ccLoginForm">
-          <label>Email<input id="ccLoginEmail" type="email" autocomplete="email" required></label>
+          <label>Phone number<input id="ccLoginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
           <label>Password<input id="ccLoginPassword" type="password" autocomplete="current-password" required></label>
           <p id="ccLoginStatus" class="cc-status" aria-live="polite"></p>
           <button class="btn btn-primary cc-wide" type="submit">Login</button>
@@ -104,15 +106,12 @@ function injectCustomerUI(){
 
       <div id="ccSignupView" class="cc-view hidden">
         <div class="cc-eyebrow">New customer</div>
-        <h2>Create your account</h2>
-        <p class="cc-muted">Your customer details are stored in CleanCore Manager with your website account.</p>
+        <h2>Create account</h2>
+        <p class="cc-muted">Only phone number and password are required. Email is optional.</p>
         <form id="ccSignupForm">
-          <label>Name<input id="ccSignupName" autocomplete="name" required></label>
-          <label>Business name<input id="ccSignupBusiness" autocomplete="organization"></label>
-          <label>Phone<input id="ccSignupPhone" inputmode="numeric" maxlength="10" autocomplete="tel" required></label>
-          <label>Email<input id="ccSignupEmail" type="email" autocomplete="email" required></label>
-          <label>Password<input id="ccSignupPassword" type="password" minlength="8" autocomplete="new-password" required></label>
-          <label>Delivery address<textarea id="ccSignupDelivery" rows="3" autocomplete="street-address"></textarea></label>
+          <label>Phone number<input id="ccSignupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
+          <label>Email <span class="cc-optional">(optional)</span><input id="ccSignupEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+          <label>Password<input id="ccSignupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required></label>
           <p id="ccSignupStatus" class="cc-status" aria-live="polite"></p>
           <button class="btn btn-primary cc-wide" type="submit">Create account</button>
         </form>
@@ -190,7 +189,9 @@ function toastSite(message){
 }
 
 function showCustomerView(name){
-  ["login","signup","account","order"].forEach(v=>document.getElementById("cc"+v.charAt(0).toUpperCase()+v.slice(1)+"View")?.classList.toggle("hidden",v!==name));
+  const map={login:"ccLoginView",signup:"ccSignupView",account:"ccAccountView",order:"ccOrderView"};
+  Object.values(map).forEach(id=>document.getElementById(id)?.classList.add("hidden"));
+  if(map[name])document.getElementById(map[name])?.classList.remove("hidden");
 }
 
 function openCustomerPanel(view="login",startOrder=false){
@@ -209,27 +210,29 @@ function openCustomerPanel(view="login",startOrder=false){
     showCustomerView(view==="signup"?"signup":"login");
   }
 }
+
 function closeCustomerPanel(){
   const layer=document.getElementById("ccCustomerLayer");
   if(layer)layer.classList.add("hidden");
   document.body.classList.remove("cc-modal-open");
 }
+
 function switchToOrderAfterLogin(){
-  if(customerUser&&pendingOrderProduct){
-    showOrderForm(pendingOrderProduct);
-  }
+  if(customerUser&&pendingOrderProduct)showOrderForm(pendingOrderProduct);
 }
 
 async function loginCustomer(e){
   e.preventDefault();
   const status=document.getElementById("ccLoginStatus");
   status.textContent="";
-  const email=document.getElementById("ccLoginEmail").value.trim();
+  const phone=normalizeSitePhone(document.getElementById("ccLoginPhone").value);
   const password=document.getElementById("ccLoginPassword").value;
-  const {data,error}=await siteDb.auth.signInWithPassword({email,password});
+  if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return;}
+  const {data,error}=await siteDb.auth.signInWithPassword({phone:"+91"+phone,password});
   if(error){status.textContent=error.message;return;}
-  customerUser=data.user;await loadCustomerProfile();
-  if(!customerProfile){status.textContent="Customer profile was not found. Please create a customer account.";return;}
+  customerUser=data.user;
+  await loadCustomerProfile();
+  if(!customerProfile){status.textContent="Customer profile could not be loaded. Please try again.";return;}
   document.getElementById("ccLoginForm").reset();
   renderCustomerNav();renderAccount();switchToOrderAfterLogin();
   if(!pendingOrderProduct)showCustomerView("account");
@@ -244,18 +247,17 @@ async function signupCustomer(e){
   const email=document.getElementById("ccSignupEmail").value.trim();
   const password=document.getElementById("ccSignupPassword").value;
   if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
+
   const {data,error}=await siteDb.auth.signUp({
-    email,password,
-    options:{data:{
-      full_name:document.getElementById("ccSignupName").value.trim(),
-      business_name:document.getElementById("ccSignupBusiness").value.trim(),
-      phone,
-      delivery_address:document.getElementById("ccSignupDelivery").value.trim()
-    }}
+    phone:"+91"+phone,
+    password,
+    options:{data:{customer_email:email}}
   });
   if(error){status.textContent=error.message;return;}
+
   if(data?.session&&data?.user){
-    customerUser=data.user;await loadCustomerProfile();
+    customerUser=data.user;
+    await loadCustomerProfile();
     if(customerProfile){
       document.getElementById("ccSignupForm").reset();
       renderCustomerNav();renderAccount();switchToOrderAfterLogin();
@@ -263,7 +265,8 @@ async function signupCustomer(e){
       return;
     }
   }
-  status.textContent="Account created. Check your email to verify the account, then login.";
+
+  status.textContent="Account created. Check the verification code sent to your phone, then login.";
 }
 
 async function loadCustomerProfile(){
@@ -281,8 +284,8 @@ function renderCustomerNav(){
 }
 
 function renderAccount(){
-  document.getElementById("ccAccountName").textContent=customerProfile?.name||customerUser?.email||"Customer account";
-  const bits=[customerProfile?.business_name,customerProfile?.phone,customerProfile?.email||customerUser?.email].filter(Boolean);
+  document.getElementById("ccAccountName").textContent=customerProfile?.name||("Customer "+normalizeSitePhone(customerUser?.phone||""));
+  const bits=[customerProfile?.phone,customerProfile?.email].filter(Boolean);
   document.getElementById("ccAccountMeta").textContent=bits.join(" • ");
   document.getElementById("ccOrdersPanel").innerHTML="";
 }
@@ -307,8 +310,8 @@ function openOrder(product){
     document.getElementById("ccLoginStatus").textContent="Login or create a customer account to place this order.";
     return;
   }
-  showOrderForm(product);
   openCustomerPanel("account");
+  showOrderForm(product);
 }
 
 function showOrderForm(product){
@@ -345,8 +348,6 @@ async function placeCustomerOrder(e){
   if(error){status.textContent=error.message;return;}
   const order=data||{};
   pendingOrderProduct=null;
-  status.textContent="";
-  renderAccount();
   await loadCustomerOrders(false);
   document.getElementById("ccOrdersPanel").insertAdjacentHTML("afterbegin",'<div class="cc-success">Order placed successfully. Order number: <strong>'+escSite(order.order_no)+'</strong> • Total: <strong>'+siteMoney(order.total)+'</strong></div>');
   showCustomerView("account");
