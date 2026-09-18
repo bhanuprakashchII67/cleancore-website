@@ -65,7 +65,7 @@ function renderCart(){
   }
   panel.innerHTML=customerCart.map(item=>'<div class="cc-cart-item"><div class="cc-cart-item-main"><strong>'+escSite(item.name)+'</strong><span>'+escSite(item.unit)+' · '+siteMoney(item.price)+'</span></div><div class="cc-cart-item-actions"><button type="button" data-cart-dec="'+escSite(item.product_id)+'" aria-label="Decrease quantity">−</button><b>'+item.quantity+'</b><button type="button" data-cart-inc="'+escSite(item.product_id)+'" aria-label="Increase quantity">+</button><button type="button" class="cc-cart-remove" data-cart-remove="'+escSite(item.product_id)+'">Remove</button></div></div>').join("");
   if(total)total.textContent=siteMoney(cartSubtotal());
-  if(checkout)checkout.disabled=!customerUser||!customerProfile;
+  if(checkout)checkout.disabled=false;
 }
 function openCart(){
   const layer=document.getElementById("ccCustomerLayer");
@@ -83,6 +83,8 @@ function closeCart(){
   document.getElementById("ccAuthModal")?.classList.remove("hidden");
 }
 function showCheckout(){
+  window.location.href="checkout.html";
+  return;
   if(!customerUser){
     closeCart();
     openCustomerPanel("login");
@@ -387,9 +389,11 @@ async function loginCustomer(e){
   const {error:setError}=await siteDb.auth.setSession(data.session);
   if(setError){status.textContent=setError.message;return;}
   customerUser=data.user||data.session.user;
-  customerProfile=data.customer||null;
+  customerProfile=null;
+  await loadCustomerProfile();
   document.getElementById("ccLoginForm").reset();
   renderCustomerNav();renderAccount();closeCustomerPanel();
+  if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
 }
 
 async function signupCustomer(e){
@@ -410,9 +414,11 @@ async function signupCustomer(e){
   const {error:setError}=await siteDb.auth.setSession(data.session);
   if(setError){status.textContent=setError.message;return;}
   customerUser=data.user||data.session.user;
-  customerProfile=data.customer||null;
+  customerProfile=null;
+  await loadCustomerProfile();
   document.getElementById("ccSignupForm").reset();
   renderCustomerNav();renderAccount();closeCustomerPanel();
+  if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
 }
 
 async function loadCustomerProfile(){
@@ -502,6 +508,61 @@ async function placeCustomerOrder(e){
   document.getElementById("ccOrdersPanel").innerHTML='<div class="cc-success">Order placed successfully. Order number: <strong>'+escSite(order.order_no)+'</strong> • Total: <strong>'+siteMoney(order.total)+'</strong></div>';
   showCustomerView("account");
 }
+
+window.initCleanCoreCheckout=function(){
+  if(!location.pathname.toLowerCase().includes("checkout.html"))return;
+  const empty=document.getElementById("checkoutEmpty");
+  const auth=document.getElementById("checkoutAuthRequired");
+  const content=document.getElementById("checkoutContent");
+  if(!empty||!auth||!content)return;
+  const items=loadCustomerCart();
+  if(!items.length){
+    empty.classList.remove("hidden");auth.classList.add("hidden");content.classList.add("hidden");return;
+  }
+  if(!customerUser){
+    auth.classList.remove("hidden");empty.classList.add("hidden");content.classList.add("hidden");
+    document.getElementById("checkoutLoginBtn").onclick=()=>{
+      injectCustomerUI();
+      openCustomerPanel("login");
+      document.getElementById("ccLoginStatus").textContent="Login to continue checkout.";
+    };
+    return;
+  }
+  auth.classList.add("hidden");empty.classList.add("hidden");content.classList.remove("hidden");
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??"";};
+  set("checkoutName",customerProfile?.name==="Customer"?"":customerProfile?.name);
+  set("checkoutEmail",customerProfile?.email);
+  set("checkoutAlternate",customerProfile?.alternate_phone);
+  set("checkoutAddress",customerProfile?.delivery_address);
+  document.getElementById("checkoutItems").innerHTML=items.map(x=>'<div class="checkout-item"><div><strong>'+escSite(x.name)+'</strong><span>'+escSite(x.unit)+' × '+x.quantity+'</span></div><strong>'+siteMoney(Number(x.price)*Number(x.quantity))+'</strong></div>').join("");
+  document.getElementById("checkoutTotal").textContent=siteMoney(items.reduce((n,x)=>n+Number(x.price)*Number(x.quantity),0));
+  const form=document.getElementById("checkoutForm");
+  if(form.dataset.bound==="1")return;
+  form.dataset.bound="1";
+  form.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const status=document.getElementById("checkoutStatus"),btn=document.getElementById("checkoutPlaceBtn");
+    const name=document.getElementById("checkoutName").value.trim();
+    const email=document.getElementById("checkoutEmail").value.trim();
+    const alternate=normalizeSitePhone(document.getElementById("checkoutAlternate").value.trim());
+    const address=document.getElementById("checkoutAddress").value.trim();
+    if(!name){status.textContent="Enter your full name.";return;}
+    if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent="Enter a valid email address.";return;}
+    if(alternate&&!phoneRE.test(alternate)){status.textContent="Enter a valid 10-digit alternate number.";return;}
+    if(!address){status.textContent="Enter your delivery address.";return;}
+    btn.disabled=true;status.textContent="Saving details and placing order…";
+    const {data:profile,error:profileError}=await siteDb.rpc("update_website_customer_profile",{p_name:name,p_email:email,p_alternate_phone:alternate,p_delivery_address:address});
+    if(profileError){btn.disabled=false;status.textContent=profileError.message;return;}
+    customerProfile={...customerProfile,...(profile||{})};
+    const {data:order,error}=await siteDb.rpc("place_website_cart_order",{p_items:items.map(x=>({product_id:x.product_id,quantity:Number(x.quantity)})),p_notes:address});
+    if(error){btn.disabled=false;status.textContent=error.message;return;}
+    customerCart=[];saveCustomerCart();
+    document.getElementById("checkoutContent").classList.add("hidden");
+    const success=document.getElementById("checkoutSuccess");
+    success.classList.remove("hidden");
+    success.innerHTML='<div class="cc-success"><h2>Order placed successfully</h2><p>Order number: <strong>'+escSite(order?.order_no)+'</strong></p><p>Total: <strong>'+siteMoney(order?.total)+'</strong></p><a class="btn btn-primary" href="index.html">Continue shopping</a></div>';
+  });
+};
 
 function logoutCustomer(){
   siteDb.auth.signOut({scope:"local"}).finally(()=>{
