@@ -525,7 +525,7 @@ window.initCleanCoreCheckout=function(){
   }
   auth.classList.add("hidden");empty.classList.add("hidden");content.classList.remove("hidden");
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??"";};
-  set("checkoutName",customerProfile?.name==="Customer"?"":customerProfile?.name);
+  set("checkoutName",/^Customer\s+\d{10}$/.test(String(customerProfile?.name||""))?"":customerProfile?.name);
   set("checkoutEmail",customerProfile?.email);
   set("checkoutAlternate",customerProfile?.alternate_phone);
   const addr=String(customerProfile?.delivery_address||"");
