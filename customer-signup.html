@@ -52,7 +52,7 @@ document.getElementById("signupForm").addEventListener("submit",async e=>{
     const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
       method:"POST",
       headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
-      body:JSON.stringify({action:"signup",phone,email:"",password})
+      body:JSON.stringify({action:"signup",phone,email:"",password,source:getSource()})
     });
     const raw=await response.text();let data=null;
     try{data=raw?JSON.parse(raw):null}catch(_){}
