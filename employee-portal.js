@@ -4,6 +4,17 @@ const portalDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_K
 const params=new URLSearchParams(location.search);
 const portalKey=params.get("key")||"";
 const staffAuthSuffix="@staff.cleancore.local";
+const PORTAL_VERSION="3.7.4";
+let portalErrorBusy=false;
+function reportPortalError(err,meta={}){
+ const e=err instanceof Error?err:new Error(String(err||"Unknown error"));
+ if(portalErrorBusy)return;
+ portalErrorBusy=true;
+ portalDb?.rpc("log_client_error",{p_app_name:meta.app_name||"CleanCore Employee Portal",p_app_version:PORTAL_VERSION,p_page:location.pathname.split("/").pop()||"employee.html",p_url:location.href,p_action:meta.action||"",p_error_name:e.name||"Error",p_message:String(e.message||e).slice(0,4000),p_stack:String(e.stack||"").slice(0,12000),p_context:meta.context||{},p_user_agent:navigator.userAgent}).catch(()=>{}).finally(()=>{portalErrorBusy=false});
+}
+window.addEventListener("error",e=>reportPortalError(e.error||new Error(e.message||"Unhandled browser error"),{action:"window_error",context:{source:e.filename||"",line:e.lineno||0,column:e.colno||0}}));
+window.addEventListener("unhandledrejection",e=>reportPortalError(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
+
 const modules=[
   ["dashboard","Overview"],
   ["products","Products & Stock"],
@@ -54,7 +65,7 @@ async function loadEmployee(user){
   const {data,error}=await portalDb.from("employees")
     .select("id,auth_user_id,username,full_name,team,active,starts_at,ends_at,portal_key")
     .eq("auth_user_id",user.id).maybeSingle();
-  if(error||!data){
+  if(error||!data){if(error)reportPortalError(error,{action:"portal_load_employee"});
     await portalDb.auth.signOut({scope:"local"});
     return showLogin(),setStatus($("portalLoginStatus"),"Employee account not found.");
   }
@@ -69,7 +80,7 @@ async function loadEmployee(user){
   employee=data;
   const {data:perms,error:perr}=await portalDb.from("employee_permissions")
     .select("module").eq("employee_id",employee.id).eq("enabled",true);
-  if(perr){
+  if(perr){reportPortalError(perr,{action:"portal_load_permissions"});
     await portalDb.auth.signOut({scope:"local"});
     return showLogin(),setStatus($("portalLoginStatus"),"Unable to load your permissions.");
   }
@@ -125,7 +136,7 @@ async function fetchModule(module){
   else if(module==="expenses")query=portalDb.from("expenses").select("expense_date,category,amount,vendor").order("expense_date",{ascending:false}).limit(200);
   if(!query)return [];
   const {data,error}=await query;
-  if(error)throw new Error(error.message);
+  if(error){reportPortalError(error,{action:"portal_fetch_module",context:{module}});throw new Error(error.message);}
   records[module]=data||[];
   return records[module];
 }
@@ -177,7 +188,7 @@ async function requestAccess(e){
   if(!reason)return setStatus($("portalAccessStatus"),"Enter a reason for the request.");
   setStatus($("portalAccessStatus"),"Sending request…");
   const {data,error}=await portalDb.rpc("request_additional_access",{p_module:module,p_reason:reason});
-  if(error)return setStatus($("portalAccessStatus"),error.message);
+  if(error){reportPortalError(error,{action:"portal_access_request"});return setStatus($("portalAccessStatus"),error.message);}
   $("portalAccessReason").value="";
   setStatus($("portalAccessStatus"),"Request sent to Manager.",true);
   await loadAccessHistory();
