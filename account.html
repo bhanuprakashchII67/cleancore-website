@@ -19,7 +19,18 @@
 <section class="checkout-card">
 <div class="checkout-card-head"><span>1</span><div><h2>Customer details</h2><p>Saved for faster checkout.</p></div></div>
 <div id="accountDetails"></div>
-<div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
+<div id="accountEdit" class="account-edit hidden">
+<form id="accountEditForm">
+<label>Full name<input id="accountEditName" type="text" autocomplete="name" required></label>
+<label>Mobile<input id="accountEditPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" required></label>
+<label>Email<input id="accountEditEmail" type="email" autocomplete="email"></label>
+<label>Alternate mobile<input id="accountEditAlternate" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel"></label>
+<label class="account-edit-full">Delivery address<textarea id="accountEditAddress" rows="5"></textarea></label>
+<p id="accountEditStatus" class="cc-status" aria-live="polite"></p>
+<div class="account-edit-actions"><button type="submit" class="btn btn-primary">Save changes</button><button type="button" class="btn btn-secondary" id="accountEditCancel">Cancel</button></div>
+</form>
+</div>
+<div class="account-actions"><button class="btn btn-secondary" id="accountEditOpen" type="button">Edit details</button><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
 </section>
 <section class="checkout-card">
 <div class="checkout-card-head"><span>2</span><div><h2>My orders</h2><p>Your recent CleanCore website orders.</p></div></div>
@@ -29,7 +40,7 @@
 </div>
 </div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.7.4"></script>
+<script src="website.js?v=3.7.5"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const db=window.supabase?.createClient("https://rwfamxkfqslorxcryjrp.supabase.co", "sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",{auth:{storageKey:"cleancore-customer-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
@@ -42,12 +53,57 @@ document.addEventListener("DOMContentLoaded",()=>{
     const {data:customer}=await db.from("customers").select("name,phone,email,alternate_phone,business_name,delivery_address").eq("auth_user_id",user.id).maybeSingle();
     if(!customer){notice.classList.remove("hidden");return;}
     content.classList.remove("hidden");
-    document.getElementById("accountDetails").innerHTML=
-      '<div class="account-detail"><b>Full name</b><span>'+esc(customer.name||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Mobile</b><span>'+esc(customer.phone||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Email</b><span>'+esc(customer.email||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Alternate mobile</b><span>'+esc(customer.alternate_phone||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Delivery address</b><span>'+esc(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span></div>';
+    const renderCustomer=()=>{
+      document.getElementById("accountDetails").innerHTML=
+        '<div class="account-detail"><b>Full name</b><span>'+esc(customer.name||"Not added")+'</span></div>'+
+        '<div class="account-detail"><b>Mobile</b><span>'+esc(customer.phone||"Not added")+'</span></div>'+
+        '<div class="account-detail"><b>Email</b><span>'+esc(customer.email||"Not added")+'</span></div>'+
+        '<div class="account-detail"><b>Alternate mobile</b><span>'+esc(customer.alternate_phone||"Not added")+'</span></div>'+
+        '<div class="account-detail"><b>Delivery address</b><span>'+esc(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span></div>';
+    };
+    renderCustomer();
+    const editBox=document.getElementById("accountEdit");
+    const editForm=document.getElementById("accountEditForm");
+    const editStatus=document.getElementById("accountEditStatus");
+    const openEdit=()=>{
+      document.getElementById("accountEditName").value=customer.name||"";
+      document.getElementById("accountEditPhone").value=customer.phone||"";
+      document.getElementById("accountEditEmail").value=customer.email||"";
+      document.getElementById("accountEditAlternate").value=customer.alternate_phone||"";
+      document.getElementById("accountEditAddress").value=customer.delivery_address||"";
+      editStatus.textContent="";
+      editBox.classList.remove("hidden");
+      document.getElementById("accountEditName").focus();
+    };
+    document.getElementById("accountEditOpen").onclick=openEdit;
+    document.getElementById("accountEditCancel").onclick=()=>editBox.classList.add("hidden");
+    editForm.addEventListener("submit",async e=>{
+      e.preventDefault();
+      const name=document.getElementById("accountEditName").value.trim();
+      const phone=normalizeSitePhone(document.getElementById("accountEditPhone").value).slice(0,10);
+      const email=document.getElementById("accountEditEmail").value.trim();
+      const alternate=normalizeSitePhone(document.getElementById("accountEditAlternate").value).slice(0,10);
+      const address=document.getElementById("accountEditAddress").value.trim();
+      if(!name){editStatus.textContent="Enter your full name.";return;}
+      if(!phoneRE.test(phone)){editStatus.textContent="Enter a valid 10-digit mobile number.";return;}
+      if(alternate&&!phoneRE.test(alternate)){editStatus.textContent="Enter a valid 10-digit alternate mobile number.";return;}
+      if(!validSiteEmail(email)){editStatus.textContent="Enter a valid email address.";return;}
+      const btn=editForm.querySelector("button[type=submit]");
+      btn.disabled=true;btn.textContent="Saving…";editStatus.textContent="";
+      const {data,error}=await db.from("customers").update({
+        name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:address||null
+      }).eq("id",customer.id).eq("auth_user_id",user.id).select("name,phone,email,alternate_phone,business_name,delivery_address").single();
+      btn.disabled=false;btn.textContent="Save changes";
+      if(error){
+        reportSiteError(error,{action:"account_customer_update"});
+        editStatus.textContent=error.message||"Unable to save your details.";
+        return;
+      }
+      Object.assign(customer,data);
+      renderCustomer();
+      editBox.classList.add("hidden");
+      toastSite("Your details were updated.");
+    });
     const orders=await db.from("website_orders").select("order_no,status,total,created_at").eq("customer_id",customer.id).order("created_at",{ascending:false});
     const box=document.getElementById("accountOrders");
     if(orders.error){box.innerHTML='<p class="cc-status">Unable to load orders.</p>';return;}
