@@ -476,3 +476,28 @@ button,a{touch-action:manipulation}
 .account-address-line strong{font-size:12px;color:var(--navy);font-weight:900;text-transform:uppercase;letter-spacing:.02em}
 .account-address-line span{font-size:14px;color:var(--muted);line-height:1.5;min-width:0}
 @media(max-width:600px){.account-address-line{grid-template-columns:1fr;gap:3px}}
+
+
+.account-edit-form-wrap{margin-top:18px}
+.account-inline-form{border-top:1px solid var(--line);padding-top:18px}
+.account-inline-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.account-inline-form label{display:grid;gap:6px;color:var(--navy);font-size:12px;font-weight:900}
+.account-inline-form input{width:100%;box-sizing:border-box;border:1px solid #d5e0e8;border-radius:10px;padding:12px;background:#fff;color:var(--navy);font:inherit}
+.account-inline-section{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.account-inline-title{font-size:14px;font-weight:900;color:var(--navy);margin-bottom:14px}
+.address-grid{align-items:end}
+.full-row{grid-column:1/-1}
+.account-location-btn{min-height:44px;border:0;border-radius:10px;background:#2276e8;color:#fff;font-weight:900;cursor:pointer}
+.account-address-types{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.account-address-types>span{font-size:12px;font-weight:900;color:var(--navy);margin-right:6px}
+.account-address-types label{display:flex;align-items:center;gap:7px;border:1px solid #d5e0e8;border-radius:999px;padding:9px 14px;background:#fff;cursor:pointer}
+.account-address-types input{width:auto}
+.account-inline-actions{display:flex;gap:10px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.account-inline-actions .btn{flex:1}
+.account-edit-button.hidden{display:none}
+@media(max-width:600px){
+ .account-inline-grid{grid-template-columns:1fr}
+ .full-row{grid-column:1}
+ .account-inline-actions{flex-direction:column}
+ .account-address-types{align-items:stretch}
+}
