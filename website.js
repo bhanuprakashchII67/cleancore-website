@@ -5,7 +5,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.7.5";
+const SITE_VERSION="3.7.6";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -24,7 +24,6 @@ function reportSiteError(err,meta={}){
  siteDb?.rpc("log_client_error",{p_app_name:meta.app_name||"CleanCore Website",p_app_version:SITE_VERSION,p_page:location.pathname.split("/").pop()||"index.html",p_url:location.href,p_action:meta.action||"",p_error_name:e.name||"Error",p_message:String(e.message||e).slice(0,4000),p_stack:String(e.stack||"").slice(0,12000),p_context:meta.context||{},p_user_agent:navigator.userAgent}).catch(()=>{}).finally(()=>{siteErrorBusy=false});
 }
 window.addEventListener("error",e=>reportSiteError(e.error||new Error(e.message||"Unhandled browser error"),{action:"window_error",context:{source:e.filename||"",line:e.lineno||0,column:e.colno||0}}));
-window.addEventListener("unhandledrejection",e=>reportSiteError(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
 window.addEventListener("unhandledrejection",e=>reportSiteError(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
 
 let publicProducts=[];
