@@ -83,16 +83,30 @@ document.addEventListener("DOMContentLoaded",()=>{
       editWrap.classList.remove("hidden");
       return document.getElementById("accountInlineForm");
     };
+    const closeAccountEditor=()=>{
+      accountEditing=false;
+      editWrap.classList.add("hidden");
+      editWrap.innerHTML="";
+      editButton.classList.remove("hidden");
+      editButton.hidden=false;
+    };
     editButton.onclick=()=>{
       if(accountEditing)return;
       accountEditing=true;
       editButton.classList.add("hidden");
+      editButton.hidden=true;
       const form=editTemplate();
-      document.getElementById("editCancel").onclick=()=>{
-        accountEditing=false;
-        editWrap.classList.add("hidden");
-        editButton.classList.remove("hidden");
-      };
+      const cancelButton=document.getElementById("editCancel");
+      cancelButton.type="button";
+      cancelButton.addEventListener("click",e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        closeAccountEditor();
+      });
+      form.addEventListener("reset",e=>{
+        e.preventDefault();
+        closeAccountEditor();
+      });
       document.getElementById("editLocationBtn").onclick=()=>{
         if(!navigator.geolocation)return toastSite("Location is not available on this device.");
         navigator.geolocation.getCurrentPosition(
