@@ -1,4 +1,4 @@
-(()=>{if(window.__ccErrorMonitorInstalled)return;window.__ccErrorMonitorInstalled=true;
+(()=>{if(window.__ccErrorMonitorInstalled||window.__ccWebsiteLoggerActive)return;window.__ccErrorMonitorInstalled=true;
 const URL="https://rwfamxkfqslorxcryjrp.supabase.co",KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",VERSION="3.7.13";
 const db=window.supabase?.createClient?.(URL,KEY);
 const read=()=>{try{const q=JSON.parse(localStorage.getItem("cc_error_queue")||"[]");return Array.isArray(q)?q:[]}catch{return[]}};
