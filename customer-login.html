@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Customer Login | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.17">
+<link rel="stylesheet" href="style.css?v=1.23">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -35,6 +35,7 @@ const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:"cleancore-customer-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
 const validPhone=v=>/^[6-9]\d{9}$/.test(v);
+const getSource=()=>{const q=new URLSearchParams(location.search).get("source");return q||"Landing Page";};
 const getNext=()=>{
   const n=new URLSearchParams(location.search).get("next");
   return n==="checkout.html"||n==="account.html"||n==="index.html" ? "./"+n : "./index.html";
@@ -51,7 +52,7 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
     const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
       method:"POST",
       headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
-      body:JSON.stringify({action:"login",identifier:phone,password})
+      body:JSON.stringify({action:"login",identifier:phone,password,source:getSource()})
     });
     const raw=await response.text();let data=null;
     try{data=raw?JSON.parse(raw):null}catch(_){}
