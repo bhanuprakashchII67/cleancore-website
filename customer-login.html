@@ -55,7 +55,7 @@ forgotSend.addEventListener("click",async e=>{
   e.preventDefault();
   const email=document.getElementById("forgotEmail").value.trim();
   forgotStatus.className="cc-status";forgotStatus.textContent="";
-  if(!email||!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){forgotStatus.textContent="Enter a valid email address.";return;}
+  if(!email||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)===false){forgotStatus.textContent="Enter a valid email address.";return;}
   forgotSend.disabled=true;forgotCancel.disabled=true;forgotSend.textContent="Sending…";
   try{
     const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify({action:"request_password_reset",email})});
