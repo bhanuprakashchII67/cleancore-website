@@ -31,22 +31,16 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
-  const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
-  const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
-  const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
-    auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
-  });
-  const notice=document.getElementById("accountLoginNotice");
-  const content=document.getElementById("accountContent");
-  const details=document.getElementById("accountDetails");
-  const ordersBox=document.getElementById("accountOrders");
-  const editButton=document.getElementById("accountEditToggle");
-  const editWrap=document.getElementById("accountEditFormWrap");
+  const notice=document.getElementById("accountLoginNotice"), content=document.getElementById("accountContent");
+  const details=document.getElementById("accountDetails"), ordersBox=document.getElementById("accountOrders");
+  const editButton=document.getElementById("accountEditToggle"), editWrap=document.getElementById("accountEditFormWrap");
   const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
   const esc=v=>String(v??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-  const setNotice=(msg)=>{notice.classList.remove("hidden");notice.querySelector("p").textContent=msg;content.classList.add("hidden");};
-  const setOrderError=(msg)=>{ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(msg)+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);};
-  let customer=null, orders=[];
+  const phone=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"").slice(-10);
+  const emailOK=v=>!v||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const showNotice=m=>{notice.classList.remove("hidden");notice.querySelector("p").textContent=m;content.classList.add("hidden");};
+  const orderError=m=>{ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(m||"Please try again.")+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);};
+  let db, user, customer, orders=[];
   function renderCustomer(){
     details.innerHTML=
       '<div class="account-detail"><b>Full name</b><span>'+esc(customer.name||"Not added")+'</span></div>'+
@@ -55,54 +49,72 @@
       '<div class="account-detail"><b>Alternate mobile</b><span>'+esc(customer.alternate_phone||"Not added")+'</span></div>'+
       '<div class="account-detail"><b>Business</b><span>'+esc(customer.business_name||"Not added")+'</span></div>'+
       '<div class="account-detail account-address-detail"><b>Delivery address</b><span class="account-address-summary">'+
-      ([customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).map(esc).join(", ")||esc(customer.delivery_address||"Not added"))+
-      '</span></div>';
+      ([customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).map(esc).join(", ")||esc(customer.delivery_address||"Not added"))+'</span></div>';
+  }
+  function closeEdit(){editWrap.classList.add("hidden");editWrap.innerHTML="";editButton.classList.remove("hidden");editButton.hidden=false;}
+  function openEdit(){
+    const val=k=>customer[k]||"";
+    editWrap.innerHTML='<form id="accountInlineForm" class="account-inline-form">'+
+      '<div class="account-inline-grid">'+
+      '<label>Full name<input id="editName" value="'+esc(val("name"))+'" required></label>'+
+      '<label>Mobile<input id="editPhone" inputmode="numeric" maxlength="10" value="'+esc(val("phone"))+'" required></label>'+
+      '<label>Email<input id="editEmail" type="email" value="'+esc(val("email"))+'"></label>'+
+      '<label>Alternate mobile<input id="editAlternate" inputmode="numeric" maxlength="10" value="'+esc(val("alternate_phone"))+'"></label></div>'+
+      '<div class="account-inline-section"><div class="account-inline-title">Delivery address</div><div class="account-inline-grid address-grid">'+
+      '<label>Pincode (Required) *<input id="editPincode" inputmode="numeric" maxlength="6" value="'+esc(val("delivery_pincode"))+'" required></label>'+
+      '<label>State (Required) *<input id="editState" value="'+esc(val("delivery_state"))+'" required></label>'+
+      '<label>City (Required) *<input id="editCity" value="'+esc(val("delivery_city"))+'" required></label>'+
+      '<label class="full-row">House No., Building Name (Required) *<input id="editHouse" value="'+esc(val("delivery_shop_no"))+'" required></label>'+
+      '<label class="full-row">Road name, Area, Colony (Required) *<input id="editColony" value="'+esc(val("delivery_colony")||val("delivery_address"))+'" required></label>'+
+      '</div></div><div class="account-inline-actions"><button class="btn btn-primary" type="submit">Save changes</button><button class="btn btn-secondary" id="editCancel" type="button">Cancel</button></div></form>';
+    editWrap.classList.remove("hidden"); editButton.classList.add("hidden"); editButton.hidden=true;
+    document.getElementById("editCancel").onclick=closeEdit;
+    document.getElementById("accountInlineForm").onsubmit=async e=>{
+      e.preventDefault();
+      const name=document.getElementById("editName").value.trim(), p=phone(document.getElementById("editPhone").value);
+      const em=document.getElementById("editEmail").value.trim(), alt=phone(document.getElementById("editAlternate").value);
+      const pin=document.getElementById("editPincode").value.trim(), state=document.getElementById("editState").value.trim(), city=document.getElementById("editCity").value.trim(), house=document.getElementById("editHouse").value.trim(), colony=document.getElementById("editColony").value.trim();
+      if(!name||!/^[6-9]\d{9}$/.test(p)||!emailOK(em)||(alt&&!/^[6-9]\d{9}$/.test(alt))||!/^[0-9]{6}$/.test(pin)||!state||!city||!house||!colony){alert("Please complete all required fields correctly.");return;}
+      const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent="Saving…";
+      try{
+        const next={name,phone:p,email:em||null,alternate_phone:alt||null,delivery_address:[house,colony,city,state,pin].join(" | "),delivery_shop_no:house,delivery_colony:colony,delivery_city:city,delivery_state:state,delivery_pincode:pin};
+        const res=await db.from("customers").update(next).eq("id",customer.id).eq("auth_user_id",user.id).select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source").single();
+        if(res.error)throw res.error;
+        customer=res.data;renderCustomer();closeEdit();
+      }catch(err){btn.disabled=false;btn.textContent="Save changes";alert(err?.message||"Unable to save your details.");}
+    };
   }
   async function loadOrders(){
     ordersBox.innerHTML='<div class="cc-loading">Loading orders…</div>';
     try{
       const res=await db.from("website_orders").select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount").eq("customer_id",customer.id).order("created_at",{ascending:false});
-      if(res.error) throw res.error;
-      orders=Array.isArray(res.data)?res.data:[];
+      if(res.error)throw res.error; orders=Array.isArray(res.data)?res.data:[];
       if(!orders.length){ordersBox.innerHTML='<p class="cc-muted">No orders yet.</p>';return;}
-      ordersBox.innerHTML=orders.map(o=>
-        '<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div>'+
-        '<div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div>'+
-        '<div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button></div></div>'
-      ).join("");
-      ordersBox.querySelectorAll("[data-order-id]").forEach(btn=>btn.addEventListener("click",async()=>{
-        const order=orders.find(o=>o.id===btn.dataset.orderId); if(!order)return;
-        try{
-          const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",order.id).order("created_at");
-          if(res.error) throw res.error;
-          const lines=(res.data||[]).map(it=>'<div class="account-order-detail-line"><span>'+esc(it.product_name)+'</span><span>'+esc(it.unit)+' × '+esc(it.qty)+' @ '+money(it.unit_price)+' = '+money(it.line_total)+'</span></div>').join("");
-          ordersBox.querySelectorAll(".account-order-details[data-for]").forEach(x=>x.remove());
-          const detail=document.createElement("div"); detail.className="account-order-details"; detail.dataset.for=order.id;
-          detail.innerHTML='<div><b>Order details</b></div>'+lines+
-            '<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(order.subtotal)+'</b></div>'+
-            '<div class="account-order-detail-total"><span>GST</span><b>'+money(order.gst_amount)+'</b></div>'+
-            '<div class="account-order-detail-total"><span>Total</span><b>'+money(order.total)+'</b></div>'+
-            '<div class="account-order-detail-note"><span>Note</span><span>'+esc(order.notes||"No note")+'</span></div>';
-          btn.closest(".account-order").insertAdjacentElement("afterend",detail);
-        }catch(err){ setOrderError(err?.message||"Unable to load order details."); }
+      ordersBox.innerHTML=orders.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div><div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button></div></div>').join("");
+      ordersBox.querySelectorAll("[data-order-id]").forEach(b=>b.onclick=async()=>{
+        const o=orders.find(x=>x.id===b.dataset.orderId);if(!o)return;
+        try{const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",o.id).order("created_at");if(res.error)throw res.error;
+          const lines=(res.data||[]).map(i=>'<div class="account-order-detail-line"><span>'+esc(i.product_name)+'</span><span>'+esc(i.unit)+' × '+esc(i.qty)+' @ '+money(i.unit_price)+' = '+money(i.line_total)+'</span></div>').join("");
+          ordersBox.querySelectorAll(".account-order-details").forEach(x=>x.remove());const d=document.createElement("div");d.className="account-order-details";d.dataset.for=o.id;
+          d.innerHTML='<div><b>Order details</b></div>'+lines+'<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(o.subtotal)+'</b></div><div class="account-order-detail-total"><span>GST</span><b>'+money(o.gst_amount)+'</b></div><div class="account-order-detail-total"><span>Total</span><b>'+money(o.total)+'</b></div><div class="account-order-detail-note"><span>Note</span><span>'+esc(o.notes||"No note")+'</span></div>';b.closest(".account-order").insertAdjacentElement("afterend",d);
+        }catch(err){orderError(err?.message);}
       });
-    }catch(err){ console.error(err); setOrderError(err?.message||"Unable to load orders."); }
+    }catch(err){console.error(err);orderError(err?.message);}
   }
-  document.addEventListener("DOMContentLoaded",async()=>{
+  async function start(){
     try{
-      if(!db) throw new Error("Customer website client did not initialize.");
-      const {data:sessionData,error:sessionError}=await db.auth.getSession();
-      if(sessionError)throw sessionError;
-      const user=sessionData?.session?.user;
+      if(!window.supabase?.createClient){setNotice("Customer account service did not load. Please refresh the page.");return;}
+      db=window.supabase.createClient("https://rwfamxkfqslorxcryjrp.supabase.co","sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+      const s=await db.auth.getSession();if(s.error)throw s.error;user=s.data?.session?.user;
       if(!user){setNotice("Login to view your CleanCore account and orders.");return;}
-      const {data:row,error}=await db.from("customers").select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source").eq("auth_user_id",user.id).is("archived_at",null).maybeSingle();
-      if(error)throw error;
-      if(!row){await db.auth.signOut({scope:"local"});setNotice("Your customer account is not currently available. Please login again or contact CleanCore.");return;}
-      customer=row; content.classList.remove("hidden"); renderCustomer(); await loadOrders();
-      editButton?.addEventListener("click",()=>{ editWrap.innerHTML='<div class="cc-status">Customer details are loaded. Edit form remains available from the current account tools.</div>'; editWrap.classList.remove("hidden"); editButton.classList.add("hidden"); });
-    }catch(err){ console.error(err); setNotice(err?.message||"Unable to load your account."); }
-    document.getElementById("accountLogout")?.addEventListener("click",async()=>{await db.auth.signOut({scope:"local"});location.href="index.html";});
-  });
+      const r=await db.from("customers").select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source").eq("auth_user_id",user.id).is("archived_at",null).maybeSingle();
+      if(r.error)throw r.error;if(!r.data){setNotice("Your customer profile was not found for this login.");return;}
+      customer=r.data;content.classList.remove("hidden");renderCustomer();await loadOrders();
+      editButton.onclick=openEdit;
+    }catch(err){console.error("ACCOUNT LOAD ERROR",err);setNotice(err?.message||"Unable to load your account.");}
+  }
+  document.getElementById("accountLogout")?.addEventListener("click",async()=>{if(db)await db.auth.signOut({scope:"local"});location.href="index.html";});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 })();
 </script>
 </body>
