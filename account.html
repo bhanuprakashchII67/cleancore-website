@@ -32,7 +32,7 @@
 <script src="website.js?v=3.7.11"></script>
 <script>
 document.addEventListener("DOMContentLoaded",async()=>{
-  const db=window.siteDb;
+  const db=siteDb;
   const notice=document.getElementById("accountLoginNotice"),content=document.getElementById("accountContent");
   const ordersBox=document.getElementById("accountOrders");
   const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
