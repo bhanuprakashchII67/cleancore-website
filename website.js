@@ -1,3 +1,4 @@
+window.__ccWebsiteLoggerActive=true;
 const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
 const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
