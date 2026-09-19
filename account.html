@@ -19,7 +19,7 @@
 <section class="checkout-card">
 <div class="checkout-card-head account-head"><span>1</span><div><h2>Customer details</h2><p>Saved for faster checkout.</p></div><button class="account-edit-button" id="accountEditToggle" type="button" aria-label="Edit customer details"><span aria-hidden="true">✎</span><span class="account-edit-label">Edit</span></button></div>
 <div id="accountDetails"></div><div id="accountEditFormWrap" class="account-edit-form-wrap hidden"></div>
-<div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
+<div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div><div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
 </section>
 <section class="checkout-card">
 <div class="checkout-card-head"><span>2</span><div><h2>My orders</h2><p>Your recent CleanCore website orders.</p></div></div>
@@ -29,7 +29,7 @@
 </div>
 </div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.8.0"></script>
+<script src="website.js?v=3.8.1"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const db=window.supabase?.createClient("https://rwfamxkfqslorxcryjrp.supabase.co", "sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",{auth:{storageKey:"cleancore-customer-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const editWrap=document.getElementById("accountEditFormWrap");
     const editTemplate=()=>{
       const legacy=String(customer.delivery_address||"");
-      const guess=(key,fallback="")=>customer[key]||fallback;
+      const val=(key)=>customer[key]||"";
       editWrap.innerHTML='<form id="accountInlineForm" class="account-inline-form">'+
         '<div class="account-inline-grid">'+
           '<label>Full name<input id="editName" value="'+esc(customer.name||"")+'" required></label>'+
@@ -68,12 +68,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         '</div>'+
         '<div class="account-inline-section"><div class="account-inline-title">Delivery address</div>'+
           '<div class="account-inline-grid address-grid">'+
-            '<label>Pincode (Required) *<input id="editPincode" inputmode="numeric" maxlength="6" value="'+esc(guess("delivery_pincode"))+'" required></label>'+
+            '<label>Pincode (Required) *<input id="editPincode" inputmode="numeric" maxlength="6" value="'+esc(val("delivery_pincode"))+'" required></label>'+
             '<button type="button" class="account-location-btn" id="editLocationBtn">⌖ Use my location</button>'+
-            '<label>State (Required) *<input id="editState" value="'+esc(guess("delivery_state"))+'" required></label>'+
-            '<label>City (Required) *<input id="editCity" value="'+esc(guess("delivery_city"))+'" required></label>'+
-            '<label class="full-row">House No., Building Name (Required) *<input id="editHouse" value="'+esc(guess("delivery_shop_no"))+'" required></label>'+
-            '<label class="full-row">Road name, Area, Colony (Required) *<input id="editColony" value="'+esc(guess("delivery_colony",legacy))+'" required></label>'+
+            '<label>State (Required) *<input id="editState" value="'+esc(val("delivery_state"))+'" required></label>'+
+            '<label>City (Required) *<input id="editCity" value="'+esc(val("delivery_city"))+'" required></label>'+
+            '<label class="full-row">House No., Building Name (Required) *<input id="editHouse" value="'+esc(val("delivery_shop_no"))+'" required></label>'+
+            '<label class="full-row">Road name, Area, Colony (Required) *<input id="editColony" value="'+esc(val("delivery_colony",legacy))+'" required></label>'+
             '<label class="full-row">Nearby Famous Shop/Mall/Landmark (Optional)<input id="editLandmark" value="'+esc("")+'"></label>'+
           '</div>'+
           '<div class="account-address-types"><span>Type of address</span><label><input type="radio" name="addressType" value="Home" checked> Home</label><label><input type="radio" name="addressType" value="Work"> Work</label></div>'+
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       return document.getElementById("accountInlineForm");
     };
     editButton.onclick=()=>{
-      if(accountEditing){return}
+      if(accountEditing)return;
       accountEditing=true;
       editButton.classList.add("hidden");
       const form=editTemplate();
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       document.getElementById("editLocationBtn").onclick=()=>{
         if(!navigator.geolocation)return toastSite("Location is not available on this device.");
         navigator.geolocation.getCurrentPosition(
-          pos=>toastSite("Location captured. Please confirm the address fields."),
+          ()=>toastSite("Location captured. Please confirm the address fields."),
           ()=>toastSite("Unable to access your location.")
         );
       };
@@ -111,12 +111,15 @@ document.addEventListener("DOMContentLoaded",()=>{
         const delivery_city=document.getElementById("editCity").value.trim();
         const delivery_shop_no=document.getElementById("editHouse").value.trim();
         const delivery_colony=document.getElementById("editColony").value.trim();
-        if(!name||!phoneRE.test(phone)||!validSiteEmail(email)|| (alternate&&!phoneRE.test(alternate)) || !/^\d{6}$/.test(delivery_pincode)||!delivery_state||!delivery_city||!delivery_shop_no||!delivery_colony){
+        if(!name||!phoneRE.test(phone)||!validSiteEmail(email)||(alternate&&!phoneRE.test(alternate))||!/^[0-9]{6}$/.test(delivery_pincode)||!delivery_state||!delivery_city||!delivery_shop_no||!delivery_colony){
           return toastSite("Please complete all required fields correctly.");
         }
         const saveBtn=form.querySelector('button[type="submit"]');
         saveBtn.disabled=true;saveBtn.textContent="Saving…";
-        const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:[delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode].filter(Boolean).join(", "),delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode};
+        const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,
+          delivery_address:[delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode].filter(Boolean).join(", "),
+          delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode
+        };
         const {data,error}=await db.from("customers").update(nextUpdate).eq("id",customer.id).eq("auth_user_id",user.id).select("name,phone,email,alternate_phone,business_name,delivery_address,billing_shop_no,billing_colony,billing_city,billing_state,billing_pincode,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode").single();
         if(error){saveBtn.disabled=false;saveBtn.textContent="Save changes";return toastSite(error.message||"Unable to save your details.");}
         Object.assign(customer,data);
