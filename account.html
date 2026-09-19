@@ -29,7 +29,7 @@
 </div>
 </div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.7.7"></script>
+<script src="website.js?v=3.7.8"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const db=window.supabase?.createClient("https://rwfamxkfqslorxcryjrp.supabase.co", "sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",{auth:{storageKey:"cleancore-customer-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
@@ -39,18 +39,27 @@ document.addEventListener("DOMContentLoaded",()=>{
   db.auth.getSession().then(async ({data})=>{
     const user=data.session?.user;
     if(!user){notice.classList.remove("hidden");return;}
-    const {data:customer}=await db.from("customers").select("name,phone,email,alternate_phone,business_name,delivery_address").eq("auth_user_id",user.id).maybeSingle();
+    const {data:customer}=await db.from("customers").select("name,phone,email,alternate_phone,business_name,delivery_address,billing_shop_no,billing_colony,billing_city,billing_state,billing_pincode,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode").eq("auth_user_id",user.id).maybeSingle();
     if(!customer){notice.classList.remove("hidden");return;}
     content.classList.remove("hidden");
     let accountEditing=false;
     const editButton=document.getElementById("accountEditToggle");
     const renderCustomer=()=>{
+      const address=customer.delivery_shop_no||customer.delivery_colony||customer.delivery_city||customer.delivery_state||customer.delivery_pincode
+        ? '<div class="account-address-grid">'+
+          '<div class="account-address-item"><b>Flat / House No.</b><span>'+esc(customer.delivery_shop_no||"Not added")+'</span></div>'+
+          '<div class="account-address-item"><b>Colony / Area</b><span>'+esc(customer.delivery_colony||"Not added")+'</span></div>'+
+          '<div class="account-address-item"><b>City</b><span>'+esc(customer.delivery_city||"Not added")+'</span></div>'+
+          '<div class="account-address-item"><b>State</b><span>'+esc(customer.delivery_state||"Not added")+'</span></div>'+
+          '<div class="account-address-item"><b>PIN Code</b><span>'+esc(customer.delivery_pincode||"Not added")+'</span></div>'+
+          '</div>'
+        : '<span data-account-field="delivery_address">'+esc(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span>';
       document.getElementById("accountDetails").innerHTML=
         '<div class="account-detail"><b>Full name</b><span data-account-field="name">'+esc(customer.name||"Not added")+'</span></div>'+
         '<div class="account-detail"><b>Mobile</b><span data-account-field="phone">'+esc(customer.phone||"Not added")+'</span></div>'+
         '<div class="account-detail"><b>Email</b><span data-account-field="email">'+esc(customer.email||"Not added")+'</span></div>'+
         '<div class="account-detail"><b>Alternate mobile</b><span data-account-field="alternate_phone">'+esc(customer.alternate_phone||"Not added")+'</span></div>'+
-        '<div class="account-detail"><b>Delivery address</b><span data-account-field="delivery_address">'+esc(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span></div>';
+        '<div class="account-detail account-address-detail"><b>Delivery address</b>'+address+'</div>';
     };
     renderCustomer();
     editButton.onclick=async()=>{
@@ -76,7 +85,9 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(alternate&&!phoneRE.test(alternate)){toastSite("Enter a valid 10-digit alternate mobile number.");return;}
       if(!validSiteEmail(email)){toastSite("Enter a valid email address.");return;}
       editButton.disabled=true;
-      const {data,error}=await db.from("customers").update({name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:address||null}).eq("id",customer.id).eq("auth_user_id",user.id).select("name,phone,email,alternate_phone,business_name,delivery_address").single();
+      const currentAddress=customer.delivery_address||"";
+      const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:address||currentAddress||null};
+      const {data,error}=await db.from("customers").update(nextUpdate).eq("id",customer.id).eq("auth_user_id",user.id).select("name,phone,email,alternate_phone,business_name,delivery_address,billing_shop_no,billing_colony,billing_city,billing_state,billing_pincode,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode").single();
       if(error){
         editButton.disabled=false;
         toastSite(error.message||"Unable to save your details.");
