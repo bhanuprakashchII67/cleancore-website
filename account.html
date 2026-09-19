@@ -29,7 +29,7 @@
 </div>
 </div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.7.8"></script>
+<script src="website.js?v=3.7.9"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const db=window.supabase?.createClient("https://rwfamxkfqslorxcryjrp.supabase.co", "sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",{auth:{storageKey:"cleancore-customer-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
@@ -46,14 +46,16 @@ document.addEventListener("DOMContentLoaded",()=>{
     const editButton=document.getElementById("accountEditToggle");
     const renderCustomer=()=>{
       const address=customer.delivery_shop_no||customer.delivery_colony||customer.delivery_city||customer.delivery_state||customer.delivery_pincode
-        ? '<div class="account-address-grid">'+
-          '<div class="account-address-item"><b>Flat / House No.</b><span>'+esc(customer.delivery_shop_no||"Not added")+'</span></div>'+
-          '<div class="account-address-item"><b>Colony / Area</b><span>'+esc(customer.delivery_colony||"Not added")+'</span></div>'+
-          '<div class="account-address-item"><b>City</b><span>'+esc(customer.delivery_city||"Not added")+'</span></div>'+
-          '<div class="account-address-item"><b>State</b><span>'+esc(customer.delivery_state||"Not added")+'</span></div>'+
-          '<div class="account-address-item"><b>PIN Code</b><span>'+esc(customer.delivery_pincode||"Not added")+'</span></div>'+
+        ? '<div class="account-address-lines">'+
+          '<div><strong>Flat / House No.</strong><span data-address-key="delivery_shop_no">'+esc(customer.delivery_shop_no||"Not added")+'</span></div>'+
+          '<div><strong>Colony / Area</strong><span data-address-key="delivery_colony">'+esc(customer.delivery_colony||"Not added")+'</span></div>'+
+          '<div><strong>City</strong><span data-address-key="delivery_city">'+esc(customer.delivery_city||"Not added")+'</span></div>'+
+          '<div><strong>State</strong><span data-address-key="delivery_state">'+esc(customer.delivery_state||"Not added")+'</span></div>'+
+          '<div><strong>PIN Code</strong><span data-address-key="delivery_pincode">'+esc(customer.delivery_pincode||"Not added")+'</span></div>'+
           '</div>'
-        : '<span data-account-field="delivery_address">'+esc(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span>';
+        : '<div class="account-address-lines account-address-legacy">'+
+          '<div><strong>Delivery address</strong><span data-account-field="delivery_address">'+esc(customer.delivery_address||"Not added").replaceAll(" | ","<br>")+'</span></div>'+
+          '</div>';
       document.getElementById("accountDetails").innerHTML=
         '<div class="account-detail"><b>Full name</b><span data-account-field="name">'+esc(customer.name||"Not added")+'</span></div>'+
         '<div class="account-detail"><b>Mobile</b><span data-account-field="phone">'+esc(customer.phone||"Not added")+'</span></div>'+
@@ -65,7 +67,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     editButton.onclick=async()=>{
       if(!accountEditing){
         accountEditing=true;
-        document.querySelectorAll("[data-account-field]").forEach(el=>{
+        document.querySelectorAll("[data-account-field],[data-address-key]").forEach(el=>{
           el.contentEditable="true";
           el.classList.add("account-editable");
           if(el.textContent.trim()==="Not added")el.textContent="";
@@ -75,18 +77,24 @@ document.addEventListener("DOMContentLoaded",()=>{
         return;
       }
       const value=field=>document.querySelector("[data-account-field='"+field+"']")?.innerText.trim()||"";
+      const addressValue=key=>document.querySelector("[data-address-key='"+key+"']")?.innerText.trim()||"";
       const name=value("name");
       const phone=normalizeSitePhone(value("phone")).slice(0,10);
       const email=value("email");
       const alternate=normalizeSitePhone(value("alternate_phone")).slice(0,10);
       const address=value("delivery_address").replace(/\n/g," | ");
+      const delivery_shop_no=addressValue("delivery_shop_no");
+      const delivery_colony=addressValue("delivery_colony");
+      const delivery_city=addressValue("delivery_city");
+      const delivery_state=addressValue("delivery_state");
+      const delivery_pincode=addressValue("delivery_pincode");
       if(!name){toastSite("Enter your full name.");return;}
       if(!phoneRE.test(phone)){toastSite("Enter a valid 10-digit mobile number.");return;}
       if(alternate&&!phoneRE.test(alternate)){toastSite("Enter a valid 10-digit alternate mobile number.");return;}
       if(!validSiteEmail(email)){toastSite("Enter a valid email address.");return;}
       editButton.disabled=true;
       const currentAddress=customer.delivery_address||"";
-      const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:address||currentAddress||null};
+      const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:address||currentAddress||null,delivery_shop_no:delivery_shop_no||null,delivery_colony:delivery_colony||null,delivery_city:delivery_city||null,delivery_state:delivery_state||null,delivery_pincode:delivery_pincode||null};
       const {data,error}=await db.from("customers").update(nextUpdate).eq("id",customer.id).eq("auth_user_id",user.id).select("name,phone,email,alternate_phone,business_name,delivery_address,billing_shop_no,billing_colony,billing_city,billing_state,billing_pincode,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode").single();
       if(error){
         editButton.disabled=false;
@@ -100,7 +108,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       editButton.disabled=false;
       toastSite("Your details were updated.");
     };
-    const orders=await db.from("website_orders").select("order_no,status,total,created_at").eq("customer_id",customer.id).order("created_at",{ascending:false});
+        const orders=await db.from("website_orders").select("order_no,status,total,created_at").eq("customer_id",customer.id).order("created_at",{ascending:false});
     const box=document.getElementById("accountOrders");
     if(orders.error){box.innerHTML='<p class="cc-status">Unable to load orders.</p>';return;}
     box.innerHTML=orders.data?.length?orders.data.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+new Date(o.created_at).toLocaleString("en-IN")+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status)+'</span></div></div>').join(""):'<p class="cc-muted">No orders yet.</p>';
