@@ -32,7 +32,7 @@
 <script>
 const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
 const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
 const validPhone=v=>/^[6-9]\d{9}$/.test(v);
 const getSource=()=>new URLSearchParams(location.search).get("source")||"Landing Page";
