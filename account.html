@@ -19,7 +19,7 @@
 <section class="checkout-card">
 <div class="checkout-card-head account-head"><span>1</span><div><h2>Customer details</h2><p>Saved for faster checkout.</p></div><button class="account-edit-button" id="accountEditToggle" type="button" aria-label="Edit customer details"><span aria-hidden="true">✎</span><span class="account-edit-label">Edit</span></button></div>
 <div id="accountDetails"></div><div id="accountEditFormWrap" class="account-edit-form-wrap hidden"></div>
-<div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div><div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
+<div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
 </section>
 <section class="checkout-card">
 <div class="checkout-card-head"><span>2</span><div><h2>My orders</h2><p>Your recent CleanCore website orders.</p></div></div>
@@ -29,7 +29,7 @@
 </div>
 </div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.8.1"></script>
+<script src="website.js?v=3.8.2"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const db=window.supabase?.createClient("https://rwfamxkfqslorxcryjrp.supabase.co", "sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",{auth:{storageKey:"cleancore-customer-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
