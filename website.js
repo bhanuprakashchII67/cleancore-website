@@ -25,6 +25,7 @@ function reportSiteError(err,meta={}){
 }
 window.addEventListener("error",e=>reportSiteError(e.error||new Error(e.message||"Unhandled browser error"),{action:"window_error",context:{source:e.filename||"",line:e.lineno||0,column:e.colno||0}}));
 window.addEventListener("unhandledrejection",e=>reportSiteError(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
+window.addEventListener("unhandledrejection",e=>reportSiteError(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
 
 let publicProducts=[];
 let customerUser=null;
@@ -679,3 +680,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   bindCustomerAuth();
   renderCartCount();
 });
+document.addEventListener("error",e=>{
+ const t=e.target;
+ if(t && (t.tagName==="IMG"||t.tagName==="SCRIPT"||t.tagName==="LINK")){
+   reportSiteError(new Error("Failed to load "+t.tagName.toLowerCase()+": "+(t.src||t.href||"")),{
+     action:"resource_load_error",
+     context:{resource:t.src||t.href||"",tag:t.tagName}
+   });
+ }
+},true);
