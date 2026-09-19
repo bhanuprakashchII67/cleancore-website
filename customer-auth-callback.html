@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Signing in… | CleanCore"><link rel="stylesheet" href="style.css?v=1.29"></head>
+<body class="checkout-page"><main class="checkout-main"><div class="container"><section class="checkout-card auth-page-card" style="max-width:520px;margin:auto;text-align:center"><div class="eyebrow">Customer account</div><h1>Signing you in…</h1><p id="status" class="cc-muted">Completing Google sign-in securely.</p></section></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const status=document.getElementById("status");
+const q=new URLSearchParams(location.search);
+const next=q.get("next")==="checkout.html"||q.get("next")==="account.html"||q.get("next")==="index.html"?q.get("next"):"account.html";
+(async()=>{
+  try{
+    const code=q.get("code");
+    if(code){
+      const {error}=await db.auth.exchangeCodeForSession(code);
+      if(error)throw error;
+    }
+    const {data:{session},error:sessionError}=await db.auth.getSession();
+    if(sessionError)throw sessionError;
+    if(!session?.user)throw new Error("Google sign-in did not create a session.");
+    const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+session.access_token},body:JSON.stringify({action:"google_sync",email:session.user.email,name:session.user.user_metadata?.full_name||session.user.user_metadata?.name||session.user.email})});
+    const raw=await response.text();let data=null;try{data=raw?JSON.parse(raw):null}catch(_){}
+    if(!response.ok)throw new Error(data?.error||"Unable to finish customer account setup.");
+    location.replace("./"+next);
+  }catch(err){status.textContent=err?.message||"Google sign-in failed.";setTimeout(()=>location.href="customer-login.html",2500);}
+})();
+</script></body></html>
