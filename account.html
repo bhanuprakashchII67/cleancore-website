@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const notice=document.getElementById("accountLoginNotice"),content=document.getElementById("accountContent");
   const ordersBox=document.getElementById("accountOrders");
   const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
+  const normalizePhone=v=>String(v||"").replace(/\\D/g,"").replace(/^91/,"").slice(-10);
+  const validEmail=v=>!v||/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v);
   const esc=v=>String(v??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
   const showNotice=msg=>{if(notice){notice.classList.remove("hidden");if(msg)notice.querySelector("p").textContent=msg;}if(content)content.classList.add("hidden");};
 
@@ -118,15 +120,15 @@ document.addEventListener("DOMContentLoaded",async()=>{
       form.addEventListener("submit",async e=>{
         e.preventDefault();
         const name=document.getElementById("editName").value.trim();
-        const phone=normalizeSitePhone(document.getElementById("editPhone").value).slice(0,10);
+        const phone=normalizePhone(document.getElementById("editPhone").value);
         const email=document.getElementById("editEmail").value.trim();
-        const alternate=normalizeSitePhone(document.getElementById("editAlternate").value).slice(0,10);
+        const alternate=normalizePhone(document.getElementById("editAlternate").value);
         const delivery_pincode=document.getElementById("editPincode").value.trim();
         const delivery_state=document.getElementById("editState").value.trim();
         const delivery_city=document.getElementById("editCity").value.trim();
         const delivery_shop_no=document.getElementById("editHouse").value.trim();
         const delivery_colony=document.getElementById("editColony").value.trim();
-        if(!name||!phoneRE.test(phone)||!validSiteEmail(email)||(alternate&&!phoneRE.test(alternate))||!/^[0-9]{6}$/.test(delivery_pincode)||!delivery_state||!delivery_city||!delivery_shop_no||!delivery_colony)return toastSite("Please complete all required fields correctly.");
+        if(!name||!phoneRE.test(phone)||!validEmail(email)||(alternate&&!phoneRE.test(alternate))||!/^[0-9]{6}$/.test(delivery_pincode)||!delivery_state||!delivery_city||!delivery_shop_no||!delivery_colony)return toastSite("Please complete all required fields correctly.");
         const saveBtn=form.querySelector('button[type="submit"]');saveBtn.disabled=true;saveBtn.textContent="Saving…";
         const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:[delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode].join(" | "),delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode};
         const {data,error}=await db.from("customers").update(nextUpdate).eq("id",customer.id).eq("auth_user_id",user.id).select("id,name,phone,email,alternate_phone,business_name,gstin,billing_address,delivery_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source").single();
