@@ -58,9 +58,12 @@ document.getElementById("signupForm").addEventListener("submit",async e=>{
     try{data=raw?JSON.parse(raw):null}catch(_){}
     if(!response.ok){
       const msg=String(data?.error||"");
-      const friendly=msg.toLowerCase().includes("duplicate key")||msg.toLowerCase().includes("customers_phone_unique")||response.status===409
-        ? "This mobile number is already registered. Please login instead."
-        : (msg||"Unable to create account.");
+      const lower=msg.toLowerCase();
+      const friendly=lower.includes("recovery")
+        ? "This customer account is in Recovery. Please contact CleanCore to restore it."
+        : lower.includes("duplicate key")||lower.includes("customers_phone_unique")
+          ? "This mobile number is already registered. Please login instead."
+          : (msg||"Unable to create account.");
       status.textContent=friendly;
       btn.disabled=false;
       return;
