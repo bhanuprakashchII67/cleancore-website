@@ -19,15 +19,18 @@ function reportWebsiteClientError(err,meta={}){
 
 function siteErrorQueueRead(){try{const q=JSON.parse(localStorage.getItem("cleancore_site_error_queue")||"[]");return Array.isArray(q)?q:[];}catch{return [];}}
 function siteErrorQueueWrite(q){try{localStorage.setItem("cleancore_site_error_queue",JSON.stringify(q.slice(-30)));}catch{}}
-async function sendSiteErrorPayload(payload){
+async function sendSiteErrorPayload(payload,queueOnFail=true){
  if(!siteDb)return false;
  try{const {error}=await siteDb.rpc("log_client_error",payload);if(error)throw error;return true;}
- catch(err){const q=siteErrorQueueRead();q.push({...payload,queued_at:new Date().toISOString(),logger_error:String(err?.message||err)});siteErrorQueueWrite(q);return false;}
+ catch(err){
+   if(queueOnFail){const q=siteErrorQueueRead();q.push({...payload,queued_at:new Date().toISOString(),logger_error:String(err?.message||err)});siteErrorQueueWrite(q);}
+   return false;
+ }
 }
 async function flushSiteErrorQueue(){
  const q=siteErrorQueueRead();if(!q.length)return;
  const remaining=[];
- for(const payload of q){if(!(await sendSiteErrorPayload(payload)))remaining.push(payload);}
+ for(const payload of q){if(!(await sendSiteErrorPayload(payload,false)))remaining.push(payload);}
  siteErrorQueueWrite(remaining);
 }
 function reportSiteError(err,meta={}){
