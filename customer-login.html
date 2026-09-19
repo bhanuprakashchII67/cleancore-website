@@ -83,9 +83,13 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
     });
     const raw=await response.text();let data=null;
     try{data=raw?JSON.parse(raw):null}catch(_){}
-    if(!response.ok){status.textContent=data?.error||"Unable to login right now.";
-    if(String(data?.error||"").toLowerCase().includes("in recovery"))status.classList.add("recovery-status");else status.classList.remove("recovery-status");
-    btn.disabled=false;return;}
+    if(!response.ok){
+      const msg=String(data?.error||"");
+      status.textContent=msg||"Unable to login right now.";
+      const lower=msg.toLowerCase();
+      status.classList.toggle("recovery-status",lower.includes("recovery"));
+      btn.disabled=false;return;
+    }
     if(!data?.session){status.textContent="Login failed. Please try again.";btn.disabled=false;return;}
     const saved=await db.auth.setSession(data.session);
     if(saved.error){status.textContent=saved.error.message;btn.disabled=false;return;}
