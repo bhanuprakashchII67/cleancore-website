@@ -88,94 +88,115 @@
   }
   function pdfSafe(v){return String(v??"").replace(/[\\u0000-\\u001F]/g," ").trim();}
   function pdfMoney(v){return "Rs. "+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
-  function pdfText(doc,text,x,y,maxWidth,lineHeight=4.8){const lines=doc.splitTextToSize(pdfSafe(text),maxWidth);doc.text(lines,x,y);return y+(lines.length*lineHeight);}
+  function pdfText(doc,text,x,y,maxWidth,lineHeight=4.6){
+    const lines=doc.splitTextToSize(pdfSafe(text),maxWidth);
+    doc.text(lines,x,y);
+    return y+(lines.length*lineHeight);
+  }
+  function drawPdfLine(doc,x1,y,x2){doc.setDrawColor(210);doc.line(x1,y,x2,y);}
   async function downloadBillPdf(order,items,button){
     if(!window.jspdf?.jsPDF){alert("Bill PDF service did not load. Please refresh the page and try again.");return;}
     const old=button?.textContent;
     if(button){button.disabled=true;button.textContent="Preparing PDF…";}
     try{
-      const {jsPDF}=window.jspdf, doc=new jsPDF({unit:"mm",format:"a4"});
-      const left=15,right=195,pageW=210;
-      let y=16;
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF({unit:"mm",format:"a4"});
+      const left=12,right=198,width=right-left;
+      let y=13;
 
-      // Header
-      doc.setFont("helvetica","bold");doc.setFontSize(18);
+      // Amazon-style compact invoice header
+      doc.setFont("helvetica","bold");doc.setFontSize(17);
+      doc.text("CleanCore",left,y);
+      doc.setFontSize(8.5);doc.setFont("helvetica","normal");
+      doc.text("Chemical & Cleaning",left,y+5);
+      doc.setFont("helvetica","bold");doc.setFontSize(13);
+      doc.text(order.invoice_no?"TAX INVOICE":"BILL",right,y+2,{align:"right"});
+      doc.setFont("helvetica","normal");doc.setFontSize(8);
+      doc.text("Website order",right,y+7,{align:"right"});
+      y+=13;drawPdfLine(doc,left,y,right);y+=7;
+
+      // Seller + invoice metadata
+      doc.setFont("helvetica","bold");doc.setFontSize(9);
+      doc.text("Seller",left,y);doc.text("Invoice details",115,y);
+      y+=5;doc.setFont("helvetica","normal");doc.setFontSize(8.5);
       doc.text("CleanCore Chemical & Cleaning",left,y);
-      y+=7;doc.setFontSize(13);doc.text(order.invoice_no?"TAX INVOICE / BILL":"BILL",left,y);
-      doc.setFont("helvetica","normal");doc.setFontSize(9);
-      doc.text("Customer website order",right,y,{align:"right"});
-      y+=7;doc.setDrawColor(150);doc.line(left,y,right,y);y+=8;
+      doc.text("Invoice No.: "+pdfSafe(order.invoice_no||"—"),115,y);
+      y+=4.5;
+      doc.text("Chemical & Cleaning Products",left,y);
+      doc.text("Order No.: "+pdfSafe(order.order_no||"—"),115,y);
+      y+=4.5;
+      doc.text("Customer website order",left,y);
+      doc.text("Order date: "+(order.created_at?new Date(order.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"—"),115,y);
+      y+=4.5;
+      doc.text("Status: "+pdfSafe(order.status||"New"),115,y);
+      y+=8;
 
-      // Invoice/customer information in two columns
-      const top=y;
-      doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text("Invoice details",left,y);
-      doc.text("Bill to",110,y);
-      y+=6;doc.setFont("helvetica","normal");doc.setFontSize(9);
-
-      const invoiceRows=[
-        ["Invoice No.",order.invoice_no||"—"],
-        ["Order No.",order.order_no||"—"],
-        ["Date",order.created_at?new Date(order.created_at).toLocaleString("en-IN"):"—"],
-        ["Status",order.status||"New"]
-      ];
-      invoiceRows.forEach(([label,value])=>{doc.setFont("helvetica","bold");doc.text(label,left,y);doc.setFont("helvetica","normal");doc.text(pdfSafe(value),58,y);y+=5;});
-
-      let cy=top+6;
-      cy=pdfText(doc,customer.name||"Customer",110,cy,80)+1;
-      if(customer.phone)cy=pdfText(doc,"Mobile: "+customer.phone,110,cy,80)+1;
-      if(customer.email)cy=pdfText(doc,"Email: "+customer.email,110,cy,80)+1;
-      const addr=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address||"";
-      if(addr)cy=pdfText(doc,addr,110,cy,80)+1;
-      if(order.customer_gstin||customer.gstin)cy=pdfText(doc,"GSTIN: "+(order.customer_gstin||customer.gstin),110,cy,80)+1;
-      if(order.place_of_supply)cy=pdfText(doc,"Place of supply: "+order.place_of_supply,110,cy,80)+1;
-      y=Math.max(y+1,cy)+7;
+      // Bill-to card
+      doc.setFillColor(248,250,251);doc.roundedRect(left,y-3,width,28,2,2,"F");
+      doc.setFont("helvetica","bold");doc.setFontSize(9);doc.text("Billing address",left+4,y+2);
+      doc.text("Customer details",112,y+2);
+      doc.setFont("helvetica","normal");doc.setFontSize(8.5);
+      const addr=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address||"Not added";
+      let by=y+7;
+      by=pdfText(doc,addr,left+4,by,82)+1.5;
+      if(customer.phone)pdfText(doc,"Mobile: "+customer.phone,left+4,by,82);
+      let cy=y+7;
+      cy=pdfText(doc,customer.name||"Customer",112,cy,80)+1.5;
+      if(customer.email)cy=pdfText(doc,"Email: "+customer.email,112,cy,80)+1.5;
+      if(order.customer_gstin||customer.gstin)cy=pdfText(doc,"GSTIN: "+(order.customer_gstin||customer.gstin),112,cy,80);
+      y+=36;
 
       // Items table
-      const colX={no:17,item:30,unit:112,qty:137,rate:163,amount:195};
-      doc.setFillColor(242,242,242);doc.rect(left,y-5,pageW-30,9,"F");
-      doc.setFont("helvetica","bold");doc.setFontSize(8.5);
-      doc.text("#",colX.no,y);doc.text("Item",colX.item,y);doc.text("Unit",colX.unit,y);
-      doc.text("Qty",colX.qty,y,{align:"right"});doc.text("Rate",colX.rate,y,{align:"right"});doc.text("Amount",colX.amount,y,{align:"right"});
-      y+=6;doc.setFont("helvetica","normal");doc.setFontSize(8.5);
-
+      const x={no:15,item:27,unit:114,qty:139,rate:166,amount:196};
+      doc.setFillColor(242,244,245);doc.rect(left,y-4,width,8,"F");
+      doc.setFont("helvetica","bold");doc.setFontSize(8);
+      doc.text("S.No.",x.no,y);doc.text("Product details",x.item,y);doc.text("Unit",x.unit,y);
+      doc.text("Qty",x.qty,y,{align:"right"});doc.text("Price",x.rate,y,{align:"right"});doc.text("Amount",x.amount,y,{align:"right"});
+      y+=6;doc.setFont("helvetica","normal");doc.setFontSize(8);
       const rows=Array.isArray(items)?items:[];
       rows.forEach((it,idx)=>{
-        const nameLines=doc.splitTextToSize(pdfSafe(it.product_name||"Item"),72);
-        const h=Math.max(7,nameLines.length*4.2);
-        if(y+h>272){
-          doc.addPage();y=18;doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text("CleanCore Chemical & Cleaning — Bill (continued)",left,y);y+=8;doc.setFont("helvetica","normal");doc.setFontSize(8.5);
+        const nameLines=doc.splitTextToSize(pdfSafe(it.product_name||"Item"),84);
+        const h=Math.max(8,nameLines.length*4.2);
+        if(y+h>270){
+          doc.addPage();y=16;doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text("CleanCore — Invoice (continued)",left,y);y+=9;doc.setFont("helvetica","normal");doc.setFontSize(8);
         }
-        doc.text(String(idx+1),colX.no,y);doc.text(nameLines,colX.item,y);
-        doc.text(pdfSafe(it.unit||"—"),colX.unit,y);
-        doc.text(String(it.qty??"—"),colX.qty,y,{align:"right"});
-        doc.text(pdfMoney(it.unit_price),colX.rate,y,{align:"right"});
-        doc.text(pdfMoney(it.line_total),colX.amount,y,{align:"right"});
-        y+=h;doc.setDrawColor(220);doc.line(left,y-2,right,y-2);y+=3;
+        doc.text(String(idx+1),x.no,y);doc.text(nameLines,x.item,y);
+        doc.text(pdfSafe(it.unit||"—"),x.unit,y);
+        doc.text(String(it.qty??"—"),x.qty,y,{align:"right"});
+        doc.text(pdfMoney(it.unit_price),x.rate,y,{align:"right"});
+        doc.text(pdfMoney(it.line_total),x.amount,y,{align:"right"});
+        y+=h;drawPdfLine(doc,left,y-2,right);y+=3;
       });
       if(!rows.length){doc.text("No item details available.",left,y);y+=8;}
 
-      // Totals block
-      if(y>245){doc.addPage();y=18;}
-      y+=5;
-      const totalsX=155,totalRight=195;
-      function totalRow(label,value,bold=false){
-        doc.setFont("helvetica",bold?"bold":"normal");doc.setFontSize(bold?10:9);
-        doc.text(label,totalsX,y);doc.text(pdfMoney(value),totalRight,y,{align:"right"});y+=5;
-      }
-      totalRow("Subtotal",order.subtotal);
+      // Tax/total summary
+      if(y>248){doc.addPage();y=18;}
+      const boxTop=y+2;
+      const summaryX=124;
+      doc.setFont("helvetica","normal");doc.setFontSize(8.5);
+      const totalLine=(label,value,bold=false)=>{
+        doc.setFont("helvetica",bold?"bold":"normal");doc.setFontSize(bold?10:8.5);
+        doc.text(label,summaryX,y);doc.text(pdfMoney(value),right,y,{align:"right"});y+=5;
+      };
+      totalLine("Subtotal",order.subtotal);
       if(order.gst_enabled && Number(order.gst_amount||0)>0){
-        if(Number(order.cgst_amount||0)>0)totalRow("CGST ("+Number(order.cgst_percent||0)+"%)",order.cgst_amount);
-        if(Number(order.sgst_amount||0)>0)totalRow("SGST ("+Number(order.sgst_percent||0)+"%)",order.sgst_amount);
-        if(Number(order.igst_amount||0)>0)totalRow("IGST ("+Number(order.igst_percent||0)+"%)",order.igst_amount);
-        if(!Number(order.cgst_amount||0)&&!Number(order.sgst_amount||0)&&!Number(order.igst_amount||0))totalRow("GST ("+Number(order.gst_percent||0)+"%)",order.gst_amount);
+        if(Number(order.cgst_amount||0)>0)totalLine("CGST ("+Number(order.cgst_percent||0)+"%)",order.cgst_amount);
+        if(Number(order.sgst_amount||0)>0)totalLine("SGST ("+Number(order.sgst_percent||0)+"%)",order.sgst_amount);
+        if(Number(order.igst_amount||0)>0)totalLine("IGST ("+Number(order.igst_percent||0)+"%)",order.igst_amount);
+        if(!Number(order.cgst_amount||0)&&!Number(order.sgst_amount||0)&&!Number(order.igst_amount||0))totalLine("GST ("+Number(order.gst_percent||0)+"%)",order.gst_amount);
       }
-      doc.setDrawColor(90);doc.line(120,y,195,y);y+=6;totalRow("Grand Total",order.total,true);
+      drawPdfLine(doc,summaryX,y-2,right);
+      y+=3;totalLine("Grand total",order.total,true);
 
-      // Notes
-      if(order.notes){y+=4;doc.setFont("helvetica","bold");doc.setFontSize(9);doc.text("Notes",left,y);y+=5;doc.setFont("helvetica","normal");y=pdfText(doc,order.notes,left,y,180)+1;}
-
-      doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(100);
-      doc.text("Generated from the CleanCore customer website.",left,286);doc.setTextColor(0);
+      // Notes + footer
+      if(order.notes){
+        y+=4;doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.text("Notes",left,y);y+=4.5;
+        doc.setFont("helvetica","normal");y=pdfText(doc,order.notes,left,y,width);
+      }
+      doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(100);
+      doc.text("Thank you for your business.",left,284);
+      doc.text("Generated from CleanCore customer website.",right,284,{align:"right"});
+      doc.setTextColor(0);
 
       const safeNo=String(order.invoice_no||order.order_no||"bill").replace(/[^a-zA-Z0-9_-]/g,"-");
       doc.save("CleanCore-"+safeNo+".pdf");
