@@ -452,3 +452,16 @@ button,a{touch-action:manipulation}
 .account-edit-actions .btn{flex:1}
 .account-edit .cc-status{grid-column:1/-1;margin:0}
 @media(max-width:600px){.account-edit form{grid-template-columns:1fr}.account-edit-full,.account-edit-actions,.account-edit .cc-status{grid-column:1}.account-edit-actions{flex-direction:column}}
+
+
+.account-head{position:relative;padding-right:88px}
+.account-edit-button{position:absolute;right:0;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:7px;border:1px solid #cbdbe2;background:#fff;color:var(--navy);border-radius:10px;padding:8px 12px;font-weight:900;cursor:pointer;box-shadow:0 2px 8px #0b1f330b}
+.account-edit-button:hover{border-color:#159c99;color:#0f7775;background:#f4fbfb}
+.account-edit-button:disabled{opacity:.6;cursor:wait}
+.account-edit-button span:first-child{font-size:17px;line-height:1}
+.account-editable{color:var(--navy)!important;background:#f7fbfb;border-bottom:2px solid #159c99!important;border-radius:4px;padding:3px 5px;outline:none;cursor:text}
+@media(max-width:600px){
+ .account-head{padding-right:76px}
+ .account-edit-button{padding:7px 9px}
+ .account-edit-label{display:none}
+}
