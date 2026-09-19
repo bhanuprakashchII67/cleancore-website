@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Customer Signup | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.22">
+<link rel="stylesheet" href="style.css?v=1.24">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -35,6 +35,7 @@ const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
 const validPhone=v=>/^[6-9]\d{9}$/.test(v);
+const getSource=()=>new URLSearchParams(location.search).get("source")||"Landing Page";
 const getNext=()=>{
   const n=new URLSearchParams(location.search).get("next");
   return n==="checkout.html"||n==="account.html"||n==="index.html" ? "./"+n : "./index.html";
