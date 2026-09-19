@@ -77,7 +77,6 @@ function renderCartCount(){
     const label=a.querySelector(".customer-action-label");
     if(label)label.textContent=count>0?"Cart ("+count+")":"Cart";
   }
-}
 function renderCart(){
   const panel=document.getElementById("ccCartItems");
   const total=document.getElementById("ccCartTotal");
