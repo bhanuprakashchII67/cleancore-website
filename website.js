@@ -1,11 +1,11 @@
 const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
-const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:"cleancore-customer-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.7.7";
+const SITE_VERSION="3.7.8";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
