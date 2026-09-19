@@ -1,5 +1,4 @@
-<!doctydocument.getElementById("googleLogin").addEventListener("click",async()=>{
-  pe html>
+<!doctype html>
 <html lang="en">
 <head><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg"><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg">
 <meta charset="utf-8">
@@ -7,7 +6,7 @@
 <title>Customer Login | CleanCore</title>
 <link rel="stylesheet" href="style.css?v=1.29"><style>.recovery-status{color:#8a5a00!important;background:#fff7df;border:1px solid #f0d58a;padding:12px 14px;border-radius:12px}.recovery-status::before{content:"Recovery: ";font-weight:800}.forgot-wrap{display:flex;justify-content:flex-end;margin-top:-6px;margin-bottom:10px}.forgot-wrap button{border:0;background:none;color:#0d746e;font:800 13px/1.2 Inter,Arial,sans-serif;padding:4px 0;cursor:pointer}.forgot-wrap button:hover{text-decoration:underline;color:#075f59}.forgot-panel{display:none;margin:10px 0 14px;padding:15px;border:1px solid #dbe7e9;border-radius:14px;background:#f7fbfb}.forgot-panel.open{display:block}.forgot-panel h2{font-size:16px;margin:0 0 4px;color:#0b1f33}.forgot-panel p{font-size:12px;margin:0 0 10px;color:#66727d}.forgot-panel label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#233347}.forgot-panel input{width:100%;box-sizing:border-box;border:1px solid #d6e1e7;border-radius:10px;padding:10px 12px;background:#fff}.forgot-actions{display:flex;gap:8px;margin-top:10px}.forgot-actions button{flex:1}</style>
 <style>
-.auth-social{display:grid;gap:9px;margin-top:14px}
+.auth-social{display:grid;gap:8px;margin-top:14px}
 .auth-divider{display:flex;align-items:center;gap:10px;color:#7b8794;font-size:11px;font-weight:800;margin:12px 0}
 .auth-divider::before,.auth-divider::after{content:"";height:1px;background:#e1e8eb;flex:1}
 .google-btn{width:100%;min-height:42px;border:1px solid #d5dfe5;border-radius:10px;background:#fff;color:#172b3f;display:flex;align-items:center;justify-content:center;gap:9px;font:800 13px/1 Inter,Arial,sans-serif;cursor:pointer;box-shadow:0 2px 7px rgba(11,31,51,.04);transition:.16s ease}
@@ -32,49 +31,15 @@
 <label>Email ID<input id="loginEmail" type="email" autocomplete="email" placeholder="your@email.com" required></label>
 <label>Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
 <div class="forgot-wrap"><button id="forgotToggle" type="button">Forgot password?</button></div>
-<div id="forgotPanel" class="forgot-panel" aria-hidden="true"><h2>Reset your password</h2><p>Enter the email address saved on your CleanCore account. We’ll send a secure reset link.</p><div id="forgotForm"><label>Email address<input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" required></label><div class="forgot-actions"><button id="forgotCancel" class="btn btn-secondary" type="button">Cancel</button><button id="forgotSend" class="btn btn-primary" type="button">Send reset link</button></div><p id="forgotStatus" class="cc-status" aria-live="polite"></p></div></div>
+<div id="forgotPanel" class="forgot-panel" aria-hidden="true"><h2>Reset your password</h2><p>Enter the email address saved on your CleanCore account. We’ll send a secure reset link.</p><form id="forgotForm"><label>Email address<input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" required></label><div class="forgot-actions"><button id="forgotCancel" class="btn btn-secondary" type="button">Cancel</button><button id="forgotSend" class="btn btn-primary" type="submit">Send reset link</button></div><p id="forgotStatus" class="cc-status" aria-live="polite"></p></form></div>
 <p id="loginStatus" class="cc-status" aria-live="polite"></p>
 <button id="loginButton" class="btn btn-primary cc-wide" type="submit">Login <span aria-hidden="true">→</span></button>
 </form>
 <div class="auth-divider"><span>OR</span></div>
 <div class="auth-social"><button id="googleLogin" class="google-btn" type="button"><svg class="google-g" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.23z"/><path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.7-1.72-5.47-4.03H3.28v2.53A9.74 9.74 0 0 0 12 21.75z"/><path fill="#FBBC05" d="M6.53 13.83A5.86 5.86 0 0 1 6.22 12c0-.64.11-1.26.31-1.83V7.64H3.28A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.06 1.03 4.36l3.25-2.53z"/><path fill="#EA4335" d="M12 6.14c1.43 0 2.72.49 3.74 1.45l2.8-2.8C16.84 3.13 14.63 2.25 12 2.25a9.74 9.74 0 0 0-8.72 5.39l3.25 2.53C7.3 7.86 9.46 6.14 12 6.14z"/></svg>Continue with Google</button><p id="googleLoginStatus" class="cc-status auth-social-status" aria-live="polite"></p></div>
 <p class="auth-switch">New customer? <a href="customer-signup.html">Create account</a></p>
-</section>cument.getElementById("googleLogin").addEventListener("click",async()=>{
-  pe html>
-<html lang="en">
-<head><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg"><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Customer Login | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.29"><style>.recovery-status{color:#8a5a00!important;background:#fff7df;border:1px solid #f0d58a;padding:12px 14px;border-radius:12px}.recovery-status::before{content:"Recovery: ";font-weight:800}.forgot-wrap{display:flex;justify-content:flex-end;margin-top:-6px;margin-bottom:10px}.forgot-wrap button{border:0;background:none;color:#0d746e;font:800 13px/1.2 Inter,Arial,sans-serif;padding:4px 0;cursor:pointer}.forgot-wrap button:hover{text-decoration:underline;color:#075f59}.forgot-panel{display:none;margin:10px 0 14px;padding:15px;border:1px solid #dbe7e9;border-radius:14px;background:#f7fbfb}.forgot-panel.open{display:block}.forgot-panel h2{font-size:16px;margin:0 0 4px;color:#0b1f33}.forgot-panel p{font-size:12px;margin:0 0 10px;color:#66727d}.forgot-panel label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#233347}.forgot-panel input{width:100%;box-sizing:border-box;border:1px solid #d6e1e7;border-radius:10px;padding:10px 12px;background:#fff}.forgot-actions{display:flex;gap:8px;margin-top:10px}.forgot-actions button{flex:1}</style>
-<style>
-.auth-social{display:grid;gap:9px;margin-top:14px}
-.auth-divider{display:flex;align-items:center;gap:10px;color:#7b8794;font-size:11px;font-weight:800;margin:12px 0}
-.auth-divider::before,.auth-divider::after{content:"";height:1px;background:#e1e8eb;flex:1}
-.google-btn{width:100%;min-height:42px;border:1px solid #d5dfe5;border-radius:10px;background:#fff;color:#172b3f;display:flex;align-items:center;justify-content:center;gap:9px;font:800 13px/1 Inter,Arial,sans-serif;cursor:pointer;box-shadow:0 2px 7px rgba(11,31,51,.04);transition:.16s ease}
-.google-btn:hover{background:#f8fbfc;border-color:#b9cbd4;box-shadow:0 5px 14px rgba(11,31,51,.07);transform:translateY(-1px)}
-.google-g{width:18px;height:18px;display:block}
-.auth-social-status{font-size:11px!important;margin:0!important}
-</style></head>
-<body class="checkout-page">
-<header><div class="container"><nav>
-<a class="brand" href="index.html"><img class="site-logo" src="logo.svg" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
-<div class="navlinks" style="display:flex"><a href="products.html">Products</a><a href="index.html">Home</a></div>
-<a class="navcta" href="checkout.html">Cart</a>
-</nav></div></header>
-<main class="checkout-main">
-<div class="container"><div class="auth-page-wrap">
-<section class="checkout-card auth-page-card">
-<div class="eyebrow">Customer account</div>
-<h1>Welcome back</h1>
-<p class="cc-muted">Login with your email ID, mobile number and password.</p>
-<form id="loginForm" novalidate>
-<label>Mobile number<input id="loginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
-<label>Email ID<input id="loginEmail" type="email" autocomplete="email" placeholder="your@email.com" required></label>
-<label>Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
-<div class="forgot-wrap"><button id="forgotToggle" type="button">Forgot password?</button></div>
-<div id="forgotPanel" class="forgot-panel" aria-hidden="true"><h2>Reset your password</h2><p>Enter the email address saved on your CleanCore account. We’ll send a secure reset link.</p><div id="forgotForm"><label>Email address<input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" required></label><div class="forgot-actions"><button id="forgotCancel" class="btn btn-secondary" type="button">Cancel</button><button id="forgotSend" class="btn btn-primary" type="submit">Send reset link</button></div><p id="forgotStatus" class="cc-status" aria-live="polite"></p></form></div>
-<p id="loginStatus" class="cc-status" aria-live="polite"></p>
+</section>
+</div></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -141,7 +106,6 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
     btn.disabled=false;
   }
 });
-
 document.getElementById("googleLogin").addEventListener("click",async()=>{const gs=document.getElementById("googleLoginStatus");gs.textContent="Opening Google…";const {error}=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:new URL("customer-auth-callback.html?next="+encodeURIComponent(getNext()),location.href).href}});if(error)gs.textContent=error.message;});
 </script>
 </body>
