@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<title>CleanCore Product | Commercial Cleaning Chemicals in Hyderabad</title>
+<meta name="description" content="Commercial cleaning product from CleanCore Chemical & Cleaning in Hyderabad.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="CleanCore Chemical & Cleaning">
+<meta property="og:title" content="CleanCore Product | Commercial Cleaning Chemicals in Hyderabad">
+<meta property="og:description" content="Commercial cleaning product from CleanCore Chemical & Cleaning in Hyderabad.">
+<meta name="twitter:card" content="summary_large_image">
+<link id="canonicalLink" rel="canonical" href="product.html">
+<script id="productSchema" type="application/ld+json">{}</script>
+<link rel="stylesheet" href="style.css?v=1.27">
+<style>
+.product-detail{padding:64px 0}.product-detail-grid{display:grid;grid-template-columns:minmax(280px,1fr) minmax(280px,1fr);gap:48px;align-items:start}.product-detail-image{min-height:360px;display:grid;place-items:center;background:#eef7f6;border-radius:24px;padding:24px}.product-detail-image img{max-width:100%;max-height:420px;object-fit:contain}.product-detail-copy h1{font-size:clamp(2.2rem,5vw,4rem);margin:10px 0 16px}.product-detail-copy .lead{font-size:1.1rem;line-height:1.75}.product-meta{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}.product-meta span{padding:8px 12px;border-radius:999px;background:#eef7f6}.product-price{font-size:1.6rem;font-weight:800;margin:20px 0}.seo-copy{margin-top:48px;line-height:1.8}.seo-copy h2{margin-top:30px}@media(max-width:800px){.product-detail-grid{grid-template-columns:1fr}.product-detail{padding:36px 0}}
+</style>
+</head>
+<body>
+<header><div class="container"><nav>
+<a class="brand" href="index.html"><img class="site-logo" src="logo.svg" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
+<div class="navlinks" id="navMenu"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
+<a class="navcta" href="contact.html">Request a Quote</a>
+</nav></div></header>
+<main>
+<section class="product-detail"><div class="container" id="productRoot">
+<div class="eyebrow">CleanCore Commercial Cleaning Product</div>
+<h1>Loading product…</h1><p>Loading product information.</p>
+</div></section>
+</main>
+<footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div><a href="tel:+91 91827 25773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const esc=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const slug=new URLSearchParams(location.search).get("slug")||"";
+const root=document.getElementById("productRoot");
+function setMeta(selector,attr,value){const el=document.querySelector(selector);if(el)el.setAttribute(attr,value);}
+function setSeo(p){
+ const title=p.seo_title||((p.name||"Cleaning Product")+" in Hyderabad | CleanCore");
+ const desc=p.seo_description||("Buy "+p.name+" from CleanCore Chemical & Cleaning in Hyderabad.");
+ document.title=title;
+ setMeta('meta[name="description"]',"content",desc);
+ setMeta('meta[property="og:title"]',"content",title);
+ setMeta('meta[property="og:description"]',"content",desc);
+ setMeta('meta[name="twitter:title"]',"content",title);
+ setMeta('meta[name="twitter:description"]',"content",desc);
+ setMeta("#canonicalLink","href",location.href.split("#")[0]);
+ const schema={"@context":"https://schema.org","@type":"Product","name":p.name,"brand":{"@type":"Brand","name":"CleanCore"},"description":p.description||desc,"category":"Commercial Cleaning Chemicals","image":Array.isArray(p.image_urls)?p.image_urls:[],"offers":{"@type":"Offer","url":location.href.split("#")[0],"priceCurrency":"INR","price":Number(p.selling_price||0).toFixed(2),"availability":Number(p.stock||0)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock","seller":{"@type":"Organization","name":"CleanCore Chemical & Cleaning","address":{"@type":"PostalAddress","addressLocality":"Hyderabad","addressRegion":"Telangana","addressCountry":"IN"}}}};
+ document.getElementById("productSchema").textContent=JSON.stringify(schema);
+}
+async function load(){
+ if(!slug){root.innerHTML='<div class="eyebrow">Product</div><h1>Product not found</h1><p>Choose a product from the <a href="products.html">CleanCore product catalogue</a>.</p>';return;}
+ const {data,error}=await db.from("website_products").select("id,name,unit,selling_price,description,additional_details,image_urls,active,stock,seo_title,seo_description,seo_keywords,seo_slug").eq("active",true).eq("seo_slug",slug).maybeSingle();
+ if(error||!data){root.innerHTML='<div class="eyebrow">Product</div><h1>Product not found</h1><p>Choose a product from the <a href="products.html">CleanCore product catalogue</a>.</p>';return;}
+ setSeo(data);
+ const img=Array.isArray(data.image_urls)&&data.image_urls[0]?'<img src="'+esc(data.image_urls[0])+'" alt="'+esc(data.name)+' - CleanCore commercial cleaning product">':'<div style="font-size:5rem;font-weight:800">'+esc(String(data.name).charAt(0))+'</div>';
+ const details=data.additional_details&&typeof data.additional_details==="object"?Object.entries(data.additional_details).map(([k,v])=>'<p><strong>'+esc(k)+':</strong> '+esc(v)+'</p>').join(""):"";
+ root.innerHTML='<div class="product-detail-grid"><div class="product-detail-image">'+img+'</div><div class="product-detail-copy"><div class="eyebrow">CleanCore · Hyderabad</div><h1>'+esc(data.name)+'</h1><p class="lead">'+esc(data.seo_description||data.description||"Commercial cleaning product for professional use in Hyderabad.")+'</p><div class="product-meta"><span>'+esc(data.unit)+'</span><span>Commercial use</span><span>Hyderabad supply</span></div><div class="product-price">₹'+Number(data.selling_price||0).toLocaleString("en-IN")+' <small>/ '+esc(data.unit)+'</small></div><a class="btn btn-primary" href="contact.html">Request a Quote</a></div></div><div class="seo-copy"><h2>'+esc(data.name)+' in Hyderabad</h2><p>CleanCore supplies '+esc(data.name)+' in Hyderabad for businesses and professional cleaning requirements. This product is available in '+esc(data.unit)+' packaging and can be ordered for offices, commercial facilities, hospitality, restaurants and other business environments where suitable.</p>'+details+'</div>';
+}
+load();
+})();
+</script>
+</body></html>
