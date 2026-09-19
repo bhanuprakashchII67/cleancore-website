@@ -1,0 +1,14 @@
+(()=>{if(window.__ccErrorMonitorInstalled)return;window.__ccErrorMonitorInstalled=true;
+const URL="https://rwfamxkfqslorxcryjrp.supabase.co",KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",VERSION="3.7.13";
+const db=window.supabase?.createClient?.(URL,KEY);
+const read=()=>{try{const q=JSON.parse(localStorage.getItem("cc_error_queue")||"[]");return Array.isArray(q)?q:[]}catch{return[]}};
+const write=q=>{try{localStorage.setItem("cc_error_queue",JSON.stringify(q.slice(-50)))}catch{}};
+const send=async p=>{if(!db)return false;try{const {error}=await db.rpc("log_client_error",p);if(error)throw error;return true}catch(_){return false}};
+const flush=async()=>{const q=read(),keep=[];for(const p of q){if(!(await send(p)))keep.push(p)}write(keep)};
+const report=(err,meta={})=>{const e=err instanceof Error?err:new Error(String(err||"Unknown error"));const p={p_app_name:"CleanCore Website",p_app_version:VERSION,p_page:location.pathname.split("/").pop()||"index.html",p_url:location.href,p_action:meta.action||"website_error",p_error_name:e.name||"Error",p_message:String(e.message||e).slice(0,4000),p_stack:String(e.stack||"").slice(0,12000),p_context:{...(meta.context||{}),source:"customer_website_global_monitor"},p_user_agent:navigator.userAgent};void send(p).then(ok=>{if(!ok){const q=read();q.push(p);write(q)}})};
+window.addEventListener("error",e=>report(e.error||new Error(e.message||"Unhandled browser error"),{action:"window_error",context:{source:e.filename||"",line:e.lineno||0,column:e.colno||0}}));
+window.addEventListener("unhandledrejection",e=>report(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
+document.addEventListener("error",e=>{const t=e.target;if(t&&(t.tagName==="IMG"||t.tagName==="SCRIPT"||t.tagName==="LINK"))report(new Error("Failed to load "+t.tagName.toLowerCase()+": "+(t.src||t.href||"")),{action:"resource_load_error",context:{resource:t.src||t.href||"",tag:t.tagName}})},true);
+window.addEventListener("online",()=>void flush());
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>void flush());else void flush();
+})();
