@@ -5,7 +5,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.7.11";
+const SITE_VERSION="3.7.12";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -17,11 +17,23 @@ function reportWebsiteClientError(err,meta={}){
  }
 }
 
+function siteErrorQueueRead(){try{const q=JSON.parse(localStorage.getItem("cleancore_site_error_queue")||"[]");return Array.isArray(q)?q:[];}catch{return [];}}
+function siteErrorQueueWrite(q){try{localStorage.setItem("cleancore_site_error_queue",JSON.stringify(q.slice(-30)));}catch{}}
+async function sendSiteErrorPayload(payload){
+ if(!siteDb)return false;
+ try{const {error}=await siteDb.rpc("log_client_error",payload);if(error)throw error;return true;}
+ catch(err){const q=siteErrorQueueRead();q.push({...payload,queued_at:new Date().toISOString(),logger_error:String(err?.message||err)});siteErrorQueueWrite(q);return false;}
+}
+async function flushSiteErrorQueue(){
+ const q=siteErrorQueueRead();if(!q.length)return;
+ const remaining=[];
+ for(const payload of q){if(!(await sendSiteErrorPayload(payload)))remaining.push(payload);}
+ siteErrorQueueWrite(remaining);
+}
 function reportSiteError(err,meta={}){
  const e=err instanceof Error?err:new Error(String(err||"Unknown error"));
- if(siteErrorBusy)return;
- siteErrorBusy=true;
- siteDb?.rpc("log_client_error",{p_app_name:meta.app_name||"CleanCore Website",p_app_version:SITE_VERSION,p_page:location.pathname.split("/").pop()||"index.html",p_url:location.href,p_action:meta.action||"",p_error_name:e.name||"Error",p_message:String(e.message||e).slice(0,4000),p_stack:String(e.stack||"").slice(0,12000),p_context:meta.context||{},p_user_agent:navigator.userAgent}).catch(()=>{}).finally(()=>{siteErrorBusy=false});
+ const payload={p_app_name:meta.app_name||"CleanCore Website",p_app_version:SITE_VERSION,p_page:location.pathname.split("/").pop()||"index.html",p_url:location.href,p_action:meta.action||"website_error",p_error_name:e.name||"Error",p_message:String(e.message||e).slice(0,4000),p_stack:String(e.stack||"").slice(0,12000),p_context:{...(meta.context||{}),source:"customer_website"},p_user_agent:navigator.userAgent};
+ void sendSiteErrorPayload(payload);
 }
 window.addEventListener("error",e=>reportSiteError(e.error||new Error(e.message||"Unhandled browser error"),{action:"window_error",context:{source:e.filename||"",line:e.lineno||0,column:e.colno||0}}));
 window.addEventListener("unhandledrejection",e=>reportSiteError(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
@@ -678,6 +690,7 @@ document.addEventListener("click",e=>{
 document.addEventListener("input",e=>{});
 
 document.addEventListener("DOMContentLoaded",()=>{
+  void flushSiteErrorQueue();
   injectCustomerUI();
   injectEnquiryWidget();
   loadPublicProducts();
