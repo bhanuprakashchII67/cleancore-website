@@ -13,5 +13,6 @@ document.addEventListener("error",e=>{const t=e.target;if(t&&(t.tagName==="IMG"|
 const originalConsoleError=console.error.bind(console);console.error=(...args)=>{try{const msg=args.map(x=>typeof x==="string"?x:(x?.message||JSON.stringify(x))).join(" ").slice(0,4000);report(new Error(msg||"Console error"),{action:"console_error",context:{console_arguments:msg}})}catch{}originalConsoleError(...args)};
 window.addEventListener("online",()=>void flush());
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>void flush());else void flush();
-window.reportCustomerWebsiteError=(err,meta={})=>report(err,meta);\nif(new URLSearchParams(location.search).get("errorfinder_test")==="1")setTimeout(()=>report(new Error("Customer website Error Finder diagnostic test."),{action:"error_finder_test",context:{diagnostic:true}}),300);
+window.reportCustomerWebsiteError=(err,meta={})=>report(err,meta);
+if(new URLSearchParams(location.search).get("errorfinder_test")==="1")setTimeout(()=>report(new Error("Customer website Error Finder diagnostic test."),{action:"error_finder_test",context:{diagnostic:true}}),300);
 })();
