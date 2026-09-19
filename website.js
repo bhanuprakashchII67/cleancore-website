@@ -5,8 +5,18 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.7.4";
+const SITE_VERSION="3.7.5";
 let siteErrorBusy=false;
+// Report every client-side website failure to CleanCore Manager's Error Finder.
+// This includes broken images, script failures, unhandled promise rejections,
+// auth/order/enquiry errors, and runtime exceptions.
+function reportWebsiteClientError(err,meta={}){
+ const e=err instanceof Error?err:new Error(String(err||"Unknown error"));
+ if(typeof reportSiteError==="function"){
+   reportSiteError(e,{app_name:"CleanCore Website",action:meta.action||"website_error",context:{...meta.context,source:"customer_website"}});
+ }
+}
+
 function reportSiteError(err,meta={}){
  const e=err instanceof Error?err:new Error(String(err||"Unknown error"));
  if(siteErrorBusy)return;
