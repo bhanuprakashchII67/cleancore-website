@@ -440,3 +440,15 @@ button,a{touch-action:manipulation}
 @media(max-width:600px){.cc-order-success-only{padding:16px}.cc-order-success-only .cc-success{padding:22px 16px;border-radius:14px}}
 
 .site-logo{width:42px;height:42px;border-radius:12px;display:block;flex:0 0 auto;object-fit:cover}.brand .site-logo{box-shadow:0 2px 8px rgba(7,26,51,.16)}
+
+
+.account-edit{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:14px;background:#f8fbfc}
+.account-edit form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.account-edit label{display:grid;gap:6px;color:var(--navy);font-size:13px;font-weight:800}
+.account-edit input,.account-edit textarea{width:100%;box-sizing:border-box;border:1px solid #d5e0e8;border-radius:9px;padding:11px 12px;background:#fff;color:var(--navy);font:inherit}
+.account-edit textarea{resize:vertical;min-height:110px}
+.account-edit-full{grid-column:1/-1}
+.account-edit-actions{grid-column:1/-1;display:flex;gap:10px}
+.account-edit-actions .btn{flex:1}
+.account-edit .cc-status{grid-column:1/-1;margin:0}
+@media(max-width:600px){.account-edit form{grid-template-columns:1fr}.account-edit-full,.account-edit-actions,.account-edit .cc-status{grid-column:1}.account-edit-actions{flex-direction:column}}
