@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Customer Signup | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.19">
+<link rel="stylesheet" href="style.css?v=1.21">
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -55,7 +55,13 @@ document.getElementById("signupForm").addEventListener("submit",async e=>{
     });
     const raw=await response.text();let data=null;
     try{data=raw?JSON.parse(raw):null}catch(_){}
-    if(!response.ok){status.textContent=data?.error||"Unable to create account.";btn.disabled=false;return;}
+    if(!response.ok){\
+      const msg=String(data?.error||"");\
+      const friendly=msg.toLowerCase().includes("duplicate key")||msg.toLowerCase().includes("customers_phone_unique")||response.status===409\
+        ? "This mobile number is already registered. Please login instead."\
+        : (msg||"Unable to create account.");\
+      status.textContent=friendly;btn.disabled=false;return;\
+    }
     if(!data?.session){status.textContent="Account created. Please login.";btn.disabled=false;return;}
     const saved=await db.auth.setSession(data.session);
     if(saved.error){status.textContent=saved.error.message;btn.disabled=false;return;}
