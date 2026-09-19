@@ -5,7 +5,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.7.10";
+const SITE_VERSION="3.7.11";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -429,8 +429,9 @@ async function signupCustomer(e){
 async function loadCustomerProfile(){
   if(!customerUser)return;
   const {data,error}=await siteDb.from("customers")
-    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,delivery_state,delivery_city,delivery_pincode,alternate_phone,auth_user_id,customer_source")
-    .eq("auth_user_id",customerUser.id).maybeSingle();
+    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,delivery_state,delivery_city,delivery_pincode,alternate_phone,auth_user_id,customer_source,archived_at")
+    .eq("auth_user_id",customerUser.id).is("archived_at",null).maybeSingle();
+  if(error)reportSiteError(error,{action:"customer_profile_load"});
   customerProfile=error?null:data;
   renderCustomerNav();
 }
