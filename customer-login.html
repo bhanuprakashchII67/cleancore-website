@@ -106,7 +106,7 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
     btn.disabled=false;
   }
 });
-document.getElementById("googleLogin").addEventListener("click",async()=>{const gs=document.getElementById("googleLoginStatus");gs.textContent="Opening Google…";const {error}=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:new URL("customer-auth-callback.html?next="+encodeURIComponent(getNext()),location.href).href}});if(error)gs.textContent=error.message;});
+document.getElementById("googleLogin").addEventListener("click",async()=>{const gs=document.getElementById("googleLoginStatus");gs.textContent="Opening Google…";try{const {data,error}=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:new URL("customer-auth-callback.html?next="+encodeURIComponent(getNext()),location.href).href}});if(error)throw error;if(data?.url)window.location.assign(data.url);else gs.textContent="Google sign-in could not be started."; }catch(error){gs.textContent=error?.message||"Google sign-in could not be started.";}});if(error)gs.textContent=error.message;});
 </script>
 </body>
 </html>
