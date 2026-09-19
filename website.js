@@ -5,7 +5,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.7.6";
+const SITE_VERSION="3.7.7";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -103,6 +103,10 @@ function fillCheckoutCustomer(){
   document.getElementById("ccCustomerEmail").value=customerProfile?.email||"";
   document.getElementById("ccAlternatePhone").value=customerProfile?.alternate_phone||"";
   document.getElementById("ccOrderNotes").value=customerProfile?.delivery_address||"";
+}
+function customerSourceFromLocation(){
+ const src=new URLSearchParams(location.search).get("source");
+ return src==="whatsapp"?"WhatsApp":src==="landing"?"Landing Page":src==="website"?"Website":"Landing Page";
 }
 function getSafeNext(){
   const next=new URLSearchParams(location.search).get("next")||"index.html";
@@ -390,7 +394,7 @@ async function loginCustomer(e){
   const {error:setError}=await siteDb.auth.setSession(data.session);
   if(setError){reportSiteError(setError,{action:"customer_set_session"});status.textContent=setError.message;return;}
   customerUser=data.user||data.session.user;
-  try{await siteDb.from("customers").update({customer_source:(new URLSearchParams(location.search).get("source")||"Landing Page")}).eq("auth_user_id",customerUser.id);}catch(_){}
+  try{await siteDb.from("customers").update({customer_source:customerSourceFromLocation()}).eq("auth_user_id",customerUser.id);}catch(_){}
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccLoginForm").reset();
@@ -415,7 +419,7 @@ async function signupCustomer(e){
   const {error:setError}=await siteDb.auth.setSession(data.session);
   if(setError){status.textContent=setError.message;return;}
   customerUser=data.user||data.session.user;
-  try{await siteDb.from("customers").update({customer_source:(new URLSearchParams(location.search).get("source")||"Landing Page")}).eq("auth_user_id",customerUser.id);}catch(_){}
+  try{await siteDb.from("customers").update({customer_source:customerSourceFromLocation()}).eq("auth_user_id",customerUser.id);}catch(_){}
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccSignupForm").reset();
