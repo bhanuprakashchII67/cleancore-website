@@ -468,8 +468,11 @@ button,a{touch-action:manipulation}
 
 
 .account-address-detail{padding-bottom:18px}
-.account-address-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-top:10px}
-.account-address-item{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fafdfd}
-.account-address-item b{display:block;color:var(--navy);font-size:12px;margin-bottom:4px}
-.account-address-item span{color:var(--muted);font-size:14px;line-height:1.45}
-@media(max-width:600px){.account-address-grid{grid-template-columns:1fr}}
+
+
+.account-address-lines{display:grid;gap:0;margin-top:8px}
+.account-address-line{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.account-address-line:last-child{border-bottom:0}
+.account-address-line strong{font-size:12px;color:var(--navy);font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+.account-address-line span{font-size:14px;color:var(--muted);line-height:1.5;min-width:0}
+@media(max-width:600px){.account-address-line{grid-template-columns:1fr;gap:3px}}
