@@ -525,3 +525,20 @@ body,input,select,textarea,button{font-family:'Inter',Arial,sans-serif}
 
 /* Restore CleanCore website original palette; keep existing layout/typography */
 :root{--navy:#0b1f33;--teal:#159a91;--teal2:#0d746e;--ink:#17212b;--muted:#66727d;--line:#e5eaee;--bg:#f6f8f9;--white:#fff;--shadow:0 14px 40px rgba(11,31,51,.09)}
+
+
+/* Account order details */
+.account-order{position:relative}
+.account-order-more{grid-column:1/-1;margin-top:6px}
+.account-order-more .link{padding:0;font-weight:900}
+.account-order-details{margin:0 0 8px;padding:14px 0 4px;border-bottom:1px solid var(--line);background:#fbfdfd}
+.account-order-detail-line,.account-order-detail-total{display:flex;justify-content:space-between;gap:18px;padding:8px 0;font-size:12px}
+.account-order-detail-line span:first-child{color:var(--navy);font-weight:800}
+.account-order-detail-line span:last-child,.account-order-detail-note span:last-child{color:var(--muted);text-align:right}
+.account-order-detail-total{border-top:1px solid #eef2f4}
+.account-order-detail-total:last-of-type{font-size:14px}
+.account-order-detail-note{display:flex;justify-content:space-between;gap:18px;padding:9px 0;color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:600px){
+  .account-order-detail-line,.account-order-detail-total,.account-order-detail-note{flex-direction:column;gap:3px}
+  .account-order-detail-line span:last-child,.account-order-detail-note span:last-child{text-align:left}
+}
