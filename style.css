@@ -551,6 +551,101 @@ button,a{touch-action:manipulation}
 .account-inline-actions{gap:8px;margin-top:12px;padding-top:12px}
 
 
+
+/* Modern compact account controls */
+.account-page-compact .account-edit-button,
+.account-page-compact .account-order-more .link,
+.account-page-compact .account-actions .btn{
+  -webkit-appearance:none;
+  appearance:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border-radius:9px;
+  min-height:32px;
+  padding:7px 11px;
+  border:1px solid #d7e3e8;
+  background:#fff;
+  color:var(--navy);
+  font:800 11px/1 'Inter',Arial,sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+.account-page-compact .account-edit-button:hover,
+.account-page-compact .account-order-more .link:hover,
+.account-page-compact .account-actions .btn:hover{
+  border-color:#b9d8da;
+  background:#f5fbfb;
+  color:var(--teal2);
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(11,31,51,.07);
+}
+.account-page-compact .account-edit-button:active,
+.account-page-compact .account-order-more .link:active,
+.account-page-compact .account-actions .btn:active{
+  transform:translateY(0);
+  box-shadow:none;
+}
+.account-page-compact .account-edit-button{
+  position:absolute;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  min-height:30px;
+  padding:6px 10px;
+}
+.account-page-compact .account-edit-button:hover{transform:translateY(-50%) translateY(-1px)}
+.account-page-compact .account-edit-button span:first-child{font-size:14px}
+.account-page-compact .account-order-more{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  margin-top:2px;
+}
+.account-page-compact .account-order-more .link{
+  min-height:28px;
+  padding:6px 9px;
+  color:var(--navy);
+  background:#f8fafb;
+}
+.account-page-compact .account-order-more .account-bill-button{
+  border-color:#b9dfdb;
+  background:#edf9f7;
+  color:#0a746d;
+}
+.account-page-compact .account-order-more .account-bill-button:hover{
+  border-color:#8ccbc4;
+  background:#e4f5f2;
+  color:#075f59;
+}
+.account-page-compact .account-actions .btn{
+  min-height:36px;
+  padding:8px 12px;
+  border-radius:9px;
+  font-size:12px;
+}
+.account-page-compact .account-actions .btn-primary{
+  border-color:var(--teal);
+  background:var(--teal);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(21,154,145,.16);
+}
+.account-page-compact .account-actions .btn-primary:hover{
+  border-color:var(--teal2);
+  background:var(--teal2);
+  color:#fff;
+}
+.account-page-compact .account-actions .btn-secondary{
+  background:#fff;
+  color:var(--navy);
+}
+.account-page-compact .account-actions{
+  gap:8px;
+}
+
 /* Modern typography */
 h1,h2,h3,.brand,.price,.metric strong,.checkout-total strong,.cc-cart-total-row strong,.auth-page-card h1{font-family:'Manrope','Inter',Arial,sans-serif}
 body,input,select,textarea,button{font-family:'Inter',Arial,sans-serif}
