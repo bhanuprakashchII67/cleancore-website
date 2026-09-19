@@ -235,7 +235,7 @@ function injectEnquiryWidget(){
         <h2 id="ccEnquiryTitle">How can we help?</h2>
         <p class="cc-enquiry-sub">Send your details and our team will contact you.</p>
         <div class="cc-enquiry-contact-row">
-          <a href="tel:+919182725773"><span class="cc-contact-icon" aria-hidden="true">☎</span> Call us</a>
+          <a href="tel:+91 91827 25773"><span class="cc-contact-icon" aria-hidden="true">☎</span> Call us</a>
           <a href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20have%20an%20enquiry." target="_blank" rel="noopener"><span class="cc-contact-icon cc-wa-icon" aria-hidden="true">◉</span> WhatsApp</a>
           <a href="mailto:cleancorehyd@gmail.com"><span class="cc-contact-icon" aria-hidden="true">✉</span> Email</a>
         </div>
