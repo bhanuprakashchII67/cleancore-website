@@ -31,31 +31,53 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="website.js?v=3.7.9"></script>
 <script>
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded",async()=>{
   const db=window.siteDb;
   const notice=document.getElementById("accountLoginNotice"),content=document.getElementById("accountContent");
-  const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(Number(n||0));
+  const ordersBox=document.getElementById("accountOrders");
+  const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
   const esc=v=>String(v??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-  db.auth.getSession().then(async ({data})=>{
-    const user=data.session?.user;
-    if(!user){notice.classList.remove("hidden");return;}
-    const {data:customer}=await db.from("customers").select("name,phone,email,alternate_phone,business_name,delivery_address,billing_shop_no,billing_colony,billing_city,billing_state,billing_pincode,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode").eq("auth_user_id",user.id).maybeSingle();
-    if(!customer){notice.classList.remove("hidden");return;}
+  const showNotice=msg=>{if(notice){notice.classList.remove("hidden");if(msg)notice.querySelector("p").textContent=msg;}if(content)content.classList.add("hidden");};
+
+  try{
+    if(!db)throw new Error("Customer website client did not initialize.");
+    const {data:sessionData,error:sessionError}=await db.auth.getSession();
+    if(sessionError)throw sessionError;
+    const user=sessionData?.session?.user;
+    if(!user){showNotice("Login to view your CleanCore account and orders.");return;}
+
+    const {data:customer,error:customerError}=await db.from("customers")
+      .select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source")
+      .eq("auth_user_id",user.id)
+      .is("archived_at",null)
+      .maybeSingle();
+    if(customerError)throw customerError;
+    if(!customer){await db.auth.signOut({scope:"local"});showNotice("Your customer account is not currently available. Please login again or contact CleanCore.");return;}
+
     content.classList.remove("hidden");
-    let accountEditing=false;
-    const editButton=document.getElementById("accountEditToggle");
+
     const renderCustomer=()=>{
       document.getElementById("accountDetails").innerHTML=
         '<div class="account-detail"><b>Full name</b><span>'+esc(customer.name||"Not added")+'</span></div>'+
         '<div class="account-detail"><b>Mobile</b><span>'+esc(customer.phone||"Not added")+'</span></div>'+
         '<div class="account-detail"><b>Email</b><span>'+esc(customer.email||"Not added")+'</span></div>'+
         '<div class="account-detail"><b>Alternate mobile</b><span>'+esc(customer.alternate_phone||"Not added")+'</span></div>'+
-        '<div class="account-detail account-address-detail"><b>Delivery address</b><span class="account-address-summary">'+[
-          customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode
-        ].filter(Boolean).map(esc).join(", ")||esc(customer.delivery_address||"Not added")+'</span></div>';
+        '<div class="account-detail"><b>Business</b><span>'+esc(customer.business_name||"Not added")+'</span></div>'+
+        '<div class="account-detail account-address-detail"><b>Delivery address</b><span class="account-address-summary">'+
+          [customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).map(esc).join(", ")||
+          esc(customer.delivery_address||"Not added")+
+        '</span></div>';
     };
     renderCustomer();
+
+    let accountEditing=false;
+    const editButton=document.getElementById("accountEditToggle");
     const editWrap=document.getElementById("accountEditFormWrap");
+    const closeAccountEditor=()=>{
+      accountEditing=false;
+      editWrap.classList.add("hidden");editWrap.innerHTML="";
+      editButton.classList.remove("hidden");editButton.hidden=false;
+    };
     const editTemplate=()=>{
       const legacy=String(customer.delivery_address||"");
       const val=(key)=>customer[key]||"";
@@ -73,40 +95,19 @@ document.addEventListener("DOMContentLoaded",()=>{
             '<label>State (Required) *<input id="editState" value="'+esc(val("delivery_state"))+'" required></label>'+
             '<label>City (Required) *<input id="editCity" value="'+esc(val("delivery_city"))+'" required></label>'+
             '<label class="full-row">House No., Building Name (Required) *<input id="editHouse" value="'+esc(val("delivery_shop_no"))+'" required></label>'+
-            '<label class="full-row">Road name, Area, Colony (Required) *<input id="editColony" value="'+esc(val("delivery_colony",legacy))+'" required></label>'+
-            '<label class="full-row">Nearby Famous Shop/Mall/Landmark (Optional)<input id="editLandmark" value="'+esc("")+'"></label>'+
+            '<label class="full-row">Road name, Area, Colony (Required) *<input id="editColony" value="'+esc(val("delivery_colony")||legacy)+'" required></label>'+
           '</div>'+
-          '<div class="account-address-types"><span>Type of address</span><label><input type="radio" name="addressType" value="Home" checked> Home</label><label><input type="radio" name="addressType" value="Work"> Work</label></div>'+
         '</div>'+
         '<div class="account-inline-actions"><button class="btn btn-primary" type="submit">Save changes</button><button class="btn btn-secondary" type="button" id="editCancel">Cancel</button></div>'+
       '</form>';
       editWrap.classList.remove("hidden");
       return document.getElementById("accountInlineForm");
     };
-    const closeAccountEditor=()=>{
-      accountEditing=false;
-      editWrap.classList.add("hidden");
-      editWrap.innerHTML="";
-      editButton.classList.remove("hidden");
-      editButton.hidden=false;
-    };
     editButton.onclick=()=>{
       if(accountEditing)return;
-      accountEditing=true;
-      editButton.classList.add("hidden");
-      editButton.hidden=true;
+      accountEditing=true;editButton.classList.add("hidden");editButton.hidden=true;
       const form=editTemplate();
-      const cancelButton=document.getElementById("editCancel");
-      cancelButton.type="button";
-      cancelButton.addEventListener("click",e=>{
-        e.preventDefault();
-        e.stopPropagation();
-        closeAccountEditor();
-      });
-      form.addEventListener("reset",e=>{
-        e.preventDefault();
-        closeAccountEditor();
-      });
+      document.getElementById("editCancel").onclick=closeAccountEditor;
       document.getElementById("editLocationBtn").onclick=()=>{
         if(!navigator.geolocation)return toastSite("Location is not available on this device.");
         navigator.geolocation.getCurrentPosition(
@@ -125,30 +126,51 @@ document.addEventListener("DOMContentLoaded",()=>{
         const delivery_city=document.getElementById("editCity").value.trim();
         const delivery_shop_no=document.getElementById("editHouse").value.trim();
         const delivery_colony=document.getElementById("editColony").value.trim();
-        if(!name||!phoneRE.test(phone)||!validSiteEmail(email)||(alternate&&!phoneRE.test(alternate))||!/^[0-9]{6}$/.test(delivery_pincode)||!delivery_state||!delivery_city||!delivery_shop_no||!delivery_colony){
-          return toastSite("Please complete all required fields correctly.");
-        }
-        const saveBtn=form.querySelector('button[type="submit"]');
-        saveBtn.disabled=true;saveBtn.textContent="Saving…";
-        const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,
-          delivery_address:[delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode].filter(Boolean).join(", "),
-          delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode
-        };
-        const {data,error}=await db.from("customers").update(nextUpdate).eq("id",customer.id).eq("auth_user_id",user.id).select("name,phone,email,alternate_phone,business_name,delivery_address,billing_shop_no,billing_colony,billing_city,billing_state,billing_pincode,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode").single();
+        if(!name||!phoneRE.test(phone)||!validSiteEmail(email)||(alternate&&!phoneRE.test(alternate))||!/^[0-9]{6}$/.test(delivery_pincode)||!delivery_state||!delivery_city||!delivery_shop_no||!delivery_colony)return toastSite("Please complete all required fields correctly.");
+        const saveBtn=form.querySelector('button[type="submit"]');saveBtn.disabled=true;saveBtn.textContent="Saving…";
+        const nextUpdate={name,phone,email:email||null,alternate_phone:alternate||null,delivery_address:[delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode].join(" | "),delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode};
+        const {data,error}=await db.from("customers").update(nextUpdate).eq("id",customer.id).eq("auth_user_id",user.id).select("id,name,phone,email,alternate_phone,business_name,gstin,billing_address,delivery_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source").single();
         if(error){saveBtn.disabled=false;saveBtn.textContent="Save changes";return toastSite(error.message||"Unable to save your details.");}
-        Object.assign(customer,data);
-        accountEditing=false;
-        renderCustomer();
-        editWrap.classList.add("hidden");
-        editButton.classList.remove("hidden");
-        toastSite("Your details were updated.");
+        Object.assign(customer,data);renderCustomer();closeAccountEditor();toastSite("Your details were updated.");
       });
     };
-        const orders=await db.from("website_orders").select("order_no,status,total,created_at").eq("customer_id",customer.id).order("created_at",{ascending:false});
-    const box=document.getElementById("accountOrders");
-    if(orders.error){box.innerHTML='<p class="cc-status">Unable to load orders.</p>';return;}
-    box.innerHTML=orders.data?.length?orders.data.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+new Date(o.created_at).toLocaleString("en-IN")+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status)+'</span></div></div>').join(""):'<p class="cc-muted">No orders yet.</p>';
-  });
+
+    if(ordersBox){
+      ordersBox.innerHTML='<div class="cc-loading">Loading orders…</div>';
+      const {data:orders,error:ordersError}=await db.from("website_orders")
+        .select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount")
+        .eq("customer_id",customer.id)
+        .order("created_at",{ascending:false});
+      if(ordersError)throw ordersError;
+      if(!orders?.length){
+        ordersBox.innerHTML='<p class="cc-muted">No orders yet.</p>';
+      }else{
+        ordersBox.innerHTML=orders.map(o=>
+          '<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div>'+
+          '<div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div>'+
+          '<div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button></div></div>'
+        ).join("");
+        ordersBox.querySelectorAll("[data-order-id]").forEach(btn=>btn.addEventListener("click",async()=>{
+          const order=orders.find(o=>o.id===btn.dataset.orderId);if(!order)return;
+          const {data:items,error}=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",order.id).order("created_at");
+          if(error)return toastSite(error.message||"Unable to load order details.");
+          const lines=(items||[]).map(it=>'<div class="account-order-detail-line"><span>'+esc(it.product_name)+'</span><span>'+esc(it.unit)+' × '+esc(it.qty)+' @ '+money(it.unit_price)+' = '+money(it.line_total)+'</span></div>').join("");
+          ordersBox.querySelectorAll(".account-order-details[data-for]").forEach(x=>x.remove());
+          const detail=document.createElement("div");detail.className="account-order-details";detail.dataset.for=order.id;
+          detail.innerHTML='<div><b>Order details</b></div>'+lines+
+            '<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(order.subtotal)+'</b></div>'+
+            '<div class="account-order-detail-total"><span>GST</span><b>'+money(order.gst_amount)+'</b></div>'+
+            '<div class="account-order-detail-total"><span>Total</span><b>'+money(order.total)+'</b></div>'+
+            '<div class="account-order-detail-note"><span>Note</span><span>'+esc(order.notes||"No note")+'</span></div>';
+          btn.closest(".account-order").insertAdjacentElement("afterend",detail);
+          });
+      }
+    }
+  }catch(err){
+    console.error("Customer account load failed",err);
+    showNotice(err?.message||"Unable to load your account right now. Please refresh and try again.");
+  }
+
   document.getElementById("accountLogout").onclick=async()=>{await db.auth.signOut({scope:"local"});window.location.href="index.html";};
 });
 </script>
