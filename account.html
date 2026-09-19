@@ -29,6 +29,7 @@
 </div>
 </div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
   const notice=document.getElementById("accountLoginNotice"), content=document.getElementById("accountContent");
@@ -39,6 +40,7 @@
   const phone=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"").slice(-10);
   const emailOK=v=>!v||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const showNotice=m=>{notice.classList.remove("hidden");notice.querySelector("p").textContent=m;content.classList.add("hidden");};
+  const setNotice=showNotice;
   const orderError=m=>{ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(m||"Please try again.")+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);};
   let db, user, customer, orders=[];
   function renderCustomer(){
@@ -84,13 +86,79 @@
       }catch(err){btn.disabled=false;btn.textContent="Save changes";alert(err?.message||"Unable to save your details.");}
     };
   }
+  function pdfSafe(v){return String(v??"").replace(/[\\u0000-\\u001F]/g," ").trim();}
+  function pdfMoney(v){return "Rs. "+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function pdfLine(doc,y,label,value,rightX=195){doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(pdfSafe(label),15,y);doc.text(pdfSafe(value),rightX,y,{align:"right"});}
+  function pdfWrap(doc,text,x,y,maxWidth,lineHeight=4.8){const lines=doc.splitTextToSize(pdfSafe(text),maxWidth);doc.text(lines,x,y);return y+(lines.length*lineHeight);}
+  async function downloadBillPdf(order,items,button){
+    if(!window.jspdf?.jsPDF){alert("Bill PDF service did not load. Please refresh the page and try again.");return;}
+    const old=button?.textContent; if(button){button.disabled=true;button.textContent="Preparing PDF…";}
+    try{
+      const {jsPDF}=window.jspdf, doc=new jsPDF({unit:"mm",format:"a4"});
+      const pageW=210, left=15, right=195;
+      let y=16;
+      doc.setFont("helvetica","bold");doc.setFontSize(17);doc.text("CleanCore Chemical & Cleaning",left,y);
+      y+=7;doc.setFontSize(12);doc.text(order.invoice_no?"TAX INVOICE / BILL":"BILL",left,y);
+      doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text("Customer website order",right,y,{align:"right"});
+      y+=6;doc.setDrawColor(120);doc.line(left,y,right,y);y+=7;
+
+      doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text("Invoice details",left,y);y+=5;
+      doc.setFont("helvetica","normal");doc.setFontSize(9);
+      pdfLine(doc,y,"Invoice No.",order.invoice_no||order.order_no);y+=5;
+      pdfLine(doc,y,"Order No.",order.order_no);y+=5;
+      pdfLine(doc,y,"Date",new Date(order.created_at).toLocaleString("en-IN"));y+=5;
+      pdfLine(doc,y,"Status",order.status||"New");y+=7;
+
+      doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text("Bill to",left,y);y+=5;
+      doc.setFont("helvetica","normal");doc.setFontSize(9);
+      y=pdfWrap(doc,customer.name||"Customer",left,y,82)+1;
+      y=pdfWrap(doc,customer.phone||"",left,y,82)+1;
+      if(customer.email)y=pdfWrap(doc,customer.email,left,y,82)+1;
+      const addr=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address||"";
+      y=pdfWrap(doc,addr,left,y,82)+1;
+      if(order.customer_gstin||customer.gstin){y=pdfWrap(doc,"GSTIN: "+(order.customer_gstin||customer.gstin),left,y,82)+1;}
+      if(order.place_of_supply){y=pdfWrap(doc,"Place of supply: "+order.place_of_supply,left,y,82)+1;}
+      y=Math.max(y,74);
+
+      const tableTop=y+3, col=[15,82,112,139,162,195];
+      doc.setFillColor(242,242,242);doc.rect(left,tableTop-5,pageW-30,8,"F");
+      doc.setFont("helvetica","bold");doc.setFontSize(8);
+      doc.text("#",17,tableTop);doc.text("Item",col[1],tableTop);doc.text("Unit",col[2],tableTop);doc.text("Qty",col[3],tableTop,{align:"right"});doc.text("Rate",col[4],tableTop,{align:"right"});doc.text("Amount",col[5],tableTop,{align:"right"});
+      y=tableTop+5;doc.setFont("helvetica","normal");doc.setFontSize(8);
+      const rows=Array.isArray(items)?items:[];
+      rows.forEach((it,idx)=>{
+        const name=pdfSafe(it.product_name||"Item"), nameLines=doc.splitTextToSize(name,28), h=Math.max(6,nameLines.length*4.2);
+        if(y+h>280){doc.addPage();y=18;doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text("CleanCore Chemical & Cleaning — Bill (continued)",left,y);y+=8;doc.setFont("helvetica","normal");doc.setFontSize(8);}
+        doc.text(String(idx+1),17,y);doc.text(nameLines,col[1],y);doc.text(pdfSafe(it.unit||"-"),col[2],y);doc.text(String(it.qty??""),col[3],y,{align:"right"});doc.text(pdfMoney(it.unit_price),col[4],y,{align:"right"});doc.text(pdfMoney(it.line_total),col[5],y,{align:"right"});
+        y+=h;doc.setDrawColor(220);doc.line(left,y-2,right,y-2);y+=2;
+      });
+      if(!rows.length){doc.text("No item details available.",left,y);y+=7;}
+      if(y>250){doc.addPage();y=18;}
+      y+=4;doc.setFontSize(9);
+      pdfLine(doc,y,"Subtotal",pdfMoney(order.subtotal));y+=5;
+      if(order.gst_enabled && Number(order.gst_amount||0)>0){
+        if(Number(order.cgst_amount||0)>0)pdfLine(doc,y,"CGST ("+Number(order.cgst_percent||0)+"%)",pdfMoney(order.cgst_amount));
+        else if(Number(order.igst_amount||0)>0)pdfLine(doc,y,"IGST ("+Number(order.igst_percent||0)+"%)",pdfMoney(order.igst_amount));
+        else if(Number(order.sgst_amount||0)>0)pdfLine(doc,y,"SGST ("+Number(order.sgst_percent||0)+"%)",pdfMoney(order.sgst_amount));
+        y+=5;
+        if(Number(order.cgst_amount||0)>0 && Number(order.sgst_amount||0)>0){pdfLine(doc,y,"SGST ("+Number(order.sgst_percent||0)+"%)",pdfMoney(order.sgst_amount));y+=5;}
+        if(!Number(order.cgst_amount||0)&&!Number(order.sgst_amount||0)&&!Number(order.igst_amount||0))pdfLine(doc,y,"GST ("+Number(order.gst_percent||0)+"%)",pdfMoney(order.gst_amount)),y+=5;
+      }
+      doc.setDrawColor(80);doc.line(130,y,195,y);y+=6;doc.setFont("helvetica","bold");doc.setFontSize(11);pdfLine(doc,y,"Grand Total",pdfMoney(order.total));
+      if(order.notes){y+=8;doc.setFont("helvetica","bold");doc.setFontSize(9);doc.text("Notes",left,y);y+=5;doc.setFont("helvetica","normal");y=pdfWrap(doc,order.notes,left,y,180);}
+      y=Math.min(y+12,286);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(100);doc.text("Generated from the CleanCore customer website.",left,y);doc.setTextColor(0);
+      const safeNo=String(order.invoice_no||order.order_no||"bill").replace(/[^a-zA-Z0-9_-]/g,"-");doc.save("CleanCore-"+safeNo+".pdf");
+    }catch(err){console.error("BILL PDF ERROR",err);alert(err?.message||"Unable to generate the bill PDF.");}
+    finally{if(button){button.disabled=false;button.textContent=old||"Download bill PDF";}}
+  }
+
   async function loadOrders(){
     ordersBox.innerHTML='<div class="cc-loading">Loading orders…</div>';
     try{
-      const res=await db.from("website_orders").select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount").eq("customer_id",customer.id).order("created_at",{ascending:false});
+      const res=await db.from("website_orders").select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount,gst_enabled,gst_percent,cgst_percent,cgst_amount,sgst_percent,sgst_amount,igst_percent,igst_amount,place_of_supply,customer_gstin").eq("customer_id",customer.id).order("created_at",{ascending:false});
       if(res.error)throw res.error; orders=Array.isArray(res.data)?res.data:[];
       if(!orders.length){ordersBox.innerHTML='<p class="cc-muted">No orders yet.</p>';return;}
-      ordersBox.innerHTML=orders.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div><div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button></div></div>').join("");
+      ordersBox.innerHTML=orders.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div><div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button><button type="button" class="link account-bill-button" data-bill-id="'+esc(o.id)+'">Download bill PDF</button></div></div>').join("");
       ordersBox.querySelectorAll("[data-order-id]").forEach(b=>b.onclick=async()=>{
         const o=orders.find(x=>x.id===b.dataset.orderId);if(!o)return;
         try{const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",o.id).order("created_at");if(res.error)throw res.error;
@@ -98,6 +166,12 @@
           ordersBox.querySelectorAll(".account-order-details").forEach(x=>x.remove());const d=document.createElement("div");d.className="account-order-details";d.dataset.for=o.id;
           d.innerHTML='<div><b>Order details</b></div>'+lines+'<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(o.subtotal)+'</b></div><div class="account-order-detail-total"><span>GST</span><b>'+money(o.gst_amount)+'</b></div><div class="account-order-detail-total"><span>Total</span><b>'+money(o.total)+'</b></div><div class="account-order-detail-note"><span>Note</span><span>'+esc(o.notes||"No note")+'</span></div>';b.closest(".account-order").insertAdjacentElement("afterend",d);
         }catch(err){orderError(err?.message);}
+      });
+      ordersBox.querySelectorAll("[data-bill-id]").forEach(b=>b.onclick=async()=>{
+        const o=orders.find(x=>x.id===b.dataset.billId);if(!o)return;
+        const old=b.textContent;b.disabled=true;b.textContent="Preparing…";
+        try{const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",o.id).order("created_at");if(res.error)throw res.error;await downloadBillPdf(o,res.data||[],b);}
+        catch(err){console.error(err);alert(err?.message||"Unable to prepare bill PDF.");b.disabled=false;b.textContent=old;}
       });
     }catch(err){console.error(err);orderError(err?.message);}
   }
