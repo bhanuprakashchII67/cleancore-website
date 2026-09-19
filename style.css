@@ -521,3 +521,7 @@ button,a{touch-action:manipulation}
 /* Modern typography */
 h1,h2,h3,.brand,.price,.metric strong,.checkout-total strong,.cc-cart-total-row strong,.auth-page-card h1{font-family:'Manrope','Inter',Arial,sans-serif}
 body,input,select,textarea,button{font-family:'Inter',Arial,sans-serif}
+
+
+/* Restore CleanCore website original palette; keep existing layout/typography */
+:root{--navy:#0b1f33;--teal:#159a91;--teal2:#0d746e;--ink:#17212b;--muted:#66727d;--line:#e5eaee;--bg:#f6f8f9;--white:#fff;--shadow:0 14px 40px rgba(11,31,51,.09)}
