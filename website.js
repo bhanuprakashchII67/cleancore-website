@@ -5,6 +5,17 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
+const SITE_VERSION="3.7.4";
+let siteErrorBusy=false;
+function reportSiteError(err,meta={}){
+ const e=err instanceof Error?err:new Error(String(err||"Unknown error"));
+ if(siteErrorBusy)return;
+ siteErrorBusy=true;
+ siteDb?.rpc("log_client_error",{p_app_name:meta.app_name||"CleanCore Website",p_app_version:SITE_VERSION,p_page:location.pathname.split("/").pop()||"index.html",p_url:location.href,p_action:meta.action||"",p_error_name:e.name||"Error",p_message:String(e.message||e).slice(0,4000),p_stack:String(e.stack||"").slice(0,12000),p_context:meta.context||{},p_user_agent:navigator.userAgent}).catch(()=>{}).finally(()=>{siteErrorBusy=false});
+}
+window.addEventListener("error",e=>reportSiteError(e.error||new Error(e.message||"Unhandled browser error"),{action:"window_error",context:{source:e.filename||"",line:e.lineno||0,column:e.colno||0}}));
+window.addEventListener("unhandledrejection",e=>reportSiteError(e.reason||new Error("Unhandled promise rejection"),{action:"unhandled_rejection"}));
+
 let publicProducts=[];
 let customerUser=null;
 let customerProfile=null;
@@ -203,7 +214,7 @@ function bindWebsiteEnquiry(){
     if(!validSiteEmail(payload.email)){msg.textContent="Enter a valid email address.";return;}
     // Always record the enquiry. Existing customers/leads may submit again; enquiries are not de-duplicated.
     const {error}=await siteDb.from("enquiries").insert(payload);
-    if(error){msg.textContent="Unable to send right now. Please use the order form or contact CleanCore.";return;}
+    if(error){reportSiteError(error,{action:"website_enquiry_insert"});msg.textContent="Unable to send right now. Please use the order form or contact CleanCore.";return;}
     form.reset();
     msg.textContent="Request sent. CleanCore will contact you.";
   });
@@ -362,12 +373,12 @@ async function loginCustomer(e){
   if(!password){status.textContent="Enter your password.";return;}
 
   const {data,error}=await invokeCustomerAuth({action:"login",identifier,password});
-  if(error){status.textContent=error.message||"Unable to login right now.";return;}
+  if(error){reportSiteError(error,{action:"customer_login"});status.textContent=error.message||"Unable to login right now.";return;}
   if(data?.error){status.textContent=data.error;return;}
   if(!data?.session){status.textContent="Login failed. Please try again.";return;}
 
   const {error:setError}=await siteDb.auth.setSession(data.session);
-  if(setError){status.textContent=setError.message;return;}
+  if(setError){reportSiteError(setError,{action:"customer_set_session"});status.textContent=setError.message;return;}
   customerUser=data.user||data.session.user;
   customerProfile=null;
   await loadCustomerProfile();
@@ -386,7 +397,7 @@ async function signupCustomer(e){
   if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
 
   const {data,error}=await invokeCustomerAuth({action:"signup",phone,email,password});
-  if(error){status.textContent=error.message||"Unable to create account right now.";return;}
+  if(error){reportSiteError(error,{action:"customer_signup"});status.textContent=error.message||"Unable to create account right now.";return;}
   if(data?.error){status.textContent=data.error;return;}
   if(!data?.session){status.textContent="Account created, but login could not be started. Please login.";return;}
 
@@ -472,7 +483,7 @@ async function placeCustomerOrder(e){
   const {data:profileData,error:profileError}=await siteDb.rpc("update_website_customer_profile",{
     p_name:name,p_email:email,p_alternate_phone:normalizeSitePhone(alternate),p_delivery_address:address
   });
-  if(profileError){status.textContent=profileError.message;return;}
+  if(profileError){reportSiteError(profileError,{action:"customer_profile_update"});status.textContent=profileError.message;return;}
   customerProfile={...customerProfile,...(profileData||{})};
   status.textContent="Placing order…";
   const {data,error}=await siteDb.rpc("place_website_cart_order",{
@@ -585,7 +596,7 @@ window.initCleanCoreCheckout=async function(){
     if(gstEnabled&&!billingAddress){status.textContent="Enter your full billing address for the GST invoice.";return;}
     btn.disabled=true;status.textContent="Saving details and placing order…";
     const {data:profile,error:profileError}=await siteDb.rpc("update_website_customer_profile",{p_name:name,p_email:email,p_alternate_phone:alternate,p_delivery_address:address,p_business_name:businessName,p_billing_address:billingAddress,p_gstin:gstEnabled?gstin:""});
-    if(profileError){btn.disabled=false;status.textContent=profileError.message;return;}
+    if(profileError){reportSiteError(profileError,{action:"checkout_profile_update"});btn.disabled=false;status.textContent=profileError.message;return;}
     customerProfile={...customerProfile,...(profile||{})};
     const currentItems=loadCustomerCart();
     if(!currentItems.length){btn.disabled=false;status.textContent="Your cart is empty.";return;}
