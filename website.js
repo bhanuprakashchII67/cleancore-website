@@ -390,6 +390,7 @@ async function loginCustomer(e){
   const {error:setError}=await siteDb.auth.setSession(data.session);
   if(setError){reportSiteError(setError,{action:"customer_set_session"});status.textContent=setError.message;return;}
   customerUser=data.user||data.session.user;
+  try{await siteDb.from("customers").update({customer_source:(new URLSearchParams(location.search).get("source")||"Landing Page")}).eq("auth_user_id",customerUser.id);}catch(_){}
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccLoginForm").reset();
@@ -414,6 +415,7 @@ async function signupCustomer(e){
   const {error:setError}=await siteDb.auth.setSession(data.session);
   if(setError){status.textContent=setError.message;return;}
   customerUser=data.user||data.session.user;
+  try{await siteDb.from("customers").update({customer_source:(new URLSearchParams(location.search).get("source")||"Landing Page")}).eq("auth_user_id",customerUser.id);}catch(_){}
   customerProfile=null;
   await loadCustomerProfile();
   document.getElementById("ccSignupForm").reset();
@@ -423,7 +425,7 @@ async function signupCustomer(e){
 async function loadCustomerProfile(){
   if(!customerUser)return;
   const {data,error}=await siteDb.from("customers")
-    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,delivery_state,delivery_city,delivery_pincode,alternate_phone,auth_user_id")
+    .select("id,name,phone,business_name,email,gstin,billing_address,delivery_address,delivery_state,delivery_city,delivery_pincode,alternate_phone,auth_user_id,customer_source")
     .eq("auth_user_id",customerUser.id).maybeSingle();
   customerProfile=error?null:data;
   renderCustomerNav();
