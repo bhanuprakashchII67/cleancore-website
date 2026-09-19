@@ -1,11 +1,24 @@
-<!doctype html>
+<!doctydocument.getElementById("googleSignup").addEventListener("click",async()=>{
+  const gs=document.getElementById("googleSignupStatus");gs.textContent="Opening Google…";
+  const {error}=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:new URL("customer-auth-callback.html?next="+encodeURIComponent(getNext()),location.href).href}});
+  if(error)gs.textContent=error.message;
+});
+pe html>
 <html lang="en">
 <head><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Customer Signup | CleanCore</title>
 <link rel="stylesheet" href="style.css?v=1.27">
-</head>
+<style>
+.auth-social{display:grid;gap:9px;margin-top:14px}
+.auth-divider{display:flex;align-items:center;gap:10px;color:#7b8794;font-size:11px;font-weight:800;margin:12px 0}
+.auth-divider::before,.auth-divider::after{content:"";height:1px;background:#e1e8eb;flex:1}
+.google-btn{width:100%;min-height:42px;border:1px solid #d5dfe5;border-radius:10px;background:#fff;color:#172b3f;display:flex;align-items:center;justify-content:center;gap:9px;font:800 13px/1 Inter,Arial,sans-serif;cursor:pointer;box-shadow:0 2px 7px rgba(11,31,51,.04);transition:.16s ease}
+.google-btn:hover{background:#f8fbfc;border-color:#b9cbd4;box-shadow:0 5px 14px rgba(11,31,51,.07);transform:translateY(-1px)}
+.google-g{width:18px;height:18px;display:block}
+.auth-social-status{font-size:11px!important;margin:0!important}
+</style></head>
 <body class="checkout-page">
 <header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
@@ -17,11 +30,11 @@
 <section class="checkout-card auth-page-card">
 <div class="eyebrow">Customer account</div>
 <h1>Create your account</h1>
-<p class="cc-muted">Just your mobile number and a password.</p>
+<p class="cc-muted">Create your account with email, mobile number and password.</p>
 <form id="signupForm" novalidate>
-<label>Mobile number<input id="signupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
+<label>Email ID<input id="signupEmail" type="email" autocomplete="email" placeholder="your@email.com" required></label>\n<label>Mobile number<input id="signupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
 <label>Password<input id="signupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required></label>
-<p id="signupStatus" class="cc-status" aria-live="polite"></p>
+<p id="signupStatus" class="cc-status" aria-live="polite"></p>\n<div class="auth-divider"><span>OR</span></div><div class="auth-social"><button id="googleSignup" class="google-btn" type="button"><svg class="google-g" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.23z"/><path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.7-1.72-5.47-4.03H3.28v2.53A9.74 9.74 0 0 0 12 21.75z"/><path fill="#FBBC05" d="M6.53 13.83A5.86 5.86 0 0 1 6.22 12c0-.64.11-1.26.31-1.83V7.64H3.28A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.06 1.03 4.36l3.25-2.53z"/><path fill="#EA4335" d="M12 6.14c1.43 0 2.72.49 3.74 1.45l2.8-2.8C16.84 3.13 14.63 2.25 12 2.25a9.74 9.74 0 0 0-8.72 5.39l3.25 2.53C7.3 7.86 9.46 6.14 12 6.14z"/></svg>Continue with Google</button><p id="googleSignupStatus" class="cc-status auth-social-status" aria-live="polite"></p></div>
 <button id="signupButton" class="btn btn-primary cc-wide" type="submit">Create account <span aria-hidden="true">→</span></button>
 </form>
 <p class="auth-switch">Already have an account? <a class="auth-link-blue" href="customer-login.html">Login</a></p>
@@ -43,16 +56,17 @@ const getNext=()=>{
 document.getElementById("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const status=document.getElementById("signupStatus"),btn=document.getElementById("signupButton");
+  const email=document.getElementById("signupEmail").value.trim().toLowerCase();
   const phone=normalize(document.getElementById("signupPhone").value);
   const password=document.getElementById("signupPassword").value;
-  if(!validPhone(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent="Enter a valid email ID.";return;}\n  if(!validPhone(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
   if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
   btn.disabled=true;status.textContent="Creating your account…";
   try{
     const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
       method:"POST",
       headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
-      body:JSON.stringify({action:"signup",phone,email:"",password,source:getSource()})
+      body:JSON.stringify({action:"signup",phone,email,password,source:getSource()})
     });
     const raw=await response.text();let data=null;
     try{data=raw?JSON.parse(raw):null}catch(_){}
