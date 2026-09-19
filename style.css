@@ -225,12 +225,12 @@ button,a{touch-action:manipulation}
 .cc-checkout-customer input:focus,.cc-checkout-customer textarea:focus{outline:0;border-color:var(--teal);box-shadow:0 0 0 3px #159a9120}
 
 .checkout-page{background:#f6f8f9}
-.checkout-main{padding:56px 0 80px}
+.checkout-main{padding:36px 0 54px}
 .checkout-title{max-width:720px;margin-bottom:28px}
-.checkout-title h1{font-size:44px;letter-spacing:-1.8px;margin-bottom:8px}
+.checkout-title h1{font-size:38px;letter-spacing:-1.4px;margin-bottom:6px}
 .checkout-title p{color:var(--muted)}
 .checkout-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:22px;align-items:start}
-.checkout-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 10px 30px rgba(11,31,51,.05)}
+.checkout-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(11,31,51,.05)}
 .checkout-card-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:20px}
 .checkout-card-head>span{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:900;flex:0 0 30px}
 .checkout-card-head h2{font-size:21px;color:var(--navy);line-height:1.2}
@@ -270,7 +270,7 @@ button,a{touch-action:manipulation}
 .auth-page-card>p{margin-bottom:24px}
 .auth-switch{text-align:center;margin-top:18px;color:var(--muted);font-size:13px}
 .auth-switch button{border:0;background:none;color:var(--teal2);font-weight:900;cursor:pointer}
-.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.account-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px}
 .account-detail{padding:13px 0;border-bottom:1px solid var(--line)}
 .account-detail b{display:block;color:var(--navy);font-size:13px;margin-bottom:3px}
 .account-detail span{color:var(--muted);font-size:14px;line-height:1.5}
@@ -501,3 +501,18 @@ button,a{touch-action:manipulation}
  .account-inline-actions{flex-direction:column}
  .account-address-types{align-items:stretch}
 }
+
+.account-detail{padding:9px 0}
+.account-detail b{font-size:11px;margin-bottom:2px}
+.account-detail span{font-size:13px}
+.account-actions{margin-top:14px}
+.account-inline-form{padding-top:12px}
+.account-inline-grid{gap:9px}
+.account-inline-form label{gap:4px;font-size:11px}
+.account-inline-form input{padding:9px;border-radius:8px;font-size:13px}
+.account-inline-section{margin-top:12px;padding-top:12px}
+.account-inline-title{font-size:13px;margin-bottom:9px}
+.account-location-btn{min-height:38px;font-size:12px}
+.account-address-types{gap:8px;margin-top:10px}
+.account-address-types label{padding:7px 10px;font-size:11px}
+.account-inline-actions{gap:8px;margin-top:12px;padding-top:12px}
