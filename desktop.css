@@ -469,3 +469,188 @@ header{isolation:isolate!important}
     display:none!important;
   }
 }
+
+
+/* ===== DESKTOP HEADER v4.20 — FIX OVERLAP + COMPACT RIGHT =====
+   Keep brand left, navigation centered, actions right.
+   Uses normal grid flow so the three zones cannot stack on each other.
+*/
+@media (min-width:801px){
+  header .container{
+    width:100%!important;
+    max-width:1450px!important;
+    margin:0 auto!important;
+    padding:0 28px!important;
+    box-sizing:border-box!important;
+  }
+
+  header nav{
+    width:100%!important;
+    height:72px!important;
+    min-height:72px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;
+    grid-template-rows:72px!important;
+    align-items:center!important;
+    column-gap:18px!important;
+    position:relative!important;
+    box-sizing:border-box!important;
+  }
+
+  /* LEFT */
+  header nav .brand{
+    grid-column:1!important;
+    grid-row:1!important;
+    justify-self:start!important;
+    position:static!important;
+    transform:none!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:9px!important;
+    width:auto!important;
+    max-width:100%!important;
+    margin:0!important;
+    white-space:nowrap!important;
+    font-size:15px!important;
+    line-height:1.1!important;
+  }
+
+  header nav .site-logo{
+    width:42px!important;
+    height:42px!important;
+    flex:0 0 42px!important;
+  }
+
+  /* CENTER */
+  header nav .navlinks{
+    grid-column:2!important;
+    grid-row:1!important;
+    justify-self:center!important;
+    position:static!important;
+    transform:none!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    width:max-content!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    flex:none!important;
+  }
+
+  header nav .navlinks a,
+  header nav .navlinks a:hover,
+  header nav .navlinks a:focus,
+  header nav .navlinks a:active,
+  header nav .navlinks a:visited{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:4px 0!important;
+    font-family:Inter,Arial,sans-serif!important;
+    font-size:13px!important;
+    font-weight:700!important;
+    line-height:1.2!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+    transform:none!important;
+    scale:1!important;
+    zoom:1!important;
+  }
+
+  /* RIGHT ACTION ZONE */
+  header nav .nav-user-actions{
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    position:static!important;
+    transform:none!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    width:auto!important;
+    margin:0 184px 0 0!important;
+    padding:0!important;
+  }
+
+  header nav .customer-nav-action{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:auto!important;
+    min-width:0!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:0 9px!important;
+    gap:6px!important;
+    border-radius:10px!important;
+    box-sizing:border-box!important;
+  }
+
+  header nav .customer-action-label{
+    display:inline!important;
+    font-size:13px!important;
+    font-weight:700!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+
+  header nav .customer-face,
+  header nav .customer-cart-icon{
+    width:19px!important;
+    height:19px!important;
+    flex:0 0 19px!important;
+  }
+
+  header nav .customer-face svg,
+  header nav .customer-cart-icon svg{
+    width:18px!important;
+    height:18px!important;
+  }
+
+  /* QUOTE: compact, far right */
+  header nav .navcta{
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    position:static!important;
+    transform:none!important;
+    width:176px!important;
+    height:40px!important;
+    min-height:40px!important;
+    margin:0!important;
+    padding:0 14px!important;
+    border-radius:9px!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+
+  /* Keep the two right-side groups side-by-side within the right column. */
+  header nav .nav-user-actions{
+    margin-right:190px!important;
+  }
+
+  header nav .menu-toggle{display:none!important}
+}
+
+/* On narrower desktop widths, compact the brand/right zone further. */
+@media (min-width:801px) and (max-width:1250px){
+  header .container{padding-inline:18px!important}
+  header nav{column-gap:10px!important}
+  header nav .brand{font-size:14px!important}
+  header nav .site-logo{width:38px!important;height:38px!important;flex-basis:38px!important}
+  header nav .navlinks{gap:7px!important}
+  header nav .navlinks a{font-size:12px!important}
+  header nav .customer-nav-action{padding-inline:7px!important}
+  header nav .customer-action-label{font-size:12px!important}
+  header nav .navcta{width:160px!important;font-size:12px!important}
+  header nav .nav-user-actions{margin-right:170px!important}
+}
