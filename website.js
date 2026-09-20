@@ -322,6 +322,26 @@ function injectEnquiryWidget(){
   });
 }
 
+function bindSharedMenu(){
+  const b=document.getElementById("menuToggle"),m=document.getElementById("navMenu");
+  if(!b||!m||b.dataset.ccMenuBound==="1")return;
+  b.dataset.ccMenuBound="1";
+  b.addEventListener("click",function(){
+    const open=m.classList.toggle("open");
+    b.classList.toggle("open",open);
+    b.setAttribute("aria-expanded",String(open));
+    b.setAttribute("aria-label",open?"Close navigation":"Open navigation");
+  });
+  m.querySelectorAll("a").forEach(a=>a.addEventListener("click",function(){
+    m.classList.remove("open");b.classList.remove("open");
+    b.setAttribute("aria-expanded","false");
+    b.setAttribute("aria-label","Open navigation");
+  }));
+  window.addEventListener("resize",function(){
+    if(window.innerWidth>800){m.classList.remove("open");b.classList.remove("open");b.setAttribute("aria-expanded","false");}
+  });
+}
+
 function ensureSharedNav(){
   const nav=document.getElementById("navMenu");
   if(!nav)return null;
@@ -790,6 +810,7 @@ document.addEventListener("input",e=>{});
 document.addEventListener("DOMContentLoaded",()=>{
   void flushSiteErrorQueue();
   injectCustomerUI();
+  bindSharedMenu();
   injectMobileBar();
   injectEnquiryWidget();
   loadPublicProducts();
