@@ -84,3 +84,49 @@
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+/* ===== CleanCore header hardening v3.83 ===== */
+header .container,header nav{overflow:visible!important}
+header{isolation:isolate!important}
+.brand{display:flex!important;align-items:center!important;min-width:0!important;visibility:visible!important;opacity:1!important}
+.site-logo{display:block!important;visibility:visible!important;opacity:1!important;object-fit:contain!important}
+.nav-user-actions{display:flex!important;align-items:center!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important}
+.customer-nav-action{display:grid!important;visibility:visible!important;opacity:1!important;place-items:center!important;text-decoration:none!important}
+.customer-nav-action .customer-face,.customer-nav-action .customer-cart-icon{display:grid!important;visibility:visible!important;opacity:1!important;place-items:center!important}
+.customer-nav-action svg{display:block!important;visibility:visible!important;opacity:1!important}
+.menu-toggle{display:flex!important;visibility:visible!important;opacity:1!important;align-items:stretch!important;justify-content:center!important;flex-direction:column!important}
+.menu-toggle span{display:block!important;visibility:visible!important;opacity:1!important}
+@media(min-width:801px){
+  header nav{min-height:78px!important}
+  .nav-user-actions{order:3!important;margin-left:auto!important}
+  .navlinks{order:2!important}
+  .navcta{order:4!important}
+  .menu-toggle{display:none!important}
+  .site-logo{width:44px!important;height:44px!important}
+  .brand{gap:11px!important;font-size:16px!important}
+  .customer-nav-action{min-width:44px!important;min-height:44px!important;padding:0 11px!important}
+}
+@media(max-width:800px){
+  header .container{width:100%!important;max-width:none!important;padding:6px 10px!important}
+  header nav{min-height:62px!important;height:auto!important;gap:6px!important;padding:4px 0!important}
+  .brand{flex:1 1 auto!important;font-size:13px!important;gap:8px!important;min-width:0!important}
+  .brand>div:last-child{min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .site-logo{width:36px!important;height:36px!important;flex:0 0 36px!important}
+  .nav-user-actions{order:2!important;margin-left:auto!important;gap:5px!important;flex:0 0 auto!important}
+  .customer-nav-action{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;padding:0!important;border-radius:11px!important}
+  .customer-nav-action .customer-action-label{display:none!important}
+  .customer-nav-action .customer-face,.customer-nav-action .customer-cart-icon{width:22px!important;height:22px!important}
+  .customer-nav-action .customer-face svg,.customer-nav-action .customer-cart-icon svg{width:22px!important;height:22px!important}
+  .menu-toggle{order:3!important;flex:0 0 40px!important;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;margin:0!important;padding:9px!important;border:1px solid #dbe5e9!important;border-radius:11px!important;background:#fff!important}
+  .menu-toggle span{width:100%!important;height:3px!important;margin:3px 0!important;background:var(--navy)!important;border-radius:3px!important}
+  .navlinks{position:absolute!important;left:0!important;right:0!important;top:calc(100% + 6px)!important;z-index:5000!important;display:grid!important;gap:4px!important;padding:8px!important;border:1px solid #dce6ea!important;border-radius:16px!important;background:#fff!important;box-shadow:0 18px 44px rgba(11,31,51,.16)!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:translateY(-8px)!important}
+  .navlinks.open{opacity:1!important;visibility:visible!important;pointer-events:auto!important;transform:none!important}
+}
+@media(max-width:460px){
+  header .container{padding-inline:8px!important}
+  .site-logo{width:34px!important;height:34px!important}
+  .customer-nav-action{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important}
+  .menu-toggle{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;flex-basis:38px!important}
+  .customer-nav-action .customer-face,.customer-nav-action .customer-cart-icon,
+  .customer-nav-action .customer-face svg,.customer-nav-action .customer-cart-icon svg{width:20px!important;height:20px!important}
+}
