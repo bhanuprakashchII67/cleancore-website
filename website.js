@@ -641,8 +641,39 @@ window.initCleanCoreCheckout=async function(){
     empty.classList.add("hidden");auth.classList.add("hidden");content.classList.add("hidden");
     document.querySelector(".checkout-title")?.classList.add("hidden");
     const placedAt=order?.placed_at?new Date(order.placed_at):new Date();
-    const successTitle=order?.invoice_no?"Congratulations! Your order was placed successfully.":"Congratulations! Your order was placed successfully.";
-    document.body.innerHTML='<main class="cc-order-success-only"><div class="cc-success"><h2>'+successTitle+'</h2><p>Thank you for ordering from CleanCore Chemical & Cleaning.</p><div class="order-success-grid"><div><span>Order number</span><strong>'+escSite(order?.order_no)+'</strong></div><div><span>Invoice number</span><strong>'+escSite(order?.invoice_no||"Generating")+'</strong></div><div><span>Order date & time</span><strong>'+escSite(placedAt.toLocaleString("en-IN"))+'</strong></div><div><span>Total</span><strong>'+siteMoney(order?.total)+'</strong></div></div><a class="btn btn-primary" href="index.html">Continue shopping</a></div></main>';
+    let billItems=[];
+    if(order?.id){
+      const ir=await siteDb.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",order.id).order("created_at");
+      if(!ir.error) billItems=ir.data||[];
+    }
+    const addrParts=String(customerProfile?.delivery_address||"").split(" | ");
+    const billAddress=addrParts.filter(Boolean).join(", ")||"—";
+    const business=String(customerProfile?.business_name||"").trim();
+    const showBusiness=business&&business.toLowerCase()!=="na";
+    const gstBill=Number(order?.gst_amount||0)>0;
+    const gstin=String(order?.customer_gstin||customerProfile?.gstin||"").trim();
+    const shownGstin=gstin&&gstin.toLowerCase()!=="na"?gstin:"NA";
+    const billRows=billItems.map((it,n)=>'<tr><td>'+String(n+1)+'</td><td>'+escSite(it.product_name||"Item")+'</td><td>'+escSite(it.hsn_code||"—")+'</td><td>'+escSite(it.qty??"—")+'</td><td>'+siteMoney(it.unit_price)+'</td><td>'+siteMoney(it.line_total)+'</td></tr>').join("");
+    const taxRows=gstBill
+      ? ((Number(order.cgst_amount||0)>0?'<tr><td colspan="5">CGST ('+Number(order.cgst_percent||0)+'%)</td><td>'+siteMoney(order.cgst_amount)+'</td></tr>':'')+
+         (Number(order.sgst_amount||0)>0?'<tr><td colspan="5">SGST ('+Number(order.sgst_percent||0)+'%)</td><td>'+siteMoney(order.sgst_amount)+'</td></tr>':'')+
+         (Number(order.igst_amount||0)>0?'<tr><td colspan="5">IGST ('+Number(order.igst_percent||0)+'%)</td><td>'+siteMoney(order.igst_amount)+'</td></tr>':''))
+      : "";
+    document.body.innerHTML='<main class="cc-order-success-only"><div class="cc-instant-bill">'+
+      '<div class="cc-bill-header"><div><div class="cc-bill-brand">CleanCore Chemical & Cleaning</div><div class="cc-bill-sub">Manufacturing & Supply of Cleaning Chemicals</div><div>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div>Phone: +91 91827 25773</div><div>Email: cleancorehyd@gmail.com</div></div><div class="cc-bill-title"><b>'+ (gstBill?"TAX INVOICE":"INVOICE") +'</b><span>ORIGINAL FOR RECIPIENT</span></div></div>'+
+      '<div class="cc-bill-meta"><div><b>Bill No:</b> '+escSite(order?.invoice_no||"—")+'<br><b>Date:</b> '+escSite(placedAt.toLocaleDateString("en-IN"))+'</div><div><b>Place of Supply:</b> '+escSite(order?.place_of_supply||customerProfile?.delivery_state||"Telangana")+'</div></div>'+
+      '<div class="cc-bill-parties"><div><b>BILL FROM</b><p><strong>CleanCore Chemical & Cleaning</strong><br>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India<br>Phone: +91 91827 25773<br>Email: cleancorehyd@gmail.com</p></div><div><b>BILL TO</b><p>'+
+      (showBusiness?'<b>Business Name:</b> '+escSite(business)+'<br>':'')+
+      '<b>Customer Name:</b> '+escSite(customerProfile?.name||"Customer")+'<br><b>Phone:</b> '+escSite(customerProfile?.phone||"—")+'<br>'+
+      (customerProfile?.email?'<b>Email:</b> '+escSite(customerProfile.email)+'<br>':'')+
+      (gstBill?'<b>GSTIN:</b> '+escSite(shownGstin)+'<br>':'')+
+      '<b>Billing Address:</b><br>'+escSite(customerProfile?.billing_address||"—")+'<br><b>Delivery Address:</b><br>'+escSite(billAddress)+'</p></div></div>'+
+      '<table class="cc-bill-items"><thead><tr><th>S.No.</th><th>Product / Service</th><th>HSN / SAC</th><th>Qty</th><th>Rate</th><th>Taxable Value</th></tr></thead><tbody>'+billRows+
+      '<tr><td colspan="5">Subtotal</td><td>'+siteMoney(order?.subtotal)+'</td></tr>'+taxRows+
+      '<tr class="cc-bill-total"><td colspan="5">TOTAL</td><td>'+siteMoney(order?.total)+'</td></tr></tbody></table>'+
+      '<div class="cc-bill-bottom"><div><b>Terms & Conditions</b><p>Goods once sold will not be taken back unless agreed in writing.<br>Payment as per agreed business terms.<br>Subject to Hyderabad, Telangana jurisdiction.</p></div><div><span>For CleanCore Chemical & Cleaning</span><br><br><b>Authorised Signature</b></div></div>'+
+      '<div class="cc-bill-actions"><button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button><a class="btn btn-secondary" href="index.html">Continue shopping</a></div>'+
+      '</div></main>';
     document.body.className="checkout-page";
     btn.disabled=false;
   });
