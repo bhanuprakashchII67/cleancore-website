@@ -749,3 +749,40 @@ document.addEventListener("error",e=>{
    });
  }
 },true);
+
+
+/* CleanCore 4D interaction layer — pointer depth on capable devices only */
+(function(){
+  const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fine=window.matchMedia&&window.matchMedia("(pointer:fine)").matches;
+  if(reduce||!fine)return;
+  const selector=".product,.box,.contact-card,.request-form,.checkout-card,.checkout-notice,.hero-card,.home-range,.home-account-actions,.home-catalog-cta,.home-proof-item";
+  let last=null;
+  const reset=el=>{
+    if(!el)return;
+    el.style.removeProperty("--cc-rx");
+    el.style.removeProperty("--cc-ry");
+    el.classList.add("cc-tilt-reset");
+    window.setTimeout(()=>el.classList.remove("cc-tilt-reset"),360);
+  };
+  document.addEventListener("pointermove",function(e){
+    const el=e.target.closest?.(selector);
+    if(last&&last!==el)reset(last);
+    last=el;
+    if(!el)return;
+    const r=el.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+    const x=(e.clientX-r.left)/r.width-.5;
+    const y=(e.clientY-r.top)/r.height-.5;
+    const rx=(-y*3.2).toFixed(2),ry=(x*3.8).toFixed(2);
+    el.classList.add("cc-tilt-active");
+    el.style.setProperty("--cc-rx",rx+"deg");
+    el.style.setProperty("--cc-ry",ry+"deg");
+  },{passive:true});
+  document.addEventListener("pointerleave",function(){reset(last);last=null},{passive:true});
+  document.addEventListener("mouseout",function(e){
+    if(!last)return;
+    const to=e.relatedTarget;
+    if(!to||!last.contains(to)){reset(last);last=null}
+  },{passive:true});
+})();
