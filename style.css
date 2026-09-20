@@ -670,3 +670,121 @@ body,input,select,textarea,button{font-family:'Inter',Arial,sans-serif}
   .account-order-detail-line,.account-order-detail-total,.account-order-detail-note{flex-direction:column;gap:3px}
   .account-order-detail-line span:last-child,.account-order-detail-note span:last-child{text-align:left}
 }
+
+/* CleanCore immersive 3D / motion layer — shared across the website */
+:root{
+  --cc-depth:0 22px 55px rgba(11,31,51,.12);
+  --cc-depth-hover:0 30px 75px rgba(11,31,51,.18);
+}
+body{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(20,184,166,.045),transparent 28%),
+    radial-gradient(circle at 90% 12%,rgba(15,76,129,.055),transparent 30%),
+    #fff;
+}
+header{
+  box-shadow:0 8px 30px rgba(11,31,51,.06);
+}
+.product,.box,.contact-card,.request-form,.checkout-card,.checkout-notice{
+  position:relative;
+  transform:translateZ(0);
+  box-shadow:0 10px 28px rgba(11,31,51,.055);
+  transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s ease,border-color .28s ease;
+}
+.product:before,.box:before,.contact-card:before,.request-form:before,.checkout-card:before,.checkout-notice:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.7),transparent 42%);
+  opacity:.55;
+}
+.product:hover,.box:hover,.contact-card:hover,.request-form:hover,.checkout-card:hover,.checkout-notice:hover{
+  transform:translateY(-7px) perspective(900px) rotateX(1deg);
+  box-shadow:var(--cc-depth-hover);
+  border-color:#cbdde4;
+}
+.product .imgbox,.product-placeholder{
+  transform:translateZ(0);
+  overflow:hidden;
+}
+.product .prod-img{
+  transition:transform .45s cubic-bezier(.2,.7,.2,1),filter .45s ease;
+}
+.product:hover .prod-img{
+  transform:scale(1.045) translateY(-2px);
+  filter:saturate(1.05);
+}
+.btn{
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 7px 18px rgba(11,31,51,.08);
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 25px rgba(11,31,51,.14);
+  filter:saturate(1.04);
+}
+.btn:active{
+  transform:translateY(0) scale(.98);
+}
+.hero-card{
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 28px 75px rgba(11,31,51,.22);
+  transform:translateZ(0);
+}
+.hero-card:before{
+  content:"";
+  position:absolute;
+  width:280px;height:280px;
+  right:-130px;top:-150px;
+  border-radius:50%;
+  border:1px solid rgba(114,213,205,.18);
+  box-shadow:0 0 0 35px rgba(114,213,205,.035),0 0 0 70px rgba(114,213,205,.025);
+  animation:ccFloat 9s ease-in-out infinite;
+  pointer-events:none;
+}
+.mini{
+  transition:transform .2s ease,background .2s ease;
+}
+.mini:hover{
+  transform:translateX(5px);
+  background:rgba(255,255,255,.035);
+}
+@keyframes ccFloat{
+  0%,100%{transform:translate3d(0,0,0) rotate(0)}
+  50%{transform:translate3d(-14px,12px,0) rotate(8deg)}
+}
+@keyframes ccReveal{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero,.home-hero,.checkout-main,section{
+  animation:ccReveal .55s ease both;
+}
+.product-grid .product:nth-child(2){animation-delay:.04s}
+.product-grid .product:nth-child(3){animation-delay:.08s}
+.product-grid .product:nth-child(4){animation-delay:.12s}
+.product-grid .product:nth-child(5){animation-delay:.16s}
+.product-grid .product:nth-child(6){animation-delay:.20s}
+.product-grid .product:nth-child(7){animation-delay:.24s}
+@media(max-width:800px){
+  .product:hover,.box:hover,.contact-card:hover,.request-form:hover,.checkout-card:hover,.checkout-notice:hover{
+    transform:none;
+    box-shadow:0 10px 28px rgba(11,31,51,.07);
+  }
+  .btn:hover{transform:none}
+  .mini:hover{transform:none;background:transparent}
+  .hero-card:before{animation:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:.01ms!important;
+  }
+}
