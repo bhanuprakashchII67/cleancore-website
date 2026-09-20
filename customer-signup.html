@@ -21,7 +21,7 @@
 <form id="signupForm" novalidate>
 <label>Email ID<input id="signupEmail" type="email" autocomplete="email" placeholder="your@email.com" required></label>
 <label>Mobile number<input id="signupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
-<label>Password<input id="signupPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required></label>
+<label>Password<input id="signupPassword" type="password" minlength="6" maxlength="20" autocomplete="new-password" placeholder="Create a password" required></label>
 <p id="signupStatus" class="cc-status" aria-live="polite"></p>
 <button id="signupButton" class="btn btn-primary cc-wide" type="submit">Create account <span aria-hidden="true">→</span></button>
 </form>
@@ -47,7 +47,7 @@ document.getElementById("signupForm").addEventListener("submit",async e=>{
   const phone=normalize(document.getElementById("signupPhone").value);
   const password=document.getElementById("signupPassword").value;
   if(!validPhone(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
-  if(password.length<8){status.textContent="Password must be at least 8 characters.";return;}
+  if(password.length<6){status.textContent="Password must be at least 6 characters.";return;}
   btn.disabled=true;status.textContent="Creating your account…";
   try{
     const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
