@@ -783,3 +783,116 @@ header{isolation:isolate!important}
   header nav .customer-action-label{font-size:12px!important}
   header nav .navcta{width:160px!important;height:38px!important;min-height:38px!important;font-size:12px!important}
 }
+
+
+/* ===== DESKTOP HEADER v4.30 — STRUCTURAL THREE-ZONE FIX =====
+   The desktop header uses a real three-column grid. The center navigation
+   gets its own column, while account/cart/quote are one right-side group.
+   This removes the absolute-position overlap from v4.10/v4.21.
+*/
+@media (min-width:801px){
+  header .container{
+    width:100%!important;
+    max-width:1450px!important;
+    margin:0 auto!important;
+    padding:0 28px!important;
+    box-sizing:border-box!important;
+  }
+  header nav{
+    position:relative!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;
+    grid-template-rows:72px!important;
+    align-items:center!important;
+    column-gap:18px!important;
+    width:100%!important;
+    height:72px!important;
+    min-height:72px!important;
+    margin:0!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+  }
+  header nav .brand{
+    grid-column:1!important;grid-row:1!important;justify-self:start!important;
+    position:static!important;transform:none!important;
+    display:flex!important;align-items:center!important;
+    width:auto!important;max-width:100%!important;
+    margin:0!important;padding:0!important;
+    gap:8px!important;white-space:nowrap!important;
+    font-size:15px!important;line-height:1.1!important;
+  }
+  header nav .site-logo{
+    width:40px!important;height:40px!important;flex:0 0 40px!important;
+  }
+  header nav .navlinks{
+    grid-column:2!important;grid-row:1!important;justify-self:center!important;
+    position:static!important;transform:none!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    flex:0 0 auto!important;width:max-content!important;max-width:none!important;
+    gap:12px!important;margin:0!important;padding:0!important;
+    opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+  }
+  header nav .navlinks a,
+  header nav .navlinks a:hover,
+  header nav .navlinks a:focus,
+  header nav .navlinks a:active,
+  header nav .navlinks a:visited{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    width:auto!important;min-width:0!important;min-height:0!important;height:auto!important;
+    margin:0!important;padding:4px 0!important;
+    font-family:Inter,Arial,sans-serif!important;font-size:13px!important;font-weight:700!important;
+    line-height:1.2!important;letter-spacing:0!important;white-space:nowrap!important;
+    text-decoration:none!important;transform:none!important;scale:1!important;zoom:1!important;
+  }
+  header nav .nav-right-actions{
+    grid-column:3!important;grid-row:1!important;justify-self:end!important;
+    position:static!important;display:flex!important;align-items:center!important;
+    justify-content:flex-end!important;gap:7px!important;width:max-content!important;max-width:100%!important;
+    margin:0!important;padding:0!important;
+  }
+  header nav .nav-user-actions{
+    position:static!important;display:flex!important;align-items:center!important;
+    justify-content:flex-end!important;gap:5px!important;width:auto!important;
+    margin:0!important;padding:0!important;transform:none!important;
+  }
+  header nav .customer-nav-action{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:auto!important;min-width:0!important;height:38px!important;min-height:38px!important;
+    padding:0 8px!important;gap:5px!important;border-radius:9px!important;box-sizing:border-box!important;
+  }
+  header nav .customer-action-label{
+    display:inline!important;font-size:12px!important;font-weight:700!important;line-height:1!important;
+    white-space:nowrap!important;
+  }
+  header nav .customer-face,header nav .customer-cart-icon{
+    width:18px!important;height:18px!important;flex:0 0 18px!important;display:grid!important;place-items:center!important;
+  }
+  header nav .customer-face svg,header nav .customer-cart-icon svg{width:17px!important;height:17px!important}
+  header nav .navcta{
+    position:static!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    flex:0 0 154px!important;width:154px!important;height:38px!important;min-height:38px!important;
+    margin:0!important;padding:0 10px!important;border-radius:9px!important;
+    font-size:12px!important;font-weight:800!important;line-height:1!important;white-space:nowrap!important;
+    transform:none!important;scale:1!important;zoom:1!important;
+  }
+  header nav .menu-toggle{display:none!important}
+}
+@media (min-width:801px) and (max-width:1150px){
+  header .container{padding-inline:18px!important}
+  header nav{column-gap:10px!important}
+  header nav .brand{font-size:13px!important;gap:6px!important}
+  header nav .site-logo{width:36px!important;height:36px!important;flex-basis:36px!important}
+  header nav .navlinks{gap:8px!important}
+  header nav .navlinks a{font-size:11px!important}
+  header nav .nav-right-actions{gap:4px!important}
+  header nav .nav-user-actions{gap:3px!important}
+  header nav .customer-nav-action{height:34px!important;min-height:34px!important;padding-inline:6px!important;gap:4px!important}
+  header nav .customer-action-label{font-size:11px!important}
+  header nav .customer-face,header nav .customer-cart-icon{width:16px!important;height:16px!important;flex-basis:16px!important}
+  header nav .customer-face svg,header nav .customer-cart-icon svg{width:15px!important;height:15px!important}
+  header nav .navcta{flex-basis:132px!important;width:132px!important;height:34px!important;min-height:34px!important;font-size:11px!important}
+}
+/* Mobile: wrapper becomes transparent so the existing phone flex layout is unchanged. */
+@media (max-width:800px){
+  header nav .nav-right-actions{display:contents!important}
+}
