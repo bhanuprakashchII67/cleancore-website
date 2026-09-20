@@ -979,3 +979,6 @@ header{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:
  .menu-toggle{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:stretch!important;visibility:visible!important;opacity:1!important}
  .menu-toggle span{display:block!important;width:100%!important;height:3px!important;background:var(--navy)!important;margin:4px 0!important;border-radius:3px!important}
 }
+
+/* Logged-in homepage: hide guest account promotion */
+.home-account-actions.hidden{display:none!important}
