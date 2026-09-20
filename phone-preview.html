@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CleanCore — Phone Website Preview</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100vh;background:radial-gradient(circle at 50% 0%,#17344b 0,#09121d 42%,#050a10 100%);display:flex;flex-direction:column;align-items:center;color:#fff;padding:28px 18px 34px}
+.toolbar{width:min(100%,1050px);display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.brand{font-weight:900;letter-spacing:-.4px}.brand span{display:block;font-size:11px;color:#8ea2b6;font-weight:600;letter-spacing:.5px;margin-top:3px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+button,.link{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;border-radius:10px;padding:9px 12px;font:700 12px inherit;cursor:pointer;text-decoration:none}
+button.active{background:#159a91;border-color:#159a91}
+.stage{display:flex;align-items:center;justify-content:center;flex:1;width:100%;padding:8px 0 20px}
+.phone{width:390px;height:min(844px,calc(100vh - 155px));min-height:600px;background:#05070a;border:9px solid #20252b;border-radius:48px;box-shadow:0 30px 90px rgba(0,0,0,.65),0 0 0 2px rgba(255,255,255,.08);position:relative;overflow:hidden}
+.phone:before{content:"";position:absolute;z-index:4;top:8px;left:50%;transform:translateX(-50%);width:105px;height:25px;border-radius:18px;background:#05070a;box-shadow:0 0 0 1px rgba(255,255,255,.04)}
+.screen{width:100%;height:100%;border:0;display:block;background:#fff}
+.side{position:absolute;left:-13px;top:140px;width:4px;height:65px;background:#30363d;border-radius:4px}
+.side:after{content:"";position:absolute;top:78px;left:0;width:4px;height:38px;background:#30363d;border-radius:4px}
+.power{position:absolute;right:-13px;top:165px;width:4px;height:82px;background:#30363d;border-radius:4px}
+.note{margin-top:4px;color:#8193a5;font-size:11px;text-align:center}
+@media(max-width:620px){
+ body{padding:16px 8px 22px}
+ .toolbar{align-items:flex-start;flex-direction:column}
+ .controls{justify-content:flex-start}
+ .phone{width:min(390px,100vw - 18px);height:calc(100vh - 170px);min-height:520px;border-radius:38px}
+}
+</style>
+</head>
+<body>
+<header class="toolbar">
+  <div class="brand">CleanCore <span>Phone Website Preview</span></div>
+  <div class="controls">
+    <button class="active" data-page="index.html">Home</button>
+    <button data-page="products.html">Products</button>
+    <button data-page="about.html">About</button>
+    <button data-page="contact.html">Contact</button>
+    <button data-page="customer-login.html">Account</button>
+  </div>
+</header>
+<main class="stage">
+  <div class="phone">
+    <span class="side"></span><span class="power"></span>
+    <iframe id="screen" class="screen" src="index.html" title="CleanCore phone website"></iframe>
+  </div>
+</main>
+<div class="note">390 × 844 phone viewport · click the pages above to preview the mobile UI</div>
+<script>
+document.querySelectorAll("[data-page]").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.getElementById("screen").src=this.dataset.page;
+    document.querySelectorAll("[data-page]").forEach(function(x){x.classList.remove("active")});
+    this.classList.add("active");
+  });
+});
+</script>
+</body>
+</html>
