@@ -205,7 +205,7 @@ async function loadPublicProducts(){
         ? '<div class="imgbox"><img class="prod-img" src="'+escSite(img)+'" alt="'+escSite(p.name)+'"></div>'
         : '<div class="imgbox product-placeholder"><div>'+escSite(String(p.name||"").trim().charAt(0).toUpperCase())+'</div></div>';
       const priceMarkup=location.pathname.toLowerCase().includes("products.html")?'<div class="price">'+siteMoney(p.selling_price)+' <small>/ '+escSite(p.unit)+'</small></div>':"";
-      const inStock=Number(p.stock||0)>0; const stockMarkup=inStock?'':'<div class="stock-out">Out of stock</div>'; const buttonMarkup=inStock?'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button>':'<button type="button" class="btn btn-secondary order-now" data-product-id="'+escSite(p.id)+'" disabled>Out of stock</button>'; const slug=p.seo_slug||String(p.name||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); const detailUrl="product.html?slug="+encodeURIComponent(slug); return '<article class="product">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3><a class="product-title-link" href="'+detailUrl+'">'+escSite(p.name)+'</a></h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p>'+priceMarkup+stockMarkup+buttonMarkup+'</div></article>';
+      const inStock=Number(p.stock||0)>0; const stockMarkup=inStock?'':'<div class="stock-out">Out of stock</div>'; const buttonMarkup=inStock?'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button>':'<button type="button" class="btn btn-secondary order-now" data-product-id="'+escSite(p.id)+'" disabled>Out of stock</button>'; const slug=p.seo_slug||String(p.name||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); const detailUrl="product.html?slug="+encodeURIComponent(slug); return '<article class="product product-link" data-product-url="'+escSite(detailUrl)+'" tabindex="0" role="link">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit)+'</span><h3><a class="product-title-link" href="'+detailUrl+'">'+escSite(p.name)+'</a></h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p>'+priceMarkup+stockMarkup+buttonMarkup+'</div></article>';
     }).join("");
   });
 }
@@ -685,9 +685,16 @@ document.addEventListener("click",e=>{
   const btn=e.target.closest?.(".order-now");
   if(btn){
     e.preventDefault();
+    if(btn.disabled)return;
     const id=btn.dataset.productId;
     const product=id?publicProducts.find(p=>p.id===id):publicProducts.find(p=>p.name===btn.dataset.productName);
     if(product)openOrder(product);
+    return;
+  }
+  const card=e.target.closest?.(".product-link[data-product-url]");
+  if(card){
+    e.preventDefault();
+    window.location.href=card.dataset.productUrl;
   }
 });
 document.addEventListener("input",e=>{});
