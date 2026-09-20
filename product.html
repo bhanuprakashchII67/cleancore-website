@@ -12,7 +12,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link id="canonicalLink" rel="canonical" href="product.html">
 <script id="productSchema" type="application/ld+json">{}</script>
-<link rel="stylesheet" href="style.css?v=1.28">
+<link rel="stylesheet" href="style.css?v=1.40">
 <style>
 .product-detail{padding:56px 0}.product-detail-grid{display:grid;grid-template-columns:minmax(300px,1.05fr) minmax(300px,.95fr);gap:40px;align-items:start}
 .product-gallery{position:sticky;top:90px}.product-detail-image{min-height:460px;display:grid;place-items:center;background:#eef7f6;border-radius:24px;padding:28px;overflow:hidden}
@@ -104,8 +104,10 @@ html,body{max-width:100%;overflow-x:hidden}
 <body>
 <header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
-<div class="navlinks"><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
-
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+<div class="nav-user-actions" id="navUserActions"></div>
+<div class="navlinks" id="navMenu"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
+<a class="navcta" href="contact.html">Request a Quote</a>
 </nav></div></header>
 <main><section class="product-detail"><div class="container" id="productRoot"><div class="eyebrow">CleanCore Commercial Cleaning Product</div><h1>Loading product…</h1><p>Loading product information.</p></div></section></main>
 <footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div><a href="tel:+91 91827 25773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer>
@@ -139,4 +141,4 @@ load().catch(e=>{root.innerHTML='<div class="eyebrow">Product</div><h1>Product d
 })();
 </script>
 <script src="error-monitor.js?v=3.7.15"></script>
-</body></html>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="website.js?v=3.80"></script></body></html>
