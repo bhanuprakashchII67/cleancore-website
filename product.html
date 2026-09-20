@@ -12,11 +12,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <link id="canonicalLink" rel="canonical" href="product.html">
 <script id="productSchema" type="application/ld+json">{}</script>
-<link rel="stylesheet" href="style.css?v=1.41">
-<link rel="stylesheet" href="desktop.css?v=1.5" media="(min-width: 801px)">
-<link rel="stylesheet" href="mobile.css?v=2.4" media="(max-width: 800px)">
-<link rel="stylesheet" href="customer-desktop.css?v=1.5" media="(min-width:801px)">
-<link rel="stylesheet" href="customer-mobile.css?v=2.4" media="(max-width:800px)">
+<link rel="stylesheet" href="style.css?v=1.50">
+<link rel="stylesheet" href="desktop.css?v=4.31" media="(min-width: 801px)">
+<link rel="stylesheet" href="mobile.css?v=2.9" media="(max-width: 800px)">
+<link rel="stylesheet" href="customer-desktop.css?v=4.22" media="(min-width:801px)">
+<link rel="stylesheet" href="customer-mobile.css?v=2.9" media="(max-width:800px)">
 <style>
 .product-detail{padding:56px 0}.product-detail-grid{display:grid;grid-template-columns:minmax(300px,1.05fr) minmax(300px,.95fr);gap:40px;align-items:start}
 .product-gallery{position:sticky;top:90px}.product-detail-image{min-height:460px;display:grid;place-items:center;background:#eef7f6;border-radius:24px;padding:28px;overflow:hidden}
@@ -103,7 +103,58 @@ html,body{max-width:100%;overflow-x:hidden}
   .product-gallery{grid-template-columns:minmax(0,1fr) 58px}
   .product-gallery .product-thumbs-side{max-height:76vw}
   .product-gallery .product-thumb{width:52px;height:52px;min-width:52px;flex-basis:52px}
-}</style>
+}
+
+/* ===== PRODUCT PAGE FINAL MOBILE REPAIR v4.31 ===== */
+@media (max-width:800px){
+  header nav{position:relative!important;display:flex!important;align-items:center!important;gap:6px!important}
+  header nav .menu-toggle#menuToggle{
+    display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:99999!important;
+    flex:0 0 40px!important;width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+    max-width:40px!important;max-height:40px!important;margin:0 0 0 6px!important;padding:8px!important;box-sizing:border-box!important;
+    align-items:stretch!important;justify-content:center!important;flex-direction:column!important;gap:4px!important;
+    border:1px solid #dbe5e9!important;border-radius:11px!important;background:#fff!important;overflow:visible!important;
+  }
+  header nav .menu-toggle#menuToggle span,
+  header nav .menu-toggle#menuToggle span:nth-child(1),
+  header nav .menu-toggle#menuToggle span:nth-child(2),
+  header nav .menu-toggle#menuToggle span:nth-child(3){
+    display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;
+    height:3px!important;min-height:3px!important;max-height:3px!important;flex:0 0 3px!important;
+    margin:0!important;padding:0!important;background:#0b1f33!important;border-radius:3px!important;transform:none!important;
+  }
+  header nav .menu-toggle#menuToggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)!important}
+  header nav .menu-toggle#menuToggle.open span:nth-child(2){opacity:0!important}
+  header nav .menu-toggle#menuToggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)!important}
+
+  .product-detail{width:100%!important;max-width:100%!important;overflow:hidden!important;box-sizing:border-box!important}
+  .product-detail-grid{display:grid!important;grid-template-columns:1fr!important;gap:14px!important;width:100%!important;max-width:100%!important}
+  .product-gallery{position:static!important;display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important}
+  .product-detail-image{width:100%!important;min-height:0!important;height:auto!important;padding:5px!important;margin:0 0 6px!important;box-sizing:border-box!important;overflow:hidden!important}
+  .product-detail-image img{display:block!important;width:100%!important;height:auto!important;max-width:100%!important;max-height:300px!important;object-fit:contain!important;margin:0 auto!important}
+  .product-thumbs{
+    display:flex!important;flex-wrap:nowrap!important;align-items:flex-start!important;justify-content:space-between!important;
+    width:100%!important;height:56px!important;min-height:56px!important;max-height:56px!important;
+    gap:5px!important;margin:0 0 10px!important;padding:0!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  .product-thumbs .product-thumb{
+    display:block!important;flex:0 0 calc((100% - 20px)/5)!important;width:calc((100% - 20px)/5)!important;
+    height:56px!important;min-height:56px!important;max-height:56px!important;aspect-ratio:auto!important;
+    margin:0!important;padding:3px!important;box-sizing:border-box!important;overflow:hidden!important;border-radius:9px!important;
+  }
+  .product-thumbs .product-thumb img{
+    display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;
+    object-fit:cover!important;object-position:center!important;margin:0!important;border-radius:6px!important;
+  }
+  .product-detail-copy{display:block!important;position:relative!important;clear:both!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0!important;box-sizing:border-box!important;z-index:1!important}
+  .product-detail-copy h1{margin:4px 0 14px!important;font-size:clamp(30px,8vw,38px)!important;line-height:1.06!important;overflow-wrap:anywhere!important}
+}
+@media (max-width:380px){
+  .product-detail-image img{max-height:270px!important}
+  .product-thumbs{height:50px!important;min-height:50px!important;max-height:50px!important;gap:4px!important}
+  .product-thumbs .product-thumb{height:50px!important;min-height:50px!important;max-height:50px!important}
+}
+</style>
 <script src="error-monitor.js?v=3.80"></script>
 <style id="cc-hard-header-fix">
 @media (min-width:801px){
