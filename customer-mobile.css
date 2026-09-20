@@ -175,3 +175,15 @@ header{isolation:isolate!important}
   .product-gallery .product-thumbs-side{gap:4px!important}
   .product-gallery .product-thumb{height:54px!important;min-height:54px!important}
 }
+
+
+/* ===== CUSTOMER MOBILE FINAL OVERRIDE v2.8 ===== */
+@media (max-width:800px){
+  html,body{overflow-x:hidden!important}
+  header nav .menu-toggle#menuToggle{display:flex!important;visibility:visible!important;opacity:1!important}
+  header nav .menu-toggle#menuToggle span{display:block!important;visibility:visible!important;opacity:1!important}
+  .product-gallery .product-thumbs-side{display:flex!important;flex-wrap:nowrap!important;overflow:hidden!important;width:100%!important;height:58px!important;gap:5px!important}
+  .product-gallery .product-thumb{flex:0 0 calc((100% - 20px)/5)!important;width:calc((100% - 20px)/5)!important;height:58px!important;min-height:58px!important;max-height:58px!important}
+  .product-gallery .product-thumb img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+  .product-detail-copy{clear:both!important;position:relative!important;z-index:1!important}
+}
