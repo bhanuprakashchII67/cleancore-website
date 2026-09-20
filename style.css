@@ -1117,3 +1117,5 @@ header{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:
   body:before,body:after,.home-hero:before,.hero:before{display:none!important;animation:none!important}
   *,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
+
+#homeAccountActions[hidden]{display:none!important}
