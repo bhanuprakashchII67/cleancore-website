@@ -6,7 +6,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.7.14";
+const SITE_VERSION="3.80.0";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -358,8 +358,8 @@ function syncMobileAccount(){
   const label=a.querySelector(".cc-mobile-account-label");if(label)label.textContent=loggedIn?"Account":"Login";
 }
 function injectMobileBar(){
-  // Mobile uses the shared header controls + hamburger. A second fixed bar created by JS
-  // was competing for vertical space and hiding the account/cart experience.
+  // Kept as a compatibility hook for earlier page versions. The current mobile UI uses
+  // the shared header account/cart controls and hamburger menu, so no fixed bottom bar is injected.
   const old=document.getElementById("ccMobileBar");if(old)old.remove();
   syncMobileAccount();
 }
