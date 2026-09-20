@@ -460,6 +460,13 @@ async function loadCustomerProfile(){
   renderCustomerNav();
 }
 
+function syncHomeCustomerCard(){
+  const card=document.querySelector(".home-account-actions");
+  if(!card)return;
+  const loggedIn=!!(customerUser&&customerProfile);
+  card.classList.toggle("hidden",loggedIn);
+  card.setAttribute("aria-hidden",String(loggedIn));
+}
 function renderCustomerNav(){
   const a=document.getElementById("ccCustomerLink");
   if(a){
@@ -470,6 +477,7 @@ function renderCustomerNav(){
     if(label)label.textContent=loggedIn?"My Account":"Login";
   }
   renderCartCount();
+  syncHomeCustomerCard();
 }
 function renderAccount(){
   document.getElementById("ccAccountName").textContent=customerProfile?.phone||"Customer account";
@@ -699,7 +707,7 @@ function bindCustomerAuth(){
   if(!siteDb)return;
   siteDb.auth.onAuthStateChange(async(_event,session)=>{
     customerUser=session?.user||null;
-    if(customerUser)await loadCustomerProfile();else{customerProfile=null;renderCustomerNav();}
+    if(customerUser)await loadCustomerProfile();else{customerProfile=null;renderCustomerNav();syncHomeCustomerCard();}
     if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
   });
   siteDb.auth.getSession().then(async({data})=>{
