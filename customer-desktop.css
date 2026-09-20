@@ -99,3 +99,97 @@ header{isolation:isolate!important}
   header nav .navcta{flex-basis:112px!important;width:112px!important;font-size:9px!important}
 }
 @media (max-width:800px){header nav .nav-right-actions{display:contents!important}}
+
+
+/* ===== DESKTOP HEADER v4.40 — HARD SEPARATION OF ALL HEADER ZONES =====
+   Five-track grid: left brand | center nav | equal spacer | account/cart | quote.
+   nav-right-actions becomes transparent to the grid so account/cart and quote
+   cannot occupy the same track or overlap each other.
+*/
+@media (min-width:801px){
+  header .container{width:100%!important;max-width:1450px!important;margin:0 auto!important;padding:0 28px!important;box-sizing:border-box!important}
+  header nav{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto auto!important;
+    grid-template-rows:72px!important;
+    align-items:center!important;
+    column-gap:12px!important;
+    width:100%!important;height:72px!important;min-height:72px!important;
+    margin:0!important;padding:0!important;box-sizing:border-box!important;
+    position:relative!important;overflow:visible!important;
+  }
+  header nav .brand{
+    grid-column:1!important;grid-row:1!important;justify-self:start!important;
+    position:static!important;transform:none!important;display:flex!important;align-items:center!important;
+    min-width:0!important;max-width:100%!important;width:auto!important;margin:0!important;padding:0!important;
+    gap:8px!important;white-space:nowrap!important;font-size:15px!important;line-height:1.1!important;
+  }
+  header nav .brand .site-logo{width:40px!important;height:40px!important;flex:0 0 40px!important;max-width:40px!important}
+  header nav .brand>div:last-child{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  header nav .navlinks{
+    grid-column:2!important;grid-row:1!important;justify-self:center!important;
+    position:static!important;transform:none!important;display:flex!important;align-items:center!important;justify-content:center!important;
+    min-width:0!important;width:max-content!important;max-width:100%!important;flex:0 0 auto!important;
+    gap:10px!important;margin:0!important;padding:0!important;overflow:visible!important;
+    opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+  }
+  header nav .navlinks a,
+  header nav .navlinks a:hover,
+  header nav .navlinks a:focus,
+  header nav .navlinks a:active,
+  header nav .navlinks a:visited{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    flex:0 0 auto!important;width:auto!important;min-width:0!important;height:auto!important;min-height:0!important;
+    margin:0!important;padding:4px 0!important;font-family:Inter,Arial,sans-serif!important;font-size:13px!important;
+    font-weight:700!important;line-height:1.2!important;letter-spacing:0!important;white-space:nowrap!important;
+    text-decoration:none!important;transform:none!important;scale:1!important;zoom:1!important;
+  }
+  header nav .nav-right-actions{display:contents!important}
+  header nav .nav-user-actions{
+    grid-column:4!important;grid-row:1!important;justify-self:end!important;
+    display:flex!important;align-items:center!important;justify-content:flex-end!important;
+    width:max-content!important;min-width:0!important;margin:0!important;padding:0!important;gap:5px!important;
+    position:static!important;transform:none!important;
+  }
+  header nav .customer-nav-action{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    flex:0 0 auto!important;width:max-content!important;min-width:0!important;height:38px!important;min-height:38px!important;
+    padding:0 8px!important;gap:5px!important;border-radius:9px!important;box-sizing:border-box!important;white-space:nowrap!important;
+  }
+  header nav .customer-action-label{display:inline!important;font-size:12px!important;font-weight:700!important;line-height:1!important;white-space:nowrap!important}
+  header nav .customer-face,header nav .customer-cart-icon{width:18px!important;height:18px!important;min-width:18px!important;flex:0 0 18px!important;display:grid!important;place-items:center!important}
+  header nav .customer-face svg,header nav .customer-cart-icon svg{width:17px!important;height:17px!important}
+  header nav .navcta{
+    grid-column:5!important;grid-row:1!important;justify-self:end!important;position:static!important;
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    flex:0 0 154px!important;width:154px!important;height:38px!important;min-height:38px!important;
+    margin:0!important;padding:0 10px!important;border-radius:9px!important;font-size:12px!important;font-weight:800!important;
+    line-height:1!important;white-space:nowrap!important;transform:none!important;scale:1!important;zoom:1!important;
+    box-sizing:border-box!important;
+  }
+  header nav .menu-toggle{display:none!important}
+}
+@media (min-width:801px) and (max-width:1080px){
+  header .container{padding-inline:16px!important}
+  header nav{column-gap:7px!important}
+  header nav .brand{font-size:13px!important;gap:6px!important}
+  header nav .brand .site-logo{width:36px!important;height:36px!important;flex-basis:36px!important}
+  header nav .navlinks{gap:6px!important}
+  header nav .navlinks a{font-size:10px!important}
+  header nav .nav-user-actions{gap:3px!important}
+  header nav .customer-nav-action{height:34px!important;min-height:34px!important;padding-inline:5px!important;gap:3px!important}
+  header nav .customer-action-label{font-size:10px!important}
+  header nav .customer-face,header nav .customer-cart-icon{width:15px!important;height:15px!important;min-width:15px!important;flex-basis:15px!important}
+  header nav .customer-face svg,header nav .customer-cart-icon svg{width:14px!important;height:14px!important}
+  header nav .navcta{width:128px!important;flex-basis:128px!important;height:34px!important;min-height:34px!important;font-size:10px!important}
+}
+@media (min-width:801px) and (max-width:920px){
+  header .container{padding-inline:10px!important}
+  header nav{column-gap:5px!important}
+  header nav .brand{max-width:155px!important;font-size:12px!important}
+  header nav .navlinks{gap:5px!important}
+  header nav .navlinks a{font-size:9px!important}
+  header nav .customer-action-label{font-size:9px!important}
+  header nav .navcta{width:112px!important;flex-basis:112px!important;font-size:9px!important}
+}
+@media (max-width:800px){header nav .nav-right-actions{display:contents!important}}
