@@ -839,3 +839,30 @@ header{
   .checkout-title h1{font-size:28px}
   .checkout-item-controls{gap:7px}
 }
+
+
+/* CleanCore 4D interface layer — depth, light, touch-safe motion */
+:root{--cc-glow:rgba(20,184,166,.22);--cc-glass:rgba(255,255,255,.72);--cc-perspective:1200px}
+html{scroll-behavior:smooth}body{overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;z-index:-1;width:42vw;height:42vw;max-width:620px;max-height:620px;border-radius:50%;pointer-events:none;filter:blur(12px);opacity:.34}
+body:before{left:-22vw;top:18vh;background:radial-gradient(circle,rgba(20,184,166,.12),transparent 68%);animation:ccAmbientA 16s ease-in-out infinite alternate}
+body:after{right:-24vw;top:54vh;background:radial-gradient(circle,rgba(15,76,129,.10),transparent 68%);animation:ccAmbientB 20s ease-in-out infinite alternate}
+header{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(255,255,255,.88)}
+.home-hero,.hero{perspective:var(--cc-perspective)}
+.home-hero:before,.hero:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,transparent 0 38%,rgba(255,255,255,.38) 48%,transparent 58%),radial-gradient(circle at 78% 20%,rgba(114,213,205,.13),transparent 24%);background-size:220% 100%,100% 100%;animation:ccLightSweep 14s ease-in-out infinite;opacity:.55}
+.home-range,.hero-card,.home-account-actions,.home-catalog-cta{transform-style:preserve-3d;will-change:transform}
+.home-range:after,.hero-card:after,.home-account-actions:after,.home-catalog-cta:after{content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.48),inset 0 -1px 0 rgba(11,31,51,.04)}
+.home-account-actions{position:relative;margin-top:18px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid rgba(214,227,232,.95);border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(244,250,250,.68));box-shadow:0 18px 45px rgba(11,31,51,.09),inset 0 1px 0 rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.home-account-copy{display:grid;gap:3px}.home-account-copy strong{font-size:15px;color:var(--navy)}.home-account-copy>span:last-child{font-size:12px;color:var(--muted);line-height:1.45}
+.home-account-kicker{color:var(--teal);font-size:10px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase}.home-account-buttons{display:flex;gap:8px;flex:0 0 auto}.home-account-buttons .btn{min-height:40px}
+.home-proof-item,.home-range-item,.mini{transform-style:preserve-3d}.home-proof-item:hover{transform:translateY(-4px) translateZ(8px);box-shadow:0 14px 28px rgba(11,31,51,.09)}
+.product,.box,.contact-card,.request-form,.checkout-card,.checkout-notice{transform-style:preserve-3d}.product .product-body,.box>* ,.contact-card>*{position:relative;z-index:1}
+.product:after,.box:after,.contact-card:after,.request-form:after,.checkout-card:after,.checkout-notice:after{content:"";position:absolute;inset:8px;border-radius:inherit;border:1px solid rgba(255,255,255,.5);pointer-events:none;transform:translateZ(1px)}
+.cc-tilt-active{transition:transform .18s ease-out,box-shadow .18s ease-out}.cc-tilt-active.cc-tilt-reset{transition:transform .35s ease,box-shadow .35s ease}
+@keyframes ccAmbientA{from{transform:translate3d(0,-4vh,0) scale(.94)}to{transform:translate3d(18vw,10vh,0) scale(1.06)}}
+@keyframes ccAmbientB{from{transform:translate3d(0,5vh,0) scale(1)}to{transform:translate3d(-16vw,-8vh,0) scale(.92)}}
+@keyframes ccLightSweep{0%,55%{background-position:180% 0,0 0}80%,100%{background-position:-30% 0,0 0}}
+@media(max-width:800px){html{scroll-behavior:auto}body:before,body:after{width:75vw;height:75vw;opacity:.24;filter:blur(18px)}.home-account-actions{align-items:stretch;flex-direction:column;gap:12px;padding:15px}.home-account-buttons{display:grid;grid-template-columns:1fr 1fr;width:100%}.home-account-buttons .btn{width:100%}.home-proof-item:hover{transform:none;box-shadow:none}}
+@media(max-width:480px){.home-account-buttons{grid-template-columns:1fr}.home-account-copy strong{font-size:14px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body:before,body:after,.home-hero:before,.hero:before{animation:none}}
+@media (pointer:coarse){.cc-tilt-active{transition:transform .2s ease}}
