@@ -135,3 +135,43 @@ header{isolation:isolate!important}
     transform:translateY(-7px) rotate(-45deg)!important;
   }
 }
+
+
+/* ===== FINAL MOBILE HEADER + GALLERY HARD FIX v2.7 ===== */
+@media (max-width:800px){
+  header nav .menu-toggle#menuToggle{
+    display:flex!important;visibility:visible!important;opacity:1!important;
+    position:relative!important;z-index:99999!important;
+    flex:0 0 40px!important;width:40px!important;height:40px!important;
+    min-width:40px!important;min-height:40px!important;max-width:40px!important;max-height:40px!important;
+    margin:0!important;padding:8px!important;box-sizing:border-box!important;
+    align-items:stretch!important;justify-content:center!important;flex-direction:column!important;gap:4px!important;
+    border:1px solid #dbe5e9!important;border-radius:11px!important;background:#fff!important;
+    overflow:visible!important;font-size:0!important;line-height:0!important;
+  }
+  header nav .menu-toggle#menuToggle span,
+  header nav .menu-toggle#menuToggle span:nth-child(1),
+  header nav .menu-toggle#menuToggle span:nth-child(2),
+  header nav .menu-toggle#menuToggle span:nth-child(3){
+    display:block!important;visibility:visible!important;opacity:1!important;
+    width:100%!important;height:3px!important;min-height:3px!important;max-height:3px!important;
+    flex:0 0 3px!important;margin:0!important;padding:0!important;
+    background:#0b1f33!important;border-radius:3px!important;transform:none!important;
+  }
+  header nav .menu-toggle#menuToggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)!important}
+  header nav .menu-toggle#menuToggle.open span:nth-child(2){opacity:0!important}
+  header nav .menu-toggle#menuToggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)!important}
+  .product-gallery .product-thumbs-side{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:5px!important;width:100%!important;overflow:visible!important;
+  }
+  .product-gallery .product-thumb{
+    width:100%!important;height:62px!important;min-height:62px!important;
+    aspect-ratio:auto!important;overflow:hidden!important;margin:0!important;
+  }
+  .product-gallery .product-thumb img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+}
+@media (max-width:380px){
+  .product-gallery .product-thumbs-side{gap:4px!important}
+  .product-gallery .product-thumb{height:54px!important;min-height:54px!important}
+}
