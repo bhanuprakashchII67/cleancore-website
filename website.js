@@ -322,37 +322,46 @@ function injectEnquiryWidget(){
   });
 }
 
-function injectCustomerUI(){
+function ensureSharedNav(){
   const nav=document.getElementById("navMenu");
-  const actions=document.getElementById("navUserActions");
-  if(!nav||!actions)return;
-
+  if(!nav)return null;
+  let actions=document.getElementById("navUserActions");
+  if(!actions){actions=document.createElement("div");actions.id="navUserActions";actions.className="nav-user-actions";nav.parentNode.insertBefore(actions,nav);}
+  return {nav,actions};
+}
+function injectCustomerUI(){
+  const shared=ensureSharedNav();
+  if(!shared)return;
+  const {actions}=shared;
   if(!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
     a.id="ccCustomerLink";
-    a.href=customerUser&&customerProfile?"account.html?v=3.7.15":"customer-login.html";
+    a.href=customerUser&&customerProfile?"account.html?v=3.80":"customer-login.html";
     a.className="customer-nav-action account-nav-action";
     a.setAttribute("aria-label",customerUser&&customerProfile?"My Account":"Login");
     a.innerHTML='<span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span><span class="customer-action-label">'+(customerUser&&customerProfile?"My Account":"Login")+'</span>';
     actions.appendChild(a);
   }
-
   if(!document.getElementById("ccCartLink")){
     const cart=document.createElement("a");
-    cart.id="ccCartLink";
-    cart.href="checkout.html";
-    cart.className="customer-nav-action cart-nav-action";
-    cart.setAttribute("aria-label","Cart");
+    cart.id="ccCartLink";cart.href="checkout.html";cart.className="customer-nav-action cart-nav-action";cart.setAttribute("aria-label","Cart");
     cart.innerHTML='<span class="customer-cart-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h2l1.3 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.8L20 8H7"></path><circle cx="10" cy="19" r="1.4"></circle><circle cx="18" cy="19" r="1.4"></circle></svg></span><span class="customer-action-label">'+(cartCount()>0?"Cart ("+cartCount()+")":"Cart")+'</span>';
     actions.appendChild(cart);
   }
 }
+function syncMobileAccount(){
+  const a=document.getElementById("ccMobileAccountLink");
+  if(!a)return;
+  const loggedIn=!!(customerUser&&customerProfile);
+  a.href=loggedIn?"account.html?v=3.80":"customer-login.html";
+  a.setAttribute("aria-label",loggedIn?"My Account":"Login");
+  const label=a.querySelector(".cc-mobile-account-label");if(label)label.textContent=loggedIn?"Account":"Login";
+}
 function injectMobileBar(){
-  if(window.innerWidth>800||document.getElementById("ccMobileBar"))return;
-  const bar=document.createElement("nav");
-  bar.id="ccMobileBar";bar.className="cc-mobile-bar";bar.setAttribute("aria-label","Quick actions");
-  bar.innerHTML='<a href="index.html"><span class="cc-mobile-icon" aria-hidden="true">⌂</span><span>Home</span></a><a href="products.html"><span class="cc-mobile-icon" aria-hidden="true">◫</span><span>Products</span></a><a href="customer-login.html"><span class="cc-mobile-icon" aria-hidden="true">◯</span><span>Account</span></a><a href="checkout.html" class="primary"><span class="cc-mobile-icon" aria-hidden="true">🛒</span><span id="ccMobileCartLabel">Cart</span></a>';
-  document.body.appendChild(bar);
+  // Mobile uses the shared header controls + hamburger. A second fixed bar created by JS
+  // was competing for vertical space and hiding the account/cart experience.
+  const old=document.getElementById("ccMobileBar");if(old)old.remove();
+  syncMobileAccount();
 }
 function toastSite(message){
   let el=document.getElementById("ccToast");
