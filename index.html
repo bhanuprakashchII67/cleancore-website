@@ -1,8 +1,8 @@
 <!doctype html><html lang="en"><head><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg"><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cleaning Chemicals Supplier in Hyderabad | CleanCore</title><meta name="description" content="CleanCore Chemical & Cleaning supplies commercial cleaning chemicals in Hyderabad, including floor cleaner, toilet cleaner, glass cleaner, dishwash liquid, hand wash and hard surface cleaner for businesses."><link rel="stylesheet" href="style.css?v=1.42">
 <link rel="stylesheet" href="desktop.css?v=4.30" media="(min-width: 801px)">
-<link rel="stylesheet" href="mobile.css?v=2.10" media="(max-width: 800px)">
+<link rel="stylesheet" href="mobile.css?v=2.11" media="(max-width: 800px)">
 <link rel="stylesheet" href="customer-desktop.css?v=4.21" media="(min-width:801px)">
-<link rel="stylesheet" href="customer-mobile.css?v=2.10" media="(max-width:800px)"><meta property="og:type" content="website"><meta property="og:title" content="Cleaning Chemicals Manufacturer & Supplier in Hyderabad | CleanCore"><meta property="og:description" content="CleanCore Chemical & Cleaning supplies professional cleaning chemicals in Hyderabad for businesses, offices, hotels, restaurants, hospitals and commercial facilities. Shop floor, toilet, glass, dishwash and surface cleaners."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Cleaning Chemicals Manufacturer & Supplier in Hyderabad | CleanCore"><meta name="twitter:description" content="CleanCore Chemical & Cleaning supplies professional cleaning chemicals in Hyderabad for businesses, offices, hotels, restaurants, hospitals and commercial facilities. Shop floor, toilet, glass, dishwash and surface cleaners.">
+<link rel="stylesheet" href="customer-mobile.css?v=2.11" media="(max-width:800px)"><meta property="og:type" content="website"><meta property="og:title" content="Cleaning Chemicals Manufacturer & Supplier in Hyderabad | CleanCore"><meta property="og:description" content="CleanCore Chemical & Cleaning supplies professional cleaning chemicals in Hyderabad for businesses, offices, hotels, restaurants, hospitals and commercial facilities. Shop floor, toilet, glass, dishwash and surface cleaners."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Cleaning Chemicals Manufacturer & Supplier in Hyderabad | CleanCore"><meta name="twitter:description" content="CleanCore Chemical & Cleaning supplies professional cleaning chemicals in Hyderabad for businesses, offices, hotels, restaurants, hospitals and commercial facilities. Shop floor, toilet, glass, dishwash and surface cleaners.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"CleanCore Chemical & Cleaning","description":"Commercial cleaning chemicals supplier in Hyderabad, including floor cleaner, toilet cleaner, glass cleaner, dishwash liquid, hand wash and hard surface cleaner.","telephone":"+91 91827 25773","email":"cleancorehyd@gmail.com","logo":"logo.svg","areaServed":{"@type":"City","name":"Hyderabad"},"address":{"@type":"PostalAddress","streetAddress":"Srinivasa Colony, Manikonda","addressLocality":"Hyderabad","addressRegion":"Telangana","addressCountry":"IN"},"contactPoint":{"@type":"ContactPoint","telephone":"+91 91827 25773","email":"cleancorehyd@gmail.com","contactType":"customer service","areaServed":"IN","availableLanguage":["English","Telugu","Hindi"]}}</script>
 <script src="error-monitor.js?v=3.7.14"></script>
 <style>
@@ -173,27 +173,40 @@
   .product .imgbox{height:132px!important;min-height:132px!important}
 }
 </style>
+
 <script>
 (function(){
-  function ccBindMobileMenuFallback(){
+  function bindCleanCoreMobileMenu(){
     var b=document.getElementById('menuToggle'),m=document.getElementById('navMenu');
-    if(!b||!m||b.dataset.ccFallbackBound==='1') return;
-    b.dataset.ccFallbackBound='1';
+    if(!b||!m||b.dataset.ccMenuBound==='1') return;
+    b.dataset.ccMenuBound='1';
     b.addEventListener('click',function(e){
-      e.preventDefault();e.stopPropagation();
+      e.preventDefault();
       var open=!m.classList.contains('open');
-      m.classList.toggle('open',open);b.classList.toggle('open',open);
+      m.classList.toggle('open',open);
+      b.classList.toggle('open',open);
       b.setAttribute('aria-expanded',open?'true':'false');
       b.setAttribute('aria-label',open?'Close navigation':'Open navigation');
-    },true);
-    m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
-      m.classList.remove('open');b.classList.remove('open');b.setAttribute('aria-expanded','false');b.setAttribute('aria-label','Open navigation');
-    });});
+    });
+    m.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click',function(){
+        m.classList.remove('open'); b.classList.remove('open');
+        b.setAttribute('aria-expanded','false');
+        b.setAttribute('aria-label','Open navigation');
+      });
+    });
+    window.addEventListener('resize',function(){
+      if(window.innerWidth>800){
+        m.classList.remove('open'); b.classList.remove('open');
+        b.setAttribute('aria-expanded','false');
+        b.setAttribute('aria-label','Open navigation');
+      }
+    });
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',ccBindMobileMenuFallback); else ccBindMobileMenuFallback();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindCleanCoreMobileMenu);
+  else bindCleanCoreMobileMenu();
 })();
-</script>
-</head><body data-cc-build="2026-09-21-mobile-authoritative-2-10"><header><div class="container"><nav>
+</script></head><body data-cc-build="2026-09-21-mobile-clean-2-11"><header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg?v=3.84" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
 <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
 <div class="navlinks" id="navMenu"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
@@ -323,23 +336,4 @@
       <button type="button" class="btn btn-primary order-now" data-product-name="All-in-One Cleaner">Add to Cart</button>
     </div></article></div></div></section>
 <div class="container"><div class="home-catalog-cta"><div><h3>Need the full product catalogue?</h3><p>See all CleanCore cleaning products or message us directly for business requirements.</p></div><div class="home-catalog-actions"><a class="btn btn-primary" href="products.html">View Products</a><a class="btn btn-secondary" href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%27d%20like%20to%20know%20about%20your%20cleaning%20products.">WhatsApp Us</a></div></div></div></section><section class="band"><div class="container"><div class="section-head"><div class="eyebrow">Built for B2B</div><h2>Supply for professional cleaning requirements.</h2></div><div class="three"><div class="box"><h3>Business supply</h3><p>Focused on commercial and professional cleaning requirements.</p></div><div class="box"><h3>Simple ordering</h3><p>Choose a product, confirm quantity and contact us directly.</p></div><div class="box"><h3>Hyderabad</h3><p>Serving businesses and cleaning operations across Hyderabad.</p></div></div></div></section>
-<section class="contact"><div class="container contact-grid"><div><div class="eyebrow" style="color:#72d5cd">Need a quote?</div><h2>Tell us what your business needs.</h2><p>Contact CleanCore for product information, availability and business supply enquiries.</p><div class="buttons" style="margin-top:25px"><a class="btn btn-primary" href="tel:+91 91827 25773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773">WhatsApp</a></div></div><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Service Area</strong>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div class="contact-line"><strong>Products</strong>Cleaning liquids for professional use</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div><a href="tel:+91 91827 25773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer><script>
-(function(){
-  const b=document.getElementById("menuToggle"),m=document.getElementById("navMenu");
-  if(!b||!m)return;
-  b.addEventListener("click",function(){
-    const open=m.classList.toggle("open");
-    b.classList.toggle("open",open);
-    b.setAttribute("aria-expanded",String(open));
-    b.setAttribute("aria-label",open?"Close navigation":"Open navigation");
-  });
-  m.querySelectorAll("a").forEach(a=>a.addEventListener("click",function(){
-    m.classList.remove("open");b.classList.remove("open");
-    b.setAttribute("aria-expanded","false");
-    b.setAttribute("aria-label","Open navigation");
-  }));
-  window.addEventListener("resize",function(){
-    if(window.innerWidth>800){m.classList.remove("open");b.classList.remove("open");b.setAttribute("aria-expanded","false")}
-  });
-})();
-</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="website.js?v=3.84"></script></body></html>
+<section class="contact"><div class="container contact-grid"><div><div class="eyebrow" style="color:#72d5cd">Need a quote?</div><h2>Tell us what your business needs.</h2><p>Contact CleanCore for product information, availability and business supply enquiries.</p><div class="buttons" style="margin-top:25px"><a class="btn btn-primary" href="tel:+91 91827 25773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773">WhatsApp</a></div></div><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Service Area</strong>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div class="contact-line"><strong>Products</strong>Cleaning liquids for professional use</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div><a href="tel:+91 91827 25773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="website.js?v=3.84"></script></body></html>
