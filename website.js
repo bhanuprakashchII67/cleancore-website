@@ -463,7 +463,7 @@ async function loadCustomerProfile(){
 function syncHomeCustomerCard(){
   const card=document.querySelector(".home-account-actions");
   if(!card)return;
-  const loggedIn=!!(customerUser&&customerProfile);
+  const loggedIn=!!customerUser;
   card.classList.toggle("hidden",loggedIn);
   card.setAttribute("aria-hidden",String(loggedIn));
 }
@@ -582,6 +582,18 @@ window.initCleanCoreCheckout=async function(){
   const success=document.getElementById("checkoutSuccess");
   if(!empty||!auth||!content)return;
   if(success&&!success.classList.contains("hidden"))return;
+
+  // Always resolve the current persisted Supabase session here. The inline
+  // page call can happen before onAuthStateChange has populated customerUser.
+  if(!customerUser&&siteDb){
+    try{
+      const {data}=await siteDb.auth.getSession();
+      customerUser=data?.session?.user||null;
+      if(customerUser&&!customerProfile)await loadCustomerProfile();
+    }catch(err){
+      reportSiteError(err,{action:"checkout_session_init"});
+    }
+  }
   customerCart=loadCustomerCart();
   const items=customerCart;
   if(!items.length){
@@ -757,6 +769,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   bindWebsiteEnquiry();
   bindCustomerAuth();
   renderCartCount();
+  if(location.pathname.toLowerCase().includes("checkout.html")) void window.initCleanCoreCheckout?.();
 });
 document.addEventListener("error",e=>{
  const t=e.target;
