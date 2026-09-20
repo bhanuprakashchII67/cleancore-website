@@ -1,0 +1,29 @@
+/* CleanCore desktop presentation layer
+   Loaded only for viewports >= 801px.
+   Shared structure/data remains in style.css + website.js. */
+@media (min-width:801px){
+  html{scroll-behavior:smooth}
+  body{min-width:1024px;overflow-x:auto}
+  header{position:sticky;top:0;z-index:2000}
+  header .container{max-width:1180px}
+  header nav{min-height:74px;display:flex;align-items:center;gap:14px}
+  .brand{flex:0 0 auto}
+  .navlinks{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+  .nav-user-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .customer-nav-action{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:0 11px;border:1px solid #dbe5e9;border-radius:12px;background:#fff;color:var(--navy);text-decoration:none;box-shadow:0 4px 14px rgba(11,31,51,.06)}
+  .customer-nav-action:hover{transform:translateY(-2px);box-shadow:0 9px 20px rgba(11,31,51,.10)}
+  .customer-face,.customer-cart-icon{display:grid;place-items:center;width:22px;height:22px}
+  .customer-face svg,.customer-cart-icon svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.8}
+  .menu-toggle{display:none!important}
+  .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .home-hero-grid{grid-template-columns:minmax(0,1.08fr) minmax(420px,.92fr)}
+  .three{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .contact-grid{grid-template-columns:1.05fr .95fr}
+  .checkout-grid{grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr)}
+  .product-detail-grid{grid-template-columns:minmax(0,1fr) minmax(380px,.82fr)}
+  .product-gallery{grid-template-columns:96px minmax(0,1fr)}
+  .product-gallery .product-thumbs-side{grid-column:1;grid-row:1;display:flex;flex-direction:column}
+  .product-gallery .product-detail-image{grid-column:2;grid-row:1}
+  .product-buy-row{display:flex;align-items:center;gap:10px}
+  .product-buy-btn{min-width:190px}
+}
