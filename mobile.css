@@ -200,3 +200,30 @@ header{isolation:isolate!important}
     transform:translateY(-7px) rotate(-45deg)!important;
   }
 }
+
+
+/* ===== MOBILE PRODUCT GALLERY v2.6 — KEEP ALL THUMBNAILS IN ONE ROW ===== */
+@media (max-width:800px){
+  .product-gallery .product-thumbs-side{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:6px!important;
+    align-items:start!important;
+  }
+  .product-gallery .product-thumb{
+    width:100%!important;
+    height:68px!important;
+    min-height:68px!important;
+    aspect-ratio:auto!important;
+    overflow:hidden!important;
+  }
+  .product-gallery .product-thumb img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+    display:block!important;
+  }
+}
+@media (max-width:380px){
+  .product-gallery .product-thumbs-side{gap:5px!important}
+  .product-gallery .product-thumb{height:60px!important;min-height:60px!important}
+}
