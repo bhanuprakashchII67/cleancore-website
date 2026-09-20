@@ -250,4 +250,28 @@ load().catch(e=>{root.innerHTML='<div class="eyebrow">Product</div><h1>Product d
 })();
 </script>
 
-<script src="website.js?v=3.83"></script></body></html>
+<script src="website.js?v=3.83"></script>
+<script>
+/* CleanCore product-page menu fallback: works even if an earlier JS bundle fails to parse. */
+(function(){
+  function bind(){
+    var b=document.getElementById('menuToggle'),m=document.getElementById('navMenu');
+    if(!b||!m||b.dataset.ccMenuBound==='1') return;
+    b.dataset.ccMenuBound='1';
+    b.addEventListener('click',function(e){
+      e.preventDefault(); e.stopPropagation();
+      var open=!m.classList.contains('open');
+      m.classList.toggle('open',open);
+      b.classList.toggle('open',open);
+      b.setAttribute('aria-expanded',String(open));
+      b.setAttribute('aria-label',open?'Close navigation':'Open navigation');
+    });
+    m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
+      m.classList.remove('open'); b.classList.remove('open');
+      b.setAttribute('aria-expanded','false'); b.setAttribute('aria-label','Open navigation');
+    });});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind); else bind();
+})();
+</script>
+</body></html>
