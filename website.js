@@ -328,7 +328,7 @@ function injectCustomerUI(){
   if(!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
     a.id="ccCustomerLink";
-    a.href=customerUser&&customerProfile?"account.html":"customer-login.html";
+    a.href=customerUser&&customerProfile?"account.html?v=3.7.15":"customer-login.html";
     a.className="customer-nav-action account-nav-action";
     a.setAttribute("aria-label",customerUser&&customerProfile?"My Account":"Login");
     a.innerHTML='<span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span><span class="customer-action-label">'+(customerUser&&customerProfile?"My Account":"Login")+'</span>';
@@ -455,7 +455,7 @@ function renderCustomerNav(){
   const a=document.getElementById("ccCustomerLink");
   if(a){
     const loggedIn=!!(customerUser&&customerProfile);
-    a.href=loggedIn?"account.html":"customer-login.html";
+    a.href=loggedIn?"account.html?v=3.7.15":"customer-login.html";
     a.setAttribute("aria-label",loggedIn?"My Account":"Login");
     const label=a.querySelector(".customer-action-label");
     if(label)label.textContent=loggedIn?"My Account":"Login";
