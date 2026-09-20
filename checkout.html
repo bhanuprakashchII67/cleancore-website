@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Checkout | CleanCore Chemical & Cleaning</title>
 <meta name="description" content="CleanCore customer checkout.">
-<link rel="stylesheet" href="style.css?v=1.36">
+<link rel="stylesheet" href="style.css?v=1.40">
 <script src="error-monitor.js?v=3.7.15"></script>
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
-<div class="navlinks" style="display:flex"><a href="products.html">Products</a><a href="index.html">Home</a></div>
-<a class="navcta" href="index.html">Continue shopping</a>
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+<div class="nav-user-actions" id="navUserActions"></div>
+<div class="navlinks" id="navMenu"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
+<a class="navcta" href="contact.html">Request a Quote</a>
 </nav></div></header>
 
 <main class="checkout-main">
@@ -81,7 +83,7 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.7.20"></script>
+<script src="website.js?v=3.80"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>window.initCleanCoreCheckout?.());
 </script>
