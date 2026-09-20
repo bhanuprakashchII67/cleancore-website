@@ -333,19 +333,20 @@ function injectCustomerUI(){
   const shared=ensureSharedNav();
   if(!shared)return;
   const {actions}=shared;
+  actions.classList.add("cc-nav-actions-ready");
   if(!document.getElementById("ccCustomerLink")){
     const a=document.createElement("a");
     a.id="ccCustomerLink";
     a.href=customerUser&&customerProfile?"account.html?v=3.80":"customer-login.html";
     a.className="customer-nav-action account-nav-action";
     a.setAttribute("aria-label",customerUser&&customerProfile?"My Account":"Login");
-    a.innerHTML='<span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span><span class="customer-action-label">'+(customerUser&&customerProfile?"My Account":"Login")+'</span>';
+    a.innerHTML='<span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span><span class="customer-action-label">'+(customerUser&&customerProfile?"My Account":"Login")+'</span>';
     actions.appendChild(a);
   }
   if(!document.getElementById("ccCartLink")){
     const cart=document.createElement("a");
     cart.id="ccCartLink";cart.href="checkout.html";cart.className="customer-nav-action cart-nav-action";cart.setAttribute("aria-label","Cart");
-    cart.innerHTML='<span class="customer-cart-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h2l1.3 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.8L20 8H7"></path><circle cx="10" cy="19" r="1.4"></circle><circle cx="18" cy="19" r="1.4"></circle></svg></span><span class="customer-action-label">'+(cartCount()>0?"Cart ("+cartCount()+")":"Cart")+'</span>';
+    cart.innerHTML='<span class="customer-cart-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h2l1.3 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.8L20 8H7"></path><circle cx="10" cy="19" r="1.4"></circle><circle cx="18" cy="19" r="1.4"></circle></svg></span><span class="customer-action-label">'+(cartCount()>0?"Cart ("+cartCount()+")":"Cart")+'</span>';
     actions.appendChild(cart);
   }
 }
