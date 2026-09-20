@@ -145,3 +145,42 @@ header{isolation:isolate!important}
     white-space:nowrap!important;
   }
 }
+
+/* ===== Desktop nav text lock v3.85 =====
+   Product/card navigation must never change the desktop nav typography.
+   Keep Home → Contact at a fixed readable size after card clicks,
+   hover states, route changes, and the 4D card interaction. */
+@media(min-width:801px){
+  header .navlinks{
+    flex:0 0 auto!important;
+    transform:none!important;
+    scale:1!important;
+    zoom:1!important;
+  }
+  header .navlinks a{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:max-content!important;
+    font-family:'Inter',Arial,sans-serif!important;
+    font-size:17px!important;
+    line-height:1.2!important;
+    font-weight:700!important;
+    letter-spacing:0!important;
+    transform:none!important;
+    scale:1!important;
+    zoom:1!important;
+    opacity:1!important;
+    visibility:visible!important;
+  }
+  header .navlinks a:hover,
+  header .navlinks a:focus,
+  header .navlinks a:active{
+    font-size:17px!important;
+    transform:none!important;
+    scale:1!important;
+    opacity:1!important;
+  }
+  header .navlinks a:visited{
+    font-size:17px!important;
+  }
+}
