@@ -85,9 +85,9 @@ function removeCartItem(productId){
   renderCart();
 }
 function renderCartCount(){
+  const count=cartCount();
   const a=document.getElementById("ccCartLink");
   if(a){
-    const count=cartCount();
     a.setAttribute("aria-label",count>0?"Cart ("+count+")":"Cart");
     const label=a.querySelector(".customer-action-label");
     if(label)label.textContent=count>0?"Cart ("+count+")":"Cart";
@@ -713,7 +713,7 @@ function bindCustomerAuth(){
   siteDb.auth.getSession().then(async({data})=>{
     customerUser=data.session?.user||null;
     if(customerUser)await loadCustomerProfile();else renderCustomerNav();
-    if(location.pathname.toLowerCase().includes("checkout.html")) window.initCleanCoreCheckout?.();
+    if(location.pathname.toLowerCase().includes("checkout.html")) await window.initCleanCoreCheckout?.();
   });
 }
 
