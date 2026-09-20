@@ -6,7 +6,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.80.0";
+const SITE_VERSION="3.81.0";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -358,10 +358,28 @@ function syncMobileAccount(){
   const label=a.querySelector(".cc-mobile-account-label");if(label)label.textContent=loggedIn?"Account":"Login";
 }
 function injectMobileBar(){
-  // Kept as a compatibility hook for earlier page versions. The current mobile UI uses
-  // the shared header account/cart controls and hamburger menu, so no fixed bottom bar is injected.
-  const old=document.getElementById("ccMobileBar");if(old)old.remove();
+  let bar=document.getElementById("ccMobileBar");
+  if(!bar){
+    bar=document.createElement("nav");
+    bar.id="ccMobileBar";
+    bar.className="cc-mobile-bar";
+    bar.setAttribute("aria-label","Mobile navigation");
+    bar.innerHTML='<a href="index.html" data-mobile-nav="home"><span class="cc-mobile-icon">⌂</span><span>Home</span></a>'+
+      '<a href="products.html" data-mobile-nav="products"><span class="cc-mobile-icon">▦</span><span>Products</span></a>'+
+      '<a href="checkout.html" data-mobile-nav="cart"><span class="cc-mobile-icon">🛒</span><b class="cc-mobile-cart-badge hidden" id="ccMobileCartBadge">0</b><span>Cart</span></a>'+
+      '<a href="customer-login.html" data-mobile-nav="account" id="ccMobileAccountLink"><span class="cc-mobile-icon">◯</span><span class="cc-mobile-account-label">Login</span></a>';
+    document.body.appendChild(bar);
+  }
+  const path=(location.pathname.split("/").pop()||"index.html").toLowerCase();
+  bar.querySelectorAll("[data-mobile-nav]").forEach(a=>{
+    const key=a.getAttribute("data-mobile-nav");
+    const active=(key==="home"&&path==="index.html")||(key==="products"&&path==="products.html")||(key==="cart"&&path==="checkout.html")||(key==="account"&&(path==="account.html"||path==="customer-login.html"||path==="customer-signup.html"));
+    a.classList.toggle("active",active);
+  });
   syncMobileAccount();
+  const badge=document.getElementById("ccMobileCartBadge");
+  const count=cartCount();
+  if(badge){badge.textContent=count>99?"99+":String(count);badge.classList.toggle("hidden",count===0);}
 }
 function toastSite(message){
   let el=document.getElementById("ccToast");
