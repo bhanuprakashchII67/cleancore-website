@@ -654,3 +654,132 @@ header{isolation:isolate!important}
   header nav .navcta{width:160px!important;font-size:12px!important}
   header nav .nav-user-actions{margin-right:170px!important}
 }
+
+
+/* ===== DESKTOP HEADER v4.21 — FINAL SPACING ===== */
+@media (min-width:801px){
+  header nav{
+    display:block!important;
+    position:relative!important;
+    width:100%!important;
+    height:72px!important;
+    min-height:72px!important;
+  }
+
+  header nav .brand{
+    position:absolute!important;
+    left:0!important;
+    top:50%!important;
+    transform:translateY(-50%)!important;
+    z-index:3!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:9px!important;
+    margin:0!important;
+    font-size:15px!important;
+    white-space:nowrap!important;
+  }
+
+  header nav .site-logo{
+    width:42px!important;
+    height:42px!important;
+    flex:0 0 42px!important;
+  }
+
+  header nav .navlinks{
+    position:absolute!important;
+    left:50%!important;
+    top:50%!important;
+    transform:translate(-50%,-50%)!important;
+    z-index:2!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    width:max-content!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  header nav .navlinks a,
+  header nav .navlinks a:hover,
+  header nav .navlinks a:focus,
+  header nav .navlinks a:active,
+  header nav .navlinks a:visited{
+    font-size:13px!important;
+    font-weight:700!important;
+    line-height:1.2!important;
+    padding:4px 0!important;
+    white-space:nowrap!important;
+    transform:none!important;
+    scale:1!important;
+    zoom:1!important;
+  }
+
+  header nav .nav-user-actions{
+    position:absolute!important;
+    right:188px!important;
+    top:50%!important;
+    transform:translateY(-50%)!important;
+    z-index:4!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  header nav .customer-nav-action{
+    height:40px!important;
+    min-height:40px!important;
+    padding:0 9px!important;
+    gap:6px!important;
+    border-radius:10px!important;
+  }
+
+  header nav .customer-action-label{
+    font-size:13px!important;
+    font-weight:700!important;
+  }
+
+  header nav .customer-face,
+  header nav .customer-cart-icon{
+    width:19px!important;
+    height:19px!important;
+    flex:0 0 19px!important;
+  }
+
+  header nav .customer-face svg,
+  header nav .customer-cart-icon svg{
+    width:18px!important;
+    height:18px!important;
+  }
+
+  header nav .navcta{
+    position:absolute!important;
+    right:0!important;
+    top:50%!important;
+    transform:translateY(-50%)!important;
+    z-index:4!important;
+    width:176px!important;
+    height:40px!important;
+    min-height:40px!important;
+    margin:0!important;
+    padding:0 14px!important;
+    border-radius:9px!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    white-space:nowrap!important;
+  }
+}
+
+@media (min-width:801px) and (max-width:1250px){
+  header nav .brand{font-size:14px!important}
+  header nav .site-logo{width:38px!important;height:38px!important;flex-basis:38px!important}
+  header nav .navlinks{gap:7px!important}
+  header nav .navlinks a{font-size:12px!important}
+  header nav .nav-user-actions{right:170px!important}
+  header nav .customer-nav-action{height:38px!important;min-height:38px!important;padding-inline:7px!important}
+  header nav .customer-action-label{font-size:12px!important}
+  header nav .navcta{width:160px!important;height:38px!important;min-height:38px!important;font-size:12px!important}
+}
