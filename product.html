@@ -68,28 +68,38 @@ html,body{max-width:100%;overflow-x:hidden}
   .product-thumb{width:64px;height:64px;flex-basis:64px}
   .product-meta span{font-size:.75rem}
 }
-/* Final responsive product gallery: thumbnails beside image */
+/* Clean product gallery — no crop, thumbnails beside main image */
 .product-gallery{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:10px;align-items:start}
-.product-gallery .product-detail-image{grid-column:1;grid-row:1;width:100%;height:auto;min-height:0;aspect-ratio:auto;padding:12px;overflow:hidden;box-sizing:border-box}
-.product-gallery .product-detail-image img{display:block;width:100%;height:auto!important;max-width:100%;max-height:none!important;object-fit:contain!important;object-position:center;border-radius:14px}
+.product-gallery .product-detail-image{grid-column:1;grid-row:1;width:100%;height:auto;min-height:0;aspect-ratio:auto;padding:8px;display:flex;align-items:center;justify-content:center;overflow:visible;background:#eef7f6;border-radius:18px;box-sizing:border-box}
+.product-gallery .product-detail-image img{display:block;width:100%;height:auto;max-width:100%;max-height:none!important;object-fit:contain!important;object-position:center;border-radius:14px}
 .product-gallery .product-thumbs-side{grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:8px;margin:0;max-height:100%;overflow-y:auto}
-.product-gallery .product-thumb{width:74px;height:74px;min-width:74px;padding:3px;box-sizing:border-box;overflow:hidden}
-.product-gallery .product-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.product-gallery .product-thumb{width:74px;height:74px;min-width:74px;flex:0 0 74px;padding:3px;box-sizing:border-box;overflow:hidden}
+.product-gallery .product-thumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:7px}
 @media(max-width:1100px){
   .product-detail-grid{grid-template-columns:1fr!important}
-  .product-gallery{grid-template-columns:minmax(0,1fr) 70px;gap:8px;width:100%;max-width:100%;align-items:start}
-  .product-gallery .product-detail-image{grid-column:1;grid-row:1;width:100%;padding:6px;border-radius:16px;background:#eef7f6}
-  .product-gallery .product-detail-image img{width:100%;height:auto!important;max-height:none!important;object-fit:contain!important}
-  .product-gallery .product-thumbs-side{grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:7px;max-height:calc(100vw - 28px);overflow-y:auto}
-  .product-gallery .product-thumb{width:62px;height:62px;min-width:62px;flex:0 0 62px}
+  .product-gallery{grid-template-columns:minmax(0,1fr) 82px;gap:10px;width:100%;max-width:100%;align-items:start}
+  .product-gallery .product-detail-image{grid-column:1;grid-row:1;width:100%;padding:6px;overflow:visible}
+  .product-gallery .product-detail-image img{width:100%;height:auto!important;max-width:100%;max-height:none!important;object-fit:contain!important}
+  .product-gallery .product-thumbs-side{grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:7px;max-height:100%;overflow-y:auto}
+  .product-gallery .product-thumb{width:70px;height:70px;min-width:70px;flex-basis:70px}
 }
-@media(max-width:480px){
-  .product-gallery{grid-template-columns:minmax(0,1fr) 60px;gap:7px}
-  .product-gallery .product-thumbs-side{max-height:calc(100vw - 30px);gap:6px}
-  .product-gallery .product-thumb{width:54px;height:54px;min-width:54px;flex-basis:54px}
-  .product-gallery .product-detail-image{padding:4px}
+@media(max-width:600px){
+  .container{width:calc(100% - 20px)!important}
+  .product-detail{padding:22px 0 36px}
+  .product-gallery{grid-template-columns:minmax(0,1fr) 68px;gap:7px}
+  .product-gallery .product-detail-image{padding:4px;border-radius:14px}
+  .product-gallery .product-detail-image img{width:100%;height:auto!important;max-width:100%;max-height:none!important;object-fit:contain!important}
+  .product-gallery .product-thumbs-side{gap:6px;max-height:78vw}
+  .product-gallery .product-thumb{width:62px;height:62px;min-width:62px;flex-basis:62px}
+  .product-detail-copy{min-width:0;width:100%}
+  .product-detail-copy h1{font-size:clamp(2rem,9vw,2.5rem);line-height:1.08}
+  .product-detail-copy .lead{font-size:1rem;line-height:1.6}
 }
-</style>
+@media(max-width:390px){
+  .product-gallery{grid-template-columns:minmax(0,1fr) 58px}
+  .product-gallery .product-thumbs-side{max-height:76vw}
+  .product-gallery .product-thumb{width:52px;height:52px;min-width:52px;flex-basis:52px}
+}</style>
 </head>
 <body>
 <header><div class="container"><nav>
