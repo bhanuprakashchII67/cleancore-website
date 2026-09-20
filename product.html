@@ -13,10 +13,10 @@
 <link id="canonicalLink" rel="canonical" href="product.html">
 <script id="productSchema" type="application/ld+json">{}</script>
 <link rel="stylesheet" href="style.css?v=1.41">
-<link rel="stylesheet" href="desktop.css?v=1.3" media="(min-width: 801px)">
-<link rel="stylesheet" href="mobile.css?v=2.2" media="(max-width: 800px)">
-<link rel="stylesheet" href="customer-desktop.css?v=1.3" media="(min-width:801px)">
-<link rel="stylesheet" href="customer-mobile.css?v=2.2" media="(max-width:800px)">
+<link rel="stylesheet" href="desktop.css?v=1.4" media="(min-width: 801px)">
+<link rel="stylesheet" href="mobile.css?v=2.3" media="(max-width: 800px)">
+<link rel="stylesheet" href="customer-desktop.css?v=1.4" media="(min-width:801px)">
+<link rel="stylesheet" href="customer-mobile.css?v=2.3" media="(max-width:800px)">
 <style>
 .product-detail{padding:56px 0}.product-detail-grid{display:grid;grid-template-columns:minmax(300px,1.05fr) minmax(300px,.95fr);gap:40px;align-items:start}
 .product-gallery{position:sticky;top:90px}.product-detail-image{min-height:460px;display:grid;place-items:center;background:#eef7f6;border-radius:24px;padding:28px;overflow:hidden}
@@ -105,7 +105,30 @@ html,body{max-width:100%;overflow-x:hidden}
   .product-gallery .product-thumb{width:52px;height:52px;min-width:52px;flex-basis:52px}
 }</style>
 <script src="error-monitor.js?v=3.80"></script>
-</head>
+<style id="cc-hard-header-fix">
+@media (min-width:801px){
+  header .navlinks a{font-size:14px!important;line-height:1.2!important;font-weight:700!important;transform:none!important;scale:1!important;zoom:1!important}
+  header .navlinks a:hover,header .navlinks a:focus,header .navlinks a:active,header .navlinks a:visited{font-size:14px!important;transform:none!important;scale:1!important}
+}
+@media (max-width:800px){
+  header nav{position:relative!important;display:flex!important;align-items:center!important}
+  header nav .menu-toggle#menuToggle{
+    display:flex!important;visibility:visible!important;opacity:1!important;
+    position:relative!important;z-index:99999!important;
+    width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+    flex:0 0 40px!important;margin-left:6px!important;padding:8px!important;
+    box-sizing:border-box!important;overflow:visible!important;
+    flex-direction:column!important;align-items:stretch!important;justify-content:center!important;gap:4px!important;
+    border:1px solid #dbe5e9!important;border-radius:11px!important;background:#fff!important;
+  }
+  header nav .menu-toggle#menuToggle span{
+    display:block!important;visibility:visible!important;opacity:1!important;
+    width:100%!important;height:3px!important;min-height:3px!important;max-height:3px!important;
+    flex:0 0 3px!important;margin:0!important;padding:0!important;
+    background:#0b1f33!important;border-radius:3px!important;
+  }
+}
+</style></head>
 <body>
 <header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg?v=3.83" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
