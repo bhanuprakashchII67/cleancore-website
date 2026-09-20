@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CleanCore — Phone Website Preview</title>
+<title>CleanCore — Phone Website Preview v2.12</title>
 <style>
 :root{color-scheme:dark}
 *{box-sizing:border-box}
@@ -16,7 +16,7 @@ button,.link{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,
 button.active{background:#159a91;border-color:#159a91}
 .stage{display:flex;align-items:center;justify-content:center;flex:1;width:100%;padding:8px 0 20px}
 .phone{width:390px;height:min(844px,calc(100vh - 155px));min-height:600px;background:#05070a;border:9px solid #20252b;border-radius:48px;box-shadow:0 30px 90px rgba(0,0,0,.65),0 0 0 2px rgba(255,255,255,.08);position:relative;overflow:hidden}
-.phone:before{content:"";position:absolute;z-index:4;top:8px;left:50%;transform:translateX(-50%);width:105px;height:0;border-radius:0;background:transparent;box-shadow:none}
+.phone:before{display:none!important}
 .screen{width:100%;height:100%;border:0;display:block;background:#fff}
 .side{position:absolute;left:-13px;top:140px;width:4px;height:65px;background:#30363d;border-radius:4px}
 .side:after{content:"";position:absolute;top:78px;left:0;width:4px;height:38px;background:#30363d;border-radius:4px}
@@ -28,6 +28,9 @@ button.active{background:#159a91;border-color:#159a91}
  .controls{justify-content:flex-start}
  .phone{width:min(390px,100vw - 18px);height:calc(100vh - 170px);min-height:520px;border-radius:38px}
 }
+
+/* v2.12: never overlay a notch over the embedded website */
+.phone:before{display:none!important;content:none!important}
 </style>
 </head>
 <body>
@@ -44,7 +47,7 @@ button.active{background:#159a91;border-color:#159a91}
 <main class="stage">
   <div class="phone">
     <span class="side"></span><span class="power"></span>
-    <iframe id="screen" class="screen" src="index.html?v=3.84" title="CleanCore phone website"></iframe>
+    <iframe id="screen" class="screen" src="index.html?v=2.12" title="CleanCore phone website"></iframe>
   </div>
 </main>
 <div class="note">390 × 844 phone viewport · click the pages above to preview the mobile UI</div>
