@@ -73,3 +73,75 @@ header{isolation:isolate!important}
   .customer-nav-action .customer-face,.customer-nav-action .customer-cart-icon,
   .customer-nav-action .customer-face svg,.customer-nav-action .customer-cart-icon svg{width:20px!important;height:20px!important}
 }
+
+/* ===== Desktop header alignment v3.84 =====
+   Match the wide desktop header layout: compact 72px bar,
+   wide viewport gutters, logo at the left, navigation immediately
+   after the brand, and account/cart/quote controls at the right. */
+@media(min-width:801px){
+  header .container{
+    width:calc(100% - 112px)!important;
+    max-width:none!important;
+    margin-inline:auto!important;
+  }
+  header nav{
+    height:72px!important;
+    min-height:72px!important;
+    padding:0!important;
+    gap:14px!important;
+  }
+  .site-logo{
+    width:50px!important;
+    height:50px!important;
+  }
+  .brand{
+    gap:10px!important;
+    font-size:20px!important;
+    line-height:1!important;
+    letter-spacing:-.5px!important;
+  }
+  .brand>div:last-child{
+    white-space:nowrap!important;
+  }
+  .navlinks{
+    gap:7px!important;
+    margin-left:2px!important;
+  }
+  .navlinks a{
+    min-height:auto!important;
+    padding:6px 0!important;
+    font-size:16px!important;
+    line-height:1.2!important;
+  }
+  .nav-user-actions{
+    margin-left:auto!important;
+    gap:10px!important;
+  }
+  .customer-nav-action{
+    min-height:54px!important;
+    padding:0 13px!important;
+    border-radius:14px!important;
+  }
+  .customer-nav-action .customer-action-label{
+    font-size:16px!important;
+    font-weight:800!important;
+  }
+  .customer-face,.customer-cart-icon{
+    width:23px!important;
+    height:23px!important;
+  }
+  .customer-face svg,.customer-cart-icon svg{
+    width:22px!important;
+    height:22px!important;
+  }
+  .navcta{
+    min-height:52px!important;
+    padding:0 22px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-radius:12px!important;
+    font-size:16px!important;
+    white-space:nowrap!important;
+  }
+}
