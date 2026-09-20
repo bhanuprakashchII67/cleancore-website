@@ -326,19 +326,27 @@ function bindSharedMenu(){
   const b=document.getElementById("menuToggle"),m=document.getElementById("navMenu");
   if(!b||!m||b.dataset.ccMenuBound==="1")return;
   b.dataset.ccMenuBound="1";
-  b.addEventListener("click",function(){
-    const open=m.classList.toggle("open");
+  // Capture first so legacy page handlers cannot toggle the menu twice.
+  b.addEventListener("click",function(e){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const open=!m.classList.contains("open");
+    m.classList.toggle("open",open);
     b.classList.toggle("open",open);
-    b.setAttribute("aria-expanded",String(open));
+    b.setAttribute("aria-expanded",open?"true":"false");
     b.setAttribute("aria-label",open?"Close navigation":"Open navigation");
-  });
+  },true);
   m.querySelectorAll("a").forEach(a=>a.addEventListener("click",function(){
     m.classList.remove("open");b.classList.remove("open");
     b.setAttribute("aria-expanded","false");
     b.setAttribute("aria-label","Open navigation");
   }));
   window.addEventListener("resize",function(){
-    if(window.innerWidth>800){m.classList.remove("open");b.classList.remove("open");b.setAttribute("aria-expanded","false");}
+    if(window.innerWidth>800){
+      m.classList.remove("open");b.classList.remove("open");
+      b.setAttribute("aria-expanded","false");
+      b.setAttribute("aria-label","Open navigation");
+    }
   });
 }
 
