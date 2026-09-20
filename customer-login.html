@@ -2,14 +2,16 @@
 <html lang="en">
 <head><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg"><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Customer Login | CleanCore</title>
-<link rel="stylesheet" href="style.css?v=1.29"><style>.recovery-status{color:#8a5a00!important;background:#fff7df;border:1px solid #f0d58a;padding:12px 14px;border-radius:12px}.recovery-status::before{content:"Recovery: ";font-weight:800}.forgot-wrap{display:flex;justify-content:flex-end;margin-top:-6px;margin-bottom:10px}.forgot-wrap button{border:0;background:none;color:#0d746e;font:800 13px/1.2 Inter,Arial,sans-serif;padding:4px 0;cursor:pointer}.forgot-wrap button:hover{text-decoration:underline;color:#075f59}.forgot-panel{display:none;margin:10px 0 14px;padding:15px;border:1px solid #dbe7e9;border-radius:14px;background:#f7fbfb}.forgot-panel.open{display:block}.forgot-panel h2{font-size:16px;margin:0 0 4px;color:#0b1f33}.forgot-panel p{font-size:12px;margin:0 0 10px;color:#66727d}.forgot-panel label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#233347}.forgot-panel input{width:100%;box-sizing:border-box;border:1px solid #d6e1e7;border-radius:10px;padding:10px 12px;background:#fff}.forgot-actions{display:flex;gap:8px;margin-top:10px}.forgot-actions button{flex:1}</style><script src="error-monitor.js?v=3.7.16"></script>
+<link rel="stylesheet" href="style.css?v=1.30"><style>.recovery-status{color:#8a5a00!important;background:#fff7df;border:1px solid #f0d58a;padding:12px 14px;border-radius:12px}.recovery-status::before{content:"Recovery: ";font-weight:800}.forgot-wrap{display:flex;justify-content:flex-end;margin-top:-6px;margin-bottom:10px}.forgot-wrap button{border:0;background:none;color:#0d746e;font:800 13px/1.2 Inter,Arial,sans-serif;padding:4px 0;cursor:pointer}.forgot-wrap button:hover{text-decoration:underline;color:#075f59}.forgot-panel{display:none;margin:10px 0 14px;padding:15px;border:1px solid #dbe7e9;border-radius:14px;background:#f7fbfb}.forgot-panel.open{display:block}.forgot-panel h2{font-size:16px;margin:0 0 4px;color:#0b1f33}.forgot-panel p{font-size:12px;margin:0 0 10px;color:#66727d}.forgot-panel label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#233347}.forgot-panel input{width:100%;box-sizing:border-box;border:1px solid #d6e1e7;border-radius:10px;padding:10px 12px;background:#fff}.forgot-actions{display:flex;gap:8px;margin-top:10px}.forgot-actions button{flex:1}</style><script src="error-monitor.js?v=3.7.16"></script>
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
-<div class="navlinks" style="display:flex"><a href="products.html">Products</a><a href="index.html">Home</a></div>
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+<div class="nav-user-actions" id="navUserActions"></div>
+<div class="navlinks" id="navMenu"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
 <a class="navcta" href="checkout.html">Cart</a>
 </nav></div></header>
 <main class="checkout-main">
@@ -19,8 +21,10 @@
 <h1>Welcome back</h1>
 <p class="cc-muted">Log in with your email address or mobile number and password.</p>
 <form id="loginForm" novalidate>
-<label>Mobile number<input id="loginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number (India +91)" required></label>
-<label>Email ID<input id="loginEmail" type="email" autocomplete="email" placeholder="your@email.com" required></label>
+<div class="login-method-note">Use either your registered mobile number or email address.</div>
+<label>Mobile number <span class="field-optional">or</span><input id="loginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number (India +91)"></label>
+<div class="login-or"><span>OR</span></div>
+<label>Email ID<input id="loginEmail" type="email" autocomplete="email" placeholder="your@email.com"></label>
 <label>Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
 <div class="forgot-wrap"><button id="forgotToggle" type="button">Forgot password?</button></div>
 <div id="forgotPanel" class="forgot-panel" aria-hidden="true"><h2>Reset your password.</h2><p>Enter the email address saved on your CleanCore account. We’ll send a secure reset link.</p><div id="forgotForm"><label>Email address<input id="forgotEmail" type="text" autocomplete="email" placeholder="you@example.com" required></label><div class="forgot-actions"><button id="forgotCancel" class="btn btn-secondary" type="button">Cancel</button><button id="forgotSend" class="btn btn-primary" type="button">Send reset link</button></div><p id="forgotStatus" class="cc-status" aria-live="polite"></p></div></div>
@@ -72,8 +76,9 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
   const phone=normalize(document.getElementById("loginPhone").value);
   const email=document.getElementById("loginEmail").value.trim().toLowerCase();
   const password=document.getElementById("loginPassword").value;
-  if(!validPhone(phone)){status.textContent="Enter your 10-digit mobile number.";return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent="Enter a valid email ID.";return;}
+  if(!phone&&!email){status.textContent="Enter your mobile number or email address.";return;}
+  if(phone&&!validPhone(phone)){status.textContent="Enter a valid 10-digit mobile number.";return;}
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent="Enter a valid email ID.";return;}
   if(!password){status.textContent="Enter your password.";return;}
   btn.disabled=true;status.textContent="Logging in…";
   try{
