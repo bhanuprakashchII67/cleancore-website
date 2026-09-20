@@ -65,3 +65,73 @@ header{isolation:isolate!important}
   .customer-nav-action .customer-face,.customer-nav-action .customer-cart-icon,
   .customer-nav-action .customer-face svg,.customer-nav-action .customer-cart-icon svg{width:20px!important;height:20px!important}
 }
+
+/* ===== Final responsive header correction v3.87 ===== */
+@media(min-width:801px){
+  header nav .navlinks a,
+  header nav .navlinks a:hover,
+  header nav .navlinks a:focus,
+  header nav .navlinks a:active,
+  header nav .navlinks a:visited{
+    font-size:14px!important;
+    font-weight:700!important;
+    line-height:1.2!important;
+    transform:none!important;
+    scale:1!important;
+  }
+}
+@media(max-width:800px){
+  header nav .menu-toggle{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:relative!important;
+    z-index:6000!important;
+    flex:0 0 40px!important;
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    min-height:40px!important;
+    max-width:40px!important;
+    max-height:40px!important;
+    margin:0!important;
+    padding:8px!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+    align-items:stretch!important;
+    justify-content:center!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    border:1px solid #dbe5e9!important;
+    border-radius:11px!important;
+    background:#fff!important;
+    color:var(--navy)!important;
+  }
+  header nav .menu-toggle span,
+  header nav .menu-toggle span:nth-child(1),
+  header nav .menu-toggle span:nth-child(2),
+  header nav .menu-toggle span:nth-child(3){
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    width:100%!important;
+    height:3px!important;
+    min-height:3px!important;
+    max-height:3px!important;
+    margin:0!important;
+    padding:0!important;
+    flex:0 0 3px!important;
+    background:#0b1f33!important;
+    border-radius:3px!important;
+    transform:none!important;
+  }
+  header nav .menu-toggle.open span:nth-child(1){
+    transform:translateY(7px) rotate(45deg)!important;
+  }
+  header nav .menu-toggle.open span:nth-child(2){
+    opacity:0!important;
+  }
+  header nav .menu-toggle.open span:nth-child(3){
+    transform:translateY(-7px) rotate(-45deg)!important;
+  }
+}
