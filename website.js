@@ -351,7 +351,7 @@ function injectMobileBar(){
   if(window.innerWidth>800||document.getElementById("ccMobileBar"))return;
   const bar=document.createElement("nav");
   bar.id="ccMobileBar";bar.className="cc-mobile-bar";bar.setAttribute("aria-label","Quick actions");
-  bar.innerHTML='<a href="index.html"><span class="cc-mobile-icon" aria-hidden="true">⌂</span><span>Home</span></a><a href="products.html"><span class="cc-mobile-icon" aria-hidden="true">◫</span><span>Products</span></a><a href="checkout.html" class="primary"><span class="cc-mobile-icon" aria-hidden="true">🛒</span><span id="ccMobileCartLabel">Cart</span></a>';
+  bar.innerHTML='<a href="index.html"><span class="cc-mobile-icon" aria-hidden="true">⌂</span><span>Home</span></a><a href="products.html"><span class="cc-mobile-icon" aria-hidden="true">◫</span><span>Products</span></a><a href="customer-login.html"><span class="cc-mobile-icon" aria-hidden="true">◯</span><span>Account</span></a><a href="checkout.html" class="primary"><span class="cc-mobile-icon" aria-hidden="true">🛒</span><span id="ccMobileCartLabel">Cart</span></a>';
   document.body.appendChild(bar);
 }
 function toastSite(message){
