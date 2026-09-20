@@ -154,6 +154,30 @@ html,body{max-width:100%;overflow-x:hidden}
   .product-thumbs{height:50px!important;min-height:50px!important;max-height:50px!important;gap:4px!important}
   .product-thumbs .product-thumb{height:50px!important;min-height:50px!important;max-height:50px!important}
 }
+
+/* ===== PRODUCT GALLERY REAL MARKUP FIX v4.32 ===== */
+@media (max-width:800px){
+  .product-gallery{display:block!important;position:static!important;width:100%!important;max-width:100%!important;min-width:0!important}
+  .product-gallery .product-detail-image{display:block!important;width:100%!important;max-width:100%!important;min-height:0!important;margin:0 0 8px!important;padding:4px!important;overflow:hidden!important;box-sizing:border-box!important}
+  .product-gallery .product-detail-image img{display:block!important;width:100%!important;height:auto!important;max-width:100%!important;max-height:300px!important;object-fit:contain!important;margin:0 auto!important}
+  .product-gallery .product-thumbs-side{
+    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;justify-content:space-between!important;
+    width:100%!important;height:56px!important;min-height:56px!important;max-height:56px!important;gap:5px!important;
+    margin:0 0 12px!important;padding:0!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  .product-gallery .product-thumbs-side .product-thumb{
+    display:block!important;flex:0 0 calc((100% - 20px)/5)!important;width:calc((100% - 20px)/5)!important;
+    height:56px!important;min-height:56px!important;max-height:56px!important;aspect-ratio:auto!important;
+    margin:0!important;padding:3px!important;box-sizing:border-box!important;overflow:hidden!important;border-radius:9px!important;
+  }
+  .product-gallery .product-thumbs-side .product-thumb img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;margin:0!important}
+  .product-detail-copy{display:block!important;clear:both!important;position:relative!important;width:100%!important;margin:0!important;padding:0!important}
+}
+@media (max-width:380px){
+  .product-gallery .product-thumbs-side{height:50px!important;min-height:50px!important;max-height:50px!important;gap:4px!important}
+  .product-gallery .product-thumbs-side .product-thumb{height:50px!important;min-height:50px!important;max-height:50px!important}
+  .product-gallery .product-detail-image img{max-height:270px!important}
+}
 </style>
 <script src="error-monitor.js?v=3.80"></script>
 <style id="cc-hard-header-fix">
