@@ -788,3 +788,23 @@ header{
     transition-duration:.01ms!important;
   }
 }
+
+/* Customer instant invoice */
+.cc-instant-bill{max-width:900px;margin:24px auto;background:#fff;border:1px solid #d9e1e7;padding:28px;font-size:12px;line-height:1.4;color:#0b1f33;box-sizing:border-box}
+.cc-bill-header{display:flex;justify-content:space-between;gap:24px;border-bottom:2px solid #12b8a6;padding-bottom:16px}
+.cc-bill-brand{font-size:22px;font-weight:800}.cc-bill-sub{font-weight:700;margin:3px 0 5px}
+.cc-bill-title{text-align:right}.cc-bill-title b{display:block;font-size:22px}.cc-bill-title span{font-size:10px}
+.cc-bill-meta{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #d9e1e7}
+.cc-bill-parties{display:grid;grid-template-columns:1fr 1fr;background:#f7fafb;margin:14px 0;border-radius:8px;overflow:hidden}
+.cc-bill-parties>div{padding:14px;min-height:125px;box-sizing:border-box}.cc-bill-parties>div+div{border-left:1px solid #d9e1e7}
+.cc-bill-parties p{margin:8px 0 0;line-height:1.45}.cc-bill-parties strong{font-size:13px}
+.cc-bill-items{width:100%;border-collapse:collapse;margin-top:12px}
+.cc-bill-items th,.cc-bill-items td{border:1px solid #d5dee5;padding:8px;text-align:left}
+.cc-bill-items th{background:#eef2f4;font-size:11px}.cc-bill-items td:nth-child(1),.cc-bill-items td:nth-child(4){text-align:center}
+.cc-bill-items td:last-child,.cc-bill-items th:last-child{text-align:right}
+.cc-bill-total td{font-weight:800;font-size:13px}
+.cc-bill-bottom{display:grid;grid-template-columns:1fr 1fr;border:1px solid #d9e1e7;margin-top:12px}
+.cc-bill-bottom>div{padding:14px;min-height:80px}.cc-bill-bottom>div+div{border-left:1px solid #d9e1e7}.cc-bill-bottom p{margin:6px 0}
+.cc-bill-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+@media(max-width:700px){.cc-instant-bill{margin:10px;padding:16px;font-size:11px}.cc-bill-header,.cc-bill-meta,.cc-bill-parties,.cc-bill-bottom{display:block}.cc-bill-title{text-align:left;margin-top:12px}.cc-bill-parties>div+div,.cc-bill-bottom>div+div{border-left:0;border-top:1px solid #d9e1e7}.cc-bill-items{font-size:9px}.cc-bill-items th,.cc-bill-items td{padding:5px}.cc-bill-actions{justify-content:flex-start;flex-wrap:wrap}}
+@media print{body{background:#fff!important}.cc-order-success-only{padding:0!important}.cc-instant-bill{max-width:none;margin:0;border:0;padding:12mm;box-shadow:none}.cc-bill-actions{display:none!important}}
