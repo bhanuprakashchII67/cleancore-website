@@ -184,3 +184,17 @@ header{isolation:isolate!important}
     font-size:17px!important;
   }
 }
+
+/* ===== Restore original desktop nav scale v3.86 ===== */
+@media(min-width:801px){
+  header .navlinks a,
+  header .navlinks a:hover,
+  header .navlinks a:focus,
+  header .navlinks a:active,
+  header .navlinks a:visited{
+    font-size:14px!important;
+    line-height:1.2!important;
+    font-weight:700!important;
+    letter-spacing:0!important;
+  }
+}
