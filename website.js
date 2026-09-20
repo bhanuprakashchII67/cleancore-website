@@ -708,8 +708,8 @@ window.initCleanCoreCheckout=async function(){
     const business=String(customerProfile?.business_name||"").trim();
     const showBusiness=business&&business.toLowerCase()!=="na";
     const gstBill=Number(order?.gst_amount||0)>0;
-    const gstin=String(order?.customer_gstin||customerProfile?.gstin||"").trim();
-    const shownGstin=gstin&&gstin.toLowerCase()!=="na"?gstin:"NA";
+    const invoiceGstin=String(order?.customer_gstin||customerProfile?.gstin||"").trim();
+    const shownGstin=invoiceGstin&&invoiceGstin.toLowerCase()!=="na"?invoiceGstin:"NA";
     const billRows=billItems.map((it,n)=>'<tr><td>'+String(n+1)+'</td><td>'+escSite(it.product_name||"Item")+'</td><td>'+escSite(it.hsn_code||"—")+'</td><td>'+escSite(it.qty??"—")+'</td><td>'+siteMoney(it.unit_price)+'</td><td>'+siteMoney(it.line_total)+'</td></tr>').join("");
     const taxRows=gstBill
       ? ((Number(order.cgst_amount||0)>0?'<tr><td colspan="5">CGST ('+Number(order.cgst_percent||0)+'%)</td><td>'+siteMoney(order.cgst_amount)+'</td></tr>':'')+
