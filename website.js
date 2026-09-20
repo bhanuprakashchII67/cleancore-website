@@ -92,6 +92,8 @@ function renderCartCount(){
     const label=a.querySelector(".customer-action-label");
     if(label)label.textContent=count>0?"Cart ("+count+")":"Cart";
   }
+  const ml=document.getElementById("ccMobileCartLabel");
+  if(ml)ml.textContent=count>0?"Cart ("+count+")":"Cart";
 }
 function renderCart(){
   const panel=document.getElementById("ccCartItems");
@@ -344,6 +346,13 @@ function injectCustomerUI(){
     cart.innerHTML='<span class="customer-cart-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h2l1.3 9.2a2 2 0 0 0 2 1.8h7.7a2 2 0 0 0 2-1.8L20 8H7"></path><circle cx="10" cy="19" r="1.4"></circle><circle cx="18" cy="19" r="1.4"></circle></svg></span><span class="customer-action-label">'+(cartCount()>0?"Cart ("+cartCount()+")":"Cart")+'</span>';
     actions.appendChild(cart);
   }
+}
+function injectMobileBar(){
+  if(window.innerWidth>800||document.getElementById("ccMobileBar"))return;
+  const bar=document.createElement("nav");
+  bar.id="ccMobileBar";bar.className="cc-mobile-bar";bar.setAttribute("aria-label","Quick actions");
+  bar.innerHTML='<a href="index.html"><span class="cc-mobile-icon" aria-hidden="true">⌂</span><span>Home</span></a><a href="products.html"><span class="cc-mobile-icon" aria-hidden="true">◫</span><span>Products</span></a><a href="checkout.html" class="primary"><span class="cc-mobile-icon" aria-hidden="true">🛒</span><span id="ccMobileCartLabel">Cart</span></a>';
+  document.body.appendChild(bar);
 }
 function toastSite(message){
   let el=document.getElementById("ccToast");
@@ -733,6 +742,7 @@ document.addEventListener("input",e=>{});
 document.addEventListener("DOMContentLoaded",()=>{
   void flushSiteErrorQueue();
   injectCustomerUI();
+  injectMobileBar();
   injectEnquiryWidget();
   loadPublicProducts();
   populateEnquiryProducts();
