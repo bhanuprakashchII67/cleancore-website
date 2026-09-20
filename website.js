@@ -763,7 +763,7 @@ document.addEventListener("error",e=>{
     el.style.removeProperty("--cc-rx");
     el.style.removeProperty("--cc-ry");
     el.classList.add("cc-tilt-reset");
-    window.setTimeout(()=>el.classList.remove("cc-tilt-reset"),360);
+    window.setTimeout(()=>el.classList.remove("cc-tilt-reset","cc-tilt-active"),360);
   };
   document.addEventListener("pointermove",function(e){
     const el=e.target.closest?.(selector);
