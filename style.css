@@ -935,3 +935,13 @@ header{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:
   .section-head h2{font-size:25px}
   .product .imgbox{min-height:175px}
 }
+
+/* Mobile interaction polish */
+@media(max-width:800px){
+  .product.product-link{cursor:pointer}
+  .product-title-link{display:block}
+  .product .order-now{position:relative;z-index:5}
+  .home-range-item{min-height:48px}
+  .navlinks.open{position:absolute;left:14px;right:14px;top:58px;display:grid!important;gap:4px;padding:10px;border-radius:16px;background:#fff;box-shadow:0 18px 45px rgba(11,31,51,.18);z-index:1200}
+  .navlinks.open a{padding:14px 12px;border-radius:12px}
+}
