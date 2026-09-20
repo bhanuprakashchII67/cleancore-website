@@ -1265,3 +1265,65 @@ header{isolation:isolate!important}
   .product-gallery .product-thumb{height:50px!important;min-height:50px!important;max-height:50px!important}
   .product-gallery .product-detail-image img{max-height:300px!important}
 }
+
+
+/* ===== MOBILE HAMBURGER DEFINITIVE FIX v2.21 =====
+   Use one visual hamburger source only. High-specificity rules override
+   the legacy inline header rules on individual pages.
+*/
+@media(max-width:800px){
+  html body header nav button.menu-toggle#menuToggle{
+    display:flex!important;
+    position:relative!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:40px!important;height:40px!important;
+    min-width:40px!important;min-height:40px!important;
+    max-width:40px!important;max-height:40px!important;
+    flex:0 0 40px!important;
+    margin:0 0 0 6px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    border:1px solid #dbe5e9!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    color:#0b1f33!important;
+    font-size:0!important;
+    line-height:1!important;
+    overflow:visible!important;
+    z-index:99999!important;
+  }
+  html body header nav button.menu-toggle#menuToggle span,
+  html body header nav button.menu-toggle#menuToggle span:nth-child(1),
+  html body header nav button.menu-toggle#menuToggle span:nth-child(2),
+  html body header nav button.menu-toggle#menuToggle span:nth-child(3){
+    display:none!important;
+    visibility:hidden!important;
+    width:0!important;height:0!important;
+    margin:0!important;padding:0!important;
+  }
+  html body header nav button.menu-toggle#menuToggle:before{
+    content:"☰"!important;
+    display:block!important;
+    position:static!important;
+    width:auto!important;height:auto!important;
+    margin:0!important;padding:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    border:0!important;
+    color:#0b1f33!important;
+    font-family:Arial,sans-serif!important;
+    font-size:28px!important;
+    font-weight:700!important;
+    line-height:1!important;
+    transform:none!important;
+  }
+  html body header nav button.menu-toggle#menuToggle:after{content:none!important;display:none!important}
+  html body header nav button.menu-toggle#menuToggle.open:before,
+  html body header nav button.menu-toggle#menuToggle[aria-expanded="true"]:before{
+    content:"×"!important;
+    font-size:30px!important;
+    font-weight:500!important;
+    line-height:1!important;
+  }
+}
