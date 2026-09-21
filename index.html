@@ -398,7 +398,23 @@
   .cc-usecase:nth-child(-n+2){border-bottom:1px solid #e8eef0}
   .cc-usecase strong{font-size:14px}
 }
-</style></head><body data-cc-build="2026-09-21-mobile-final-2-20"><header><div class="container"><nav>
+</style><style id="cc-nav-active-page-20260921">@media (min-width:801px){header nav .navlinks a:first-child{color:#566675!important;background:transparent!important;box-shadow:none!important}header nav .navlinks a.cc-nav-current{color:#0b1f33!important;background:#fff!important;box-shadow:0 3px 9px rgba(11,31,51,.08)!important}}</style>
+<script>
+(function(){
+  function setCurrentNav(){
+    var links=document.querySelectorAll('header nav .navlinks a[href]');
+    var current=(location.pathname.split('/').pop()||'index.html').split('?')[0].split('#')[0];
+    if(!current) current='index.html';
+    links.forEach(function(a){
+      var href=(a.getAttribute('href')||'').split('/').pop().split('?')[0].split('#')[0];
+      if(!href) href='index.html';
+      a.classList.toggle('cc-nav-current',href===current);
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setCurrentNav);
+  else setCurrentNav();
+})();
+</script></head><body data-cc-build="2026-09-21-mobile-final-2-20"><header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg?v=3.84" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
 <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
 <div class="navlinks" id="navMenu"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
