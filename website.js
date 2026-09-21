@@ -6,7 +6,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.82.0";
+const SITE_VERSION="3.92.0";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -263,8 +263,8 @@ function injectEnquiryWidget(){
       <section class="ccx-dialog" role="dialog" aria-modal="true" aria-labelledby="ccEnquiryTitle">
         <button type="button" class="ccx-close" id="ccEnquiryClose" aria-label="Close enquiry">×</button>
         <div class="ccx-head">
-          <span class="ccx-kicker">QUICK ENQUIRY</span>
-          <h2 id="ccEnquiryTitle">Tell us what you need</h2>
+          <span class="ccx-kicker">CLEANCORE CONTACT</span>
+          <h2 id="ccEnquiryTitle">Request a quote</h2>
           <p>Send a few details. Our CleanCore team will contact you.</p>
         </div>
         <div class="ccx-contact-strip">
