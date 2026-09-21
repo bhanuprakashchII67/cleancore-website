@@ -779,3 +779,38 @@ header{isolation:isolate!important}
   header nav .nav-user-actions .cart-nav-action{min-width:66px!important}
   header nav .navcta{width:132px!important;height:34px!important;min-height:34px!important;font-size:11px!important}
 }
+
+
+/* ===== DESKTOP HEADER v4.70 — SITEWIDE AUTHORITATIVE ACTION BAR ===== */
+@media (min-width:801px){
+ header .container{width:100%!important;max-width:1480px!important;margin:0 auto!important;padding:0 28px!important;box-sizing:border-box!important}
+ header nav{position:relative!important;display:grid!important;grid-template-columns:minmax(250px,1fr) auto minmax(420px,1fr)!important;align-items:center!important;width:100%!important;height:72px!important;min-height:72px!important;gap:20px!important;margin:0!important;padding:0!important}
+ header nav .brand{grid-column:1!important;grid-row:1!important;display:flex!important;align-items:center!important;justify-self:start!important;gap:9px!important;margin:0!important;white-space:nowrap!important;position:static!important;transform:none!important}
+ header nav .site-logo{width:42px!important;height:42px!important;flex:0 0 42px!important}
+ header nav .brand>div{font-size:15px!important;line-height:1.05!important}
+ header nav .navlinks{grid-column:2!important;grid-row:1!important;position:static!important;transform:none!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;width:max-content!important;max-width:none!important;margin:0!important;padding:4px!important;border:1px solid #e2eaed!important;border-radius:14px!important;background:#f7fafb!important;box-shadow:0 4px 14px rgba(11,31,51,.06)!important}
+ header nav .navlinks a,header nav .navlinks a:hover,header nav .navlinks a:focus,header nav .navlinks a:active,header nav .navlinks a:visited{display:inline-flex!important;align-items:center!important;justify-content:center!important;height:34px!important;min-height:34px!important;padding:0 12px!important;margin:0!important;border:0!important;border-radius:10px!important;background:transparent!important;box-shadow:none!important;color:#617282!important;font-size:12px!important;font-weight:750!important;line-height:1!important;white-space:nowrap!important;text-decoration:none!important;transform:none!important;scale:1!important;zoom:1!important}
+ header nav .navlinks a:hover,header nav .navlinks a.cc-nav-current{background:#fff!important;color:#0b1f33!important;box-shadow:0 3px 9px rgba(11,31,51,.08)!important}
+ header nav .nav-right-actions{grid-column:3!important;grid-row:1!important;justify-self:end!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;width:max-content!important;margin:0!important;padding:0!important}
+ header nav .nav-user-actions{display:flex!important;align-items:center!important;gap:5px!important;width:auto!important;margin:0!important;padding:0!important;position:static!important;transform:none!important}
+ header nav .customer-nav-action{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;height:36px!important;min-height:36px!important;padding:0 10px!important;border:1px solid #e0e8eb!important;border-radius:10px!important;background:#fff!important;color:#183046!important;box-shadow:0 2px 7px rgba(11,31,51,.04)!important;transition:all .16s ease!important}
+ header nav .customer-nav-action:hover{transform:translateY(-1px)!important;border-color:#c9d7dd!important;background:#f8fbfc!important;box-shadow:0 7px 16px rgba(11,31,51,.08)!important}
+ header nav .customer-face,header nav .customer-cart-icon{width:16px!important;height:16px!important;min-width:16px!important;flex:0 0 16px!important;display:grid!important;place-items:center!important;color:#466274!important}
+ header nav .customer-face svg,header nav .customer-cart-icon svg{width:15px!important;height:15px!important;stroke-width:1.75!important}
+ header nav .customer-action-label{display:inline!important;font-size:12px!important;font-weight:800!important;line-height:1!important;letter-spacing:-.05px!important;white-space:nowrap!important}
+ header nav .account-nav-action{min-width:104px!important}
+ header nav .cart-nav-action{min-width:65px!important}
+ header nav .navcta{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:142px!important;height:36px!important;min-height:36px!important;margin:0!important;padding:0 13px!important;border:0!important;border-radius:10px!important;background:linear-gradient(180deg,#163b57,#0b1f33)!important;color:#fff!important;box-shadow:0 6px 15px rgba(11,31,51,.12)!important;font-size:12px!important;font-weight:850!important;line-height:1!important;white-space:nowrap!important;transition:all .16s ease!important}
+ header nav .navcta:hover{transform:translateY(-1px)!important;background:linear-gradient(180deg,#1c4969,#0d2942)!important;box-shadow:0 9px 19px rgba(11,31,51,.16)!important}
+ header nav .navcta:after{content:"→"!important;margin-left:8px!important;font-size:13px!important;line-height:1!important}
+ header nav .menu-toggle{display:none!important}
+}
+@media (min-width:801px) and (max-width:1200px){
+ header .container{padding-inline:18px!important} header nav{grid-template-columns:minmax(190px,1fr) auto minmax(365px,1fr)!important;gap:10px!important}
+ header nav .brand>div{font-size:13px!important} header nav .site-logo{width:37px!important;height:37px!important;flex-basis:37px!important}
+ header nav .navlinks{gap:2px!important;padding:3px!important} header nav .navlinks a{height:31px!important;min-height:31px!important;padding-inline:8px!important;font-size:11px!important}
+ header nav .nav-right-actions{gap:4px!important} header nav .nav-user-actions{gap:3px!important}
+ header nav .customer-nav-action{height:33px!important;min-height:33px!important;padding-inline:7px!important;gap:4px!important}
+ header nav .customer-action-label{font-size:11px!important} header nav .account-nav-action{min-width:91px!important} header nav .cart-nav-action{min-width:59px!important}
+ header nav .navcta{width:128px!important;height:33px!important;min-height:33px!important;font-size:11px!important;padding-inline:9px!important} header nav .navcta:after{margin-left:6px!important;font-size:12px!important}
+}
