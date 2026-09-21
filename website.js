@@ -18,7 +18,7 @@ function reportWebsiteClientError(err,meta={}){
  }
 }
 
-function setCleanCoreActiveNav(){const links=document.querySelectorAll("header nav .navlinks a[href]");if(!links.length)return;const current=(location.pathname.split("/").pop()||"index.html").split("?")[0].split("#")[0]||"index.html";links.forEach(a=>{const href=(a.getAttribute("href")||"").split("/").pop().split("?")[0].split("#")[0]||"index.html";a.classList.toggle("cc-nav-current",href===current);});}
+function setCleanCoreActiveNav(){if(!document.getElementById("cc-nav-active-runtime")){const s=document.createElement("style");s.id="cc-nav-active-runtime";s.textContent="@media (min-width:801px){header nav .navlinks a:first-child{color:#566675!important;background:transparent!important;box-shadow:none!important}header nav .navlinks a.cc-nav-current{color:#0b1f33!important;background:#fff!important;box-shadow:0 3px 9px rgba(11,31,51,.08)!important}}";document.head.appendChild(s);}const links=document.querySelectorAll("header nav .navlinks a[href]");if(!links.length)return;const current=(location.pathname.split("/").pop()||"index.html").split("?")[0].split("#")[0]||"index.html";links.forEach(a=>{const href=(a.getAttribute("href")||"").split("/").pop().split("?")[0].split("#")[0]||"index.html";a.classList.toggle("cc-nav-current",href===current);});}
 function siteErrorQueueRead(){try{const q=JSON.parse(localStorage.getItem("cleancore_site_error_queue")||"[]");return Array.isArray(q)?q:[];}catch{return [];}}
 function siteErrorQueueWrite(q){try{localStorage.setItem("cleancore_site_error_queue",JSON.stringify(q.slice(-30)));}catch{}}
 async function sendSiteErrorPayload(payload,queueOnFail=true){
