@@ -88,6 +88,10 @@
   .checkout-page .cc-success-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:18px}
   .checkout-page .cc-success-actions .btn{width:100%;min-height:50px;border-radius:12px;font-size:14px}
 }
+@media(max-width:800px){
+  .checkout-page .cc-success-actions{position:relative;z-index:20;pointer-events:auto}
+  .checkout-page .cc-success-actions .cc-success-nav{position:relative;z-index:21;display:flex;align-items:center;justify-content:center;pointer-events:auto;touch-action:manipulation;cursor:pointer}
+}
 @media(max-width:380px){
   .checkout-page .cc-order-success-only{padding-inline:8px}
   .checkout-page .cc-order-success-card{padding-inline:13px}
@@ -171,7 +175,7 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.93"></script>
+<script src="website.js?v=3.94"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>window.initCleanCoreCheckout?.());
 </script>
