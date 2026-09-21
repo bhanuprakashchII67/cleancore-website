@@ -18,6 +18,7 @@ function reportWebsiteClientError(err,meta={}){
  }
 }
 
+function setCleanCoreActiveNav(){const links=document.querySelectorAll("header nav .navlinks a[href]");if(!links.length)return;const current=(location.pathname.split("/").pop()||"index.html").split("?")[0].split("#")[0]||"index.html";links.forEach(a=>{const href=(a.getAttribute("href")||"").split("/").pop().split("?")[0].split("#")[0]||"index.html";a.classList.toggle("cc-nav-current",href===current);});}
 function siteErrorQueueRead(){try{const q=JSON.parse(localStorage.getItem("cleancore_site_error_queue")||"[]");return Array.isArray(q)?q:[];}catch{return [];}}
 function siteErrorQueueWrite(q){try{localStorage.setItem("cleancore_site_error_queue",JSON.stringify(q.slice(-30)));}catch{}}
 async function sendSiteErrorPayload(payload,queueOnFail=true){
@@ -826,6 +827,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   void flushSiteErrorQueue();
   injectCustomerUI();
   bindSharedMenu();
+  setCleanCoreActiveNav();
   injectMobileBar();
   injectEnquiryWidget();
   loadPublicProducts();
