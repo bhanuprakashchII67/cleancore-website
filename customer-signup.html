@@ -38,9 +38,9 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
-const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const CUSTOMER_SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+const CUSTOMER_SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+const db=window.supabase.createClient(CUSTOMER_SUPABASE_URL,CUSTOMER_SUPABASE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
 const validPhone=v=>/^[6-9]\d{9}$/.test(v);
 const getSource=()=>new URLSearchParams(location.search).get("source")||"Landing Page";
@@ -57,9 +57,9 @@ document.getElementById("signupForm").addEventListener("submit",async e=>{
   if(password.length<6){status.textContent="Password must be at least 6 characters.";return;}
   btn.disabled=true;status.textContent="Creating your account…";
   try{
-    const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
+    const response=await fetch(CUSTOMER_SUPABASE_URL+"/functions/v1/customer-auth",{
       method:"POST",
-      headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
+      headers:{"Content-Type":"application/json","apikey":CUSTOMER_SUPABASE_KEY,"Authorization":"Bearer "+CUSTOMER_SUPABASE_KEY},
       body:JSON.stringify({action:"signup",phone,email:document.getElementById("signupEmail").value.trim().toLowerCase(),password,source:getSource()})
     });
     const raw=await response.text();let data=null;
