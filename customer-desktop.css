@@ -551,3 +551,99 @@ header{isolation:isolate!important}
     display:none!important;
   }
 }
+
+/* ===== CUSTOMER ACTIONS — COMPACT MODERN DESKTOP UI ===== */
+@media (min-width:801px){
+  header nav .nav-user-actions{
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+  }
+
+  header nav .customer-nav-action{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:0 12px!important;
+    border:1px solid #e2e9ed!important;
+    border-radius:11px!important;
+    background:#fff!important;
+    color:#102438!important;
+    box-shadow:0 2px 9px rgba(11,31,51,.045)!important;
+    transition:all .18s ease!important;
+  }
+
+  header nav .customer-nav-action:hover{
+    transform:translateY(-1px)!important;
+    border-color:#cbd9df!important;
+    background:#f9fcfc!important;
+    box-shadow:0 6px 14px rgba(11,31,51,.08)!important;
+  }
+
+  header nav .customer-nav-action .customer-face,
+  header nav .customer-nav-action .customer-cart-icon{
+    width:17px!important;
+    height:17px!important;
+    flex:0 0 17px!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+
+  header nav .customer-nav-action .customer-face svg,
+  header nav .customer-nav-action .customer-cart-icon svg{
+    width:16px!important;
+    height:16px!important;
+    stroke-width:1.8!important;
+  }
+
+  header nav .customer-nav-action .customer-action-label{
+    display:inline!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    line-height:1!important;
+    letter-spacing:-.1px!important;
+    white-space:nowrap!important;
+  }
+
+  header nav .nav-user-actions .account-nav-action{
+    min-width:132px!important;
+  }
+
+  header nav .nav-user-actions .cart-nav-action{
+    min-width:78px!important;
+  }
+
+  header nav .navcta{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:154px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:0 15px!important;
+    border:1px solid #0b1f33!important;
+    border-radius:11px!important;
+    background:#0b1f33!important;
+    color:#fff!important;
+    box-shadow:0 4px 12px rgba(11,31,51,.11)!important;
+    font-size:13px!important;
+    font-weight:850!important;
+    line-height:1!important;
+    transition:all .18s ease!important;
+  }
+
+  header nav .navcta:hover{
+    transform:translateY(-1px)!important;
+    background:#17324a!important;
+    box-shadow:0 7px 16px rgba(11,31,51,.15)!important;
+  }
+
+  header nav .navcta:focus-visible,
+  header nav .customer-nav-action:focus-visible{
+    outline:2px solid rgba(20,184,166,.28)!important;
+    outline-offset:2px!important;
+  }
+}
