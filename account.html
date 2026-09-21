@@ -94,7 +94,7 @@
       }catch(err){btn.disabled=false;btn.textContent="Save changes";alert(err?.message||"Unable to save your details.");}
     };
   }
-  function pdfSafe(v){return String(v??"").replace(/[\\u0000-\\u001F]/g," ").trim();}
+  function pdfSafe(v){return String(v??"").replace(/[\u0000-\u001F]/g," ").trim();}
   function pdfMoney(v){return "Rs. "+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
   let invoiceFontReady=false;
   async function loadInvoiceFonts(){
