@@ -42,9 +42,9 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
-const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const CUSTOMER_SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+const CUSTOMER_SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+const db=window.supabase.createClient(CUSTOMER_SUPABASE_URL,CUSTOMER_SUPABASE_KEY,{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const normalize=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"");
 const validPhone=v=>/^[6-9]\d{9}$/.test(v);
 const getSource=()=>{const q=new URLSearchParams(location.search).get("source");return q||"Landing Page";};
@@ -67,7 +67,7 @@ forgotSend.addEventListener("click",async e=>{
   if(!email){forgotStatus.textContent="Enter your email address.";return;}
   forgotSend.disabled=true;forgotCancel.disabled=true;forgotSend.textContent="Sending…";
   try{
-    const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify({action:"request_password_reset",email})});
+    const response=await fetch(CUSTOMER_SUPABASE_URL+"/functions/v1/customer-auth",{method:"POST",headers:{"Content-Type":"application/json","apikey":CUSTOMER_SUPABASE_KEY,"Authorization":"Bearer "+CUSTOMER_SUPABASE_KEY},body:JSON.stringify({action:"request_password_reset",email})});
     const raw=await response.text();let data=null;try{data=raw?JSON.parse(raw):null}catch(_){}
     if(!response.ok)throw new Error(data?.error||"Unable to send reset link right now.");
     forgotStatus.textContent=data?.message||"Check your email for a password reset link.";
@@ -87,9 +87,9 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
   if(!password){status.textContent="Enter your password.";return;}
   btn.disabled=true;status.textContent="Logging in…";
   try{
-    const response=await fetch(SUPABASE_URL+"/functions/v1/customer-auth",{
+    const response=await fetch(CUSTOMER_SUPABASE_URL+"/functions/v1/customer-auth",{
       method:"POST",
-      headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
+      headers:{"Content-Type":"application/json","apikey":CUSTOMER_SUPABASE_KEY,"Authorization":"Bearer "+CUSTOMER_SUPABASE_KEY},
       body:JSON.stringify({action:"login",identifier:phone,email,password,source:getSource()})
     });
     const raw=await response.text();let data=null;
