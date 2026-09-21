@@ -224,12 +224,18 @@
       invoiceText(doc,"Thank you for your business.",L,y+10,7.5);
 
       const safeNo=String(order.invoice_no||order.order_no||"bill").replace(/[^a-zA-Z0-9_-]/g,"-");
-      doc.save("CleanCore-Invoice-"+safeNo+".pdf");
+      const fileName="CleanCore-Invoice-"+safeNo+".pdf";
+      // v4: force a direct browser download; never open an invoice/print page.
+      const blob=doc.output("blob");
+      const url=URL.createObjectURL(blob);
+      const link=document.createElement("a");link.href=url;link.download=fileName;link.style.display="none";
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
     }catch(err){
       console.error("BILL PDF ERROR",err);
       alert(err?.message||"Unable to generate the bill PDF.");
     }finally{
-      if(button){button.disabled=false;button.textContent=old||"Download bill PDF";}
+      if(button){button.disabled=false;button.textContent=old||"Download Invoice PDF";}
     }
   }
 
@@ -239,7 +245,7 @@ async function loadOrders(){
       const res=await db.from("website_orders").select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount,gst_enabled,gst_percent,cgst_percent,cgst_amount,sgst_percent,sgst_amount,igst_percent,igst_amount,place_of_supply,customer_gstin").eq("customer_id",customer.id).order("created_at",{ascending:false});
       if(res.error)throw res.error; orders=Array.isArray(res.data)?res.data:[];
       if(!orders.length){ordersBox.innerHTML='<p class="cc-muted">No orders yet.</p>';return;}
-      ordersBox.innerHTML=orders.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div><div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button><button type="button" class="link account-bill-button" data-bill-id="'+esc(o.id)+'">Download bill PDF</button></div></div>').join("");
+      ordersBox.innerHTML=orders.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div><div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button><button type="button" class="link account-bill-button" data-bill-id="'+esc(o.id)+'">Download Invoice PDF</button></div></div>').join("");
       ordersBox.querySelectorAll("[data-order-id]").forEach(b=>b.onclick=async()=>{
         const o=orders.find(x=>x.id===b.dataset.orderId);if(!o)return;
         try{const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",o.id).order("created_at");if(res.error)throw res.error;
