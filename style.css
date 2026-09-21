@@ -1445,6 +1445,26 @@ header{isolation:isolate!important}
 .ccx-submit:hover{background:#0f766e!important}
 .ccx-submit:focus-visible,.ccx-close:focus-visible,.ccx-contact-strip a:focus-visible{outline:3px solid rgba(15,118,110,.18)!important;outline-offset:2px!important}
 .ccx-overlay~*{pointer-events:none}
+/* Desktop: compact, balanced dialog matching the requested screenshot proportions. */
+@media(min-width:601px){
+ .ccx-overlay{padding:18px!important}
+ .ccx-dialog{width:min(500px,calc(100vw - 36px))!important;max-height:min(82vh,650px)!important;padding:22px!important;border-radius:20px!important}
+ .ccx-head{padding-right:42px!important}
+ .ccx-head h2{font-size:26px!important;letter-spacing:-.6px!important}
+ .ccx-head p{font-size:13px!important;margin:6px 0 14px!important}
+ .ccx-contact-strip{gap:7px!important;margin-bottom:14px!important}
+ .ccx-contact-strip a{min-height:40px!important;padding:7px 8px!important;gap:6px!important;font-size:11px!important}
+ .ccx-contact-strip a span{width:20px!important;height:20px!important;font-size:11px!important}
+ .ccx-contact-strip a b{font-size:10px!important}
+ .ccx-form{gap:10px!important}
+ .ccx-form label{gap:5px!important;font-size:10px!important}
+ .ccx-form input,.ccx-form textarea{font-size:13px!important;padding:10px 11px!important;border-radius:10px!important}
+ .ccx-form textarea{min-height:82px!important}
+ .ccx-row{gap:8px!important}
+ .ccx-submit-row{gap:10px!important}
+ .ccx-submit{min-width:148px!important;height:44px!important;border-radius:10px!important;font-size:12px!important}
+ .ccx-close{top:11px!important;right:11px!important;width:34px!important;height:34px!important;font-size:23px!important}
+}
 @media(max-width:600px){
  .ccx-overlay{align-items:center!important;padding:12px!important}
  .ccx-dialog{width:100%!important;max-width:500px!important;max-height:calc(100dvh - 24px)!important;padding:21px 15px 16px!important;border-radius:20px!important}
