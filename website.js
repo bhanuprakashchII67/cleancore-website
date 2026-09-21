@@ -6,7 +6,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.93.0";
+const SITE_VERSION="3.95.0";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
@@ -735,8 +735,11 @@ window.initCleanCoreCheckout=async function(){
       ? successItems.map(it=>'<div class="cc-success-product"><div><strong>'+escSite(it.product_name||"Product")+'</strong><span>'+escSite(it.unit||"")+'</span></div><div><span>Qty: '+escSite(it.qty??"—")+'</span><b>'+siteMoney(it.line_total)+'</b></div></div>').join("")
       : '<div class="cc-success-product"><div><strong>Order items</strong><span>See My Orders for full details</span></div></div>';
 
-    document.body.innerHTML='<main class="cc-order-success-only">'+
-      '<section class="cc-order-success-card" aria-labelledby="ccSuccessTitle">'+
+    // Render confirmation into the existing checkout DOM instead of replacing <body>.
+    // This keeps mobile CSS, header controls, and delegated click handlers intact.
+    if(success){
+      success.className="cc-order-success-only";
+      success.innerHTML='<section class="cc-order-success-card" aria-labelledby="ccSuccessTitle">'+
         '<div class="cc-success-icon" aria-hidden="true">✓</div>'+
         '<div class="cc-success-eyebrow">CLEANCORE ORDER CONFIRMATION</div>'+
         '<h1 id="ccSuccessTitle">Order placed successfully!</h1>'+
@@ -746,9 +749,17 @@ window.initCleanCoreCheckout=async function(){
         '<div class="cc-success-section"><div class="cc-success-section-head"><div><span class="cc-success-kicker">YOUR ORDER</span><h2>Product details</h2></div><span>'+successItems.length+' item'+(successItems.length===1?"":"s")+'</span></div><div class="cc-success-products">'+successRows+'</div><div class="cc-success-total"><span>Order total</span><strong>'+siteMoney(order?.total)+'</strong></div></div>'+
         '<div class="cc-success-message"><div class="cc-success-message-icon" aria-hidden="true">i</div><div><strong>A message from CleanCore</strong><p>Thank you for choosing CleanCore Chemical & Cleaning. We have received your order and will process it shortly. You can view your order anytime from My Account and download your invoice PDF from My Orders.</p></div></div>'+
         '<div class="cc-success-actions" role="group" aria-label="Order actions"><a class="btn btn-primary cc-success-nav" data-success-nav="account.html?v=invoice-pdf-v4" href="account.html?v=invoice-pdf-v4">Go to My Account</a><a class="btn btn-secondary cc-success-nav" data-success-nav="products.html" href="products.html">Continue shopping</a></div>'+
-      '</section>'+
-    '</main>';
-    document.body.className="checkout-page";
+      '</section>';
+      success.classList.remove("hidden");
+      success.scrollIntoView({block:"start",behavior:"auto"});
+    }
+    document.querySelectorAll("[data-success-nav]").forEach(a=>{
+      a.addEventListener("click",e=>{
+        e.preventDefault();
+        const href=a.getAttribute("data-success-nav");
+        if(href)window.location.assign(href);
+      },{passive:false});
+    });
     document.querySelectorAll("[data-success-nav]").forEach(a=>{
       a.addEventListener("click",e=>{
         e.preventDefault();
