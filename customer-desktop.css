@@ -456,3 +456,10 @@ header{isolation:isolate!important}
     box-shadow:0 3px 9px rgba(11,31,51,.08)!important;
   }
 }
+
+
+/* ===== NAV ACTIVE PAGE FIX ===== */
+@media (min-width:801px){
+  header nav .navlinks a:first-child{color:#566675!important;background:transparent!important;box-shadow:none!important}
+  header nav .navlinks a.cc-nav-current{color:#0b1f33!important;background:#fff!important;box-shadow:0 3px 9px rgba(11,31,51,.08)!important}
+}
