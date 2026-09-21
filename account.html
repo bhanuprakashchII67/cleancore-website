@@ -111,8 +111,8 @@
         return out;
       };
       const [regular,bold]=await Promise.all([
-        toBinary("fonts/Roboto-Regular.ttf?v=1"),
-        toBinary("fonts/Roboto-Bold.ttf?v=1")
+        toBinary("fonts/Roboto-Regular.ttf?v=2"),
+        toBinary("fonts/Roboto-Bold.ttf?v=2")
       ]);
       window.__jspdfInvoiceFonts=window.__jspdfInvoiceFonts||{};
       window.__jspdfInvoiceFonts.regular=regular;
@@ -153,7 +153,7 @@
       await loadInvoiceFonts();
       const doc=new jsPDF({unit:"mm",format:"a4"});
       const invoiceCustomFont=registerInvoiceFonts(doc);
-      if(!invoiceCustomFont)doc.setFont("helvetica","normal");
+      if(!invoiceCustomFont)throw new Error("Invoice font could not be embedded. Please reload the account page and try again.");
       const L=12,R=198,W=186;
       let y=14;
       const business=pdfSafe(customer.business_name||"");
