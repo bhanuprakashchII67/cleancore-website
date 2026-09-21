@@ -550,6 +550,18 @@ header{isolation:isolate!important}
     content:none!important;
     display:none!important;
   }
+  header nav .navlinks a.cc-nav-current:after{
+    content:""!important;
+    position:absolute!important;
+    left:50%!important;
+    bottom:1px!important;
+    width:20px!important;
+    height:2px!important;
+    border-radius:99px!important;
+    background:#16a69a!important;
+    transform:translateX(-50%)!important;
+    display:block!important;
+  }
 }
 
 /* ===== CUSTOMER ACTIONS — COMPACT MODERN DESKTOP UI ===== */
