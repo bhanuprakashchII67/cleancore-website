@@ -265,24 +265,20 @@ function injectEnquiryWidget(){
         <div class="ccx-head">
           <span class="ccx-kicker">CLEANCORE CONTACT</span>
           <h2 id="ccEnquiryTitle">Request a quote</h2>
-          <p>Send a few details. Our CleanCore team will contact you.</p>
+          <p>Tell us what you need and we’ll get back to you.</p>
         </div>
         <div class="ccx-contact-strip">
           <a href="tel:+919182725773"><span>☎</span><b>Call</b></a>
-          <a href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20have%20an%20enquiry." target="_blank" rel="noopener"><span>◉</span><b>WhatsApp</b></a>
+          <a href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20need%20a%20quote." target="_blank" rel="noopener"><span>◉</span><b>WhatsApp</b></a>
           <a href="mailto:cleancorehyd@gmail.com"><span>✉</span><b>Email</b></a>
         </div>
         <form id="ccQuickEnquiryForm" class="ccx-form" novalidate>
-          <div class="ccx-row ccx-row-2">
-            <label><span>Your name</span><input id="ccEnquiryName" type="text" autocomplete="name" placeholder="Enter your name" required></label>
-            <label><span>Mobile number</span><input id="ccEnquiryPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit number" required></label>
-          </div>
-          <label><span>Email address</span><input id="ccEnquiryEmail" type="email" autocomplete="email" placeholder="name@company.com"></label>
-          <label><span>Message</span><textarea id="ccEnquiryMessage" rows="4" placeholder="Product, quantity, delivery area, or anything else..."></textarea></label>
-          <div class="ccx-submit-row">
-            <p id="ccQuickEnquiryStatus" class="cc-enquiry-status" aria-live="polite"></p>
-            <button class="ccx-submit" type="submit"><span>Send enquiry</span><strong>→</strong></button>
-          </div>
+          <label><span>Your name</span><input id="ccEnquiryName" type="text" autocomplete="name" placeholder="Full name" required></label>
+          <label><span>Mobile number</span><input id="ccEnquiryPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit number" required></label>
+          <label><span>Email address <em>(optional)</em></span><input id="ccEnquiryEmail" type="email" autocomplete="email" placeholder="name@company.com"></label>
+          <label><span>What do you need?</span><textarea id="ccEnquiryMessage" rows="4" placeholder="Product, quantity, delivery area..."></textarea></label>
+          <p id="ccQuickEnquiryStatus" class="cc-enquiry-status" aria-live="polite"></p>
+          <button class="ccx-submit" type="submit"><span>Send request</span><strong>→</strong></button>
         </form>
       </section>
     </div>`;
@@ -304,13 +300,12 @@ function injectEnquiryWidget(){
     if(!name){status.textContent="Enter your name.";return}
     if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
     if(email && !validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
-    const payload={name,phone,email:email||null,message:message||null,source:"website",status:"New"};
     const request=fetch(SUPABASE_URL+"/rest/v1/enquiries",{
       method:"POST",
       headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
-      body:JSON.stringify(payload),keepalive:true
+      body:JSON.stringify({name,phone,email:email||null,message:message||null,source:"website",status:"New"}),
+      keepalive:true
     }).catch(()=>{});
-    status.textContent="Enquiry sent. We will contact you shortly.";
     e.currentTarget.reset();
     close();
     void request;
