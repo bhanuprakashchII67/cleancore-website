@@ -398,3 +398,61 @@ header{isolation:isolate!important}
     transform:translateX(-50%)!important;
   }
 }
+
+
+/* ===== NAV v4.44 — light centered pill, shared desktop header ===== */
+@media (min-width:801px){
+  header nav .navlinks{
+    position:absolute!important;
+    left:50%!important;
+    top:50%!important;
+    transform:translate(-50%,-50%)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    width:max-content!important;
+    max-width:none!important;
+    min-height:48px!important;
+    padding:4px!important;
+    border:1px solid #e1e9eb!important;
+    border-radius:16px!important;
+    background:#f8fbfb!important;
+    box-shadow:0 5px 18px rgba(11,31,51,.07)!important;
+    overflow:visible!important;
+  }
+  header nav .navlinks a,
+  header nav .navlinks a:hover,
+  header nav .navlinks a:focus,
+  header nav .navlinks a:active,
+  header nav .navlinks a:visited{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:38px!important;
+    padding:0 14px!important;
+    border:0!important;
+    border-radius:11px!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:#566675!important;
+    font-family:Inter,Arial,sans-serif!important;
+    font-size:13px!important;
+    font-weight:700!important;
+    line-height:1!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+    transform:none!important;
+    transition:background .18s ease,color .18s ease,box-shadow .18s ease!important;
+  }
+  header nav .navlinks a:hover{
+    color:#0b1f33!important;
+    background:#ffffff!important;
+    box-shadow:0 3px 9px rgba(11,31,51,.08)!important;
+  }
+  header nav .navlinks a:first-child{
+    color:#0b1f33!important;
+    background:#ffffff!important;
+    box-shadow:0 3px 9px rgba(11,31,51,.08)!important;
+  }
+}
