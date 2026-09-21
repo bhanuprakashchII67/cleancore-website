@@ -6,7 +6,7 @@ const siteDb=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
 const escSite=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const waPhone="919182725773";
 const phoneRE=/^[6-9]\d{9}$/;
-const SITE_VERSION="3.92.0";
+const SITE_VERSION="3.93.0";
 let siteErrorBusy=false;
 // Report every client-side website failure to CleanCore Manager's Error Finder.
 // This includes broken images, script failures, unhandled promise rejections,
