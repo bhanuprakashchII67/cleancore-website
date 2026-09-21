@@ -342,7 +342,88 @@ html,body{max-width:100%;overflow-x:hidden}
   .cc-product-info h1{font-size:27px!important}
 }
 </style>
-</head>
+<style id="cc-reference-product-v1">
+@media(max-width:800px){
+  body{background:#f7fafb!important}
+  .product-detail{padding:10px 0 28px!important;background:#f7fafb!important}
+  .product-detail>.container{width:calc(100% - 20px)!important;margin:0 10px!important}
+  .cc-product-layout{gap:10px!important}
+  .cc-product-gallery{
+    border-radius:20px!important;border:1px solid #dce7eb!important;
+    background:#fff!important;box-shadow:0 8px 28px rgba(11,31,51,.07)!important;
+  }
+  .cc-product-image{
+    height:300px!important;min-height:300px!important;
+    padding:14px!important;background:#eef7f6!important;
+  }
+  .cc-product-image img{
+    max-height:272px!important;max-width:100%!important;
+    width:auto!important;height:auto!important;
+    object-fit:contain!important;border-radius:10px!important;
+  }
+  .cc-product-gallery .product-thumbs-side{
+    height:68px!important;min-height:68px!important;max-height:68px!important;
+    display:flex!important;flex-wrap:nowrap!important;gap:6px!important;
+    padding:8px!important;overflow:hidden!important;
+  }
+  .cc-product-gallery .product-thumbs-side .product-thumb{
+    flex:0 0 calc((100% - 24px)/5)!important;
+    width:calc((100% - 24px)/5)!important;
+    height:52px!important;min-height:52px!important;max-height:52px!important;
+    padding:2px!important;border-radius:9px!important;
+  }
+  .cc-product-gallery .product-thumbs-side .product-thumb img{
+    width:100%!important;height:100%!important;object-fit:cover!important
+  }
+  .cc-product-info{
+    border-radius:20px!important;border:1px solid #dce7eb!important;
+    padding:18px 16px 16px!important;background:#fff!important;
+    box-shadow:0 8px 28px rgba(11,31,51,.055)!important
+  }
+  .cc-product-info .eyebrow{font-size:10px!important;margin-bottom:8px!important}
+  .cc-product-info h1{
+    font-size:29px!important;line-height:1.08!important;
+    letter-spacing:-.8px!important;margin:0 0 8px!important
+  }
+  .cc-product-info .lead{
+    font-size:14px!important;line-height:1.52!important;margin:0 0 14px!important
+  }
+  .cc-product-meta{gap:6px!important;margin-bottom:14px!important}
+  .cc-product-meta span{
+    padding:6px 9px!important;font-size:10px!important;
+    border-radius:8px!important
+  }
+  .cc-product-buybar{
+    padding:12px 0!important;gap:8px!important
+  }
+  .cc-product-buybar .product-price{font-size:22px!important}
+  .cc-product-buybar .product-price small{font-size:10px!important}
+  .cc-product-buybar .product-stock{
+    font-size:10px!important;padding:7px 8px!important
+  }
+  .cc-product-actions{margin-top:12px!important;gap:8px!important}
+  .cc-product-actions .product-buy-row{
+    grid-template-columns:78px 1fr!important;gap:7px!important
+  }
+  .cc-product-actions .product-buy-btn{
+    height:48px!important;min-height:48px!important;border-radius:11px!important
+  }
+  .cc-back-products{min-height:44px!important;border-radius:11px!important}
+  .cc-product-details{
+    border-radius:17px!important;padding:15px!important;margin-top:0!important
+  }
+  .cc-product-details h2{font-size:17px!important}
+  .cc-product-details p{font-size:13px!important;line-height:1.55!important}
+}
+@media(max-width:390px){
+  .cc-product-image{height:260px!important;min-height:260px!important}
+  .cc-product-image img{max-height:234px!important}
+  .cc-product-info{padding:16px 14px!important}
+  .cc-product-info h1{font-size:27px!important}
+  .cc-product-gallery .product-thumbs-side{height:64px!important;min-height:64px!important}
+  .cc-product-gallery .product-thumbs-side .product-thumb{height:48px!important;min-height:48px!important}
+}
+</style></head>
 <body>
 <header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg?v=3.83" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
