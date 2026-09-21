@@ -96,8 +96,50 @@
   }
   function pdfSafe(v){return String(v??"").replace(/[\\u0000-\\u001F]/g," ").trim();}
   function pdfMoney(v){return "Rs. "+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  let invoiceFontReady=false;
+  async function loadInvoiceFonts(){
+    if(invoiceFontReady)return true;
+    if(window.__ccInvoiceFontPromise)return window.__ccInvoiceFontPromise;
+    window.__ccInvoiceFontPromise=(async()=>{
+      const toBinary=async url=>{
+        const res=await fetch(url,{cache:"force-cache"});
+        if(!res.ok)throw new Error("Invoice font load failed ("+res.status+").");
+        const bytes=new Uint8Array(await res.arrayBuffer());
+        let out="";
+        const chunk=0x8000;
+        for(let i=0;i<bytes.length;i+=chunk)out+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+        return out;
+      };
+      const [regular,bold]=await Promise.all([
+        toBinary("fonts/Roboto-Regular.ttf?v=1"),
+        toBinary("fonts/Roboto-Bold.ttf?v=1")
+      ]);
+      window.__jspdfInvoiceFonts=window.__jspdfInvoiceFonts||{};
+      window.__jspdfInvoiceFonts.regular=regular;
+      window.__jspdfInvoiceFonts.bold=bold;
+      invoiceFontReady=true;
+      return true;
+    })().catch(err=>{
+      window.__ccInvoiceFontPromise=null;
+      console.warn("Invoice font load failed; using PDF fallback font.",err);
+      return false;
+    });
+    return window.__ccInvoiceFontPromise;
+  }
+  function registerInvoiceFonts(doc){
+    if(!window.__jspdfInvoiceFonts?.regular)return false;
+    try{
+      doc.addFileToVFS("CleanCoreRoboto-Regular.ttf",window.__jspdfInvoiceFonts.regular);
+      doc.addFileToVFS("CleanCoreRoboto-Bold.ttf",window.__jspdfInvoiceFonts.bold);
+      doc.addFont("CleanCoreRoboto-Regular.ttf","CleanCoreRoboto","normal");
+      doc.addFont("CleanCoreRoboto-Bold.ttf","CleanCoreRoboto","bold");
+      doc.setFont("CleanCoreRoboto","normal");
+      return true;
+    }catch(err){console.warn("Invoice font registration failed.",err);return false;}
+  }
   function invoiceText(doc,value,x,y,size=8,bold=false,maxWidth=0){
-    doc.setFont("helvetica",bold?"bold":"normal");doc.setFontSize(size);
+    doc.setFont(invoiceFontReady&&window.__jspdfInvoiceFonts?.regular?"CleanCoreRoboto": "helvetica",invoiceFontReady&&window.__jspdfInvoiceFonts?.regular?(bold?"bold":"normal"):(bold?"bold":"normal"));
+    doc.setFontSize(size);
     const s=pdfSafe(value);
     if(maxWidth){const lines=doc.splitTextToSize(s,maxWidth);doc.text(lines,x,y);return y+(lines.length*4.1);}
     doc.text(s,x,y);return y;
@@ -108,7 +150,10 @@
     const old=button?.textContent;if(button){button.disabled=true;button.textContent="Preparing bill…";}
     try{
       const {jsPDF}=window.jspdf;
+      await loadInvoiceFonts();
       const doc=new jsPDF({unit:"mm",format:"a4"});
+      const invoiceCustomFont=registerInvoiceFonts(doc);
+      if(!invoiceCustomFont)doc.setFont("helvetica","normal");
       const L=12,R=198,W=186;
       let y=14;
       const business=pdfSafe(customer.business_name||"");
@@ -279,5 +324,5 @@ async function loadOrders(){
 })();
 </script>
 
-<script src="website.js?v=3.92"></script></body>
+<script src="website.js?v=3.93"></script></body>
 </html>
