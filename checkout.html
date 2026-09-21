@@ -12,6 +12,50 @@
 <script src="error-monitor.js?v=3.80"></script>
 <link rel="stylesheet" href="customer-desktop.css?v=4.40" media="(min-width:801px)">
 <link rel="stylesheet" href="customer-mobile.css?v=2.11" media="(max-width:800px)">
+<style>
+.cc-order-success-only{min-height:calc(100vh - 84px);display:flex;align-items:center;justify-content:center;padding:48px 20px 72px;background:linear-gradient(180deg,#f6f9fb 0%,#eef4f6 100%)}
+.cc-order-success-card{width:min(760px,100%);background:#fff;border:1px solid #dfe8eb;border-radius:24px;box-shadow:0 20px 60px rgba(24,55,67,.12);padding:42px}
+.cc-success-icon{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:#e9f7ef;color:#16834b;font-size:32px;font-weight:800;margin-bottom:20px}
+.cc-success-eyebrow,.cc-success-kicker{font-size:11px;letter-spacing:.16em;font-weight:800;color:#71848d}
+.cc-order-success-card h1{margin:8px 0 10px;font-size:34px;line-height:1.1;color:#17313b}
+.cc-success-lead{margin:0;color:#61747d;line-height:1.65}
+.cc-success-order-id{margin:26px 0 14px;padding:17px 18px;background:#f3f7f8;border:1px solid #e1eaed;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.cc-success-order-id span,.cc-success-meta span{display:block;color:#7a8b92;font-size:12px}
+.cc-success-order-id strong{font-size:18px;color:#17313b}
+.cc-success-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.cc-success-meta>div{padding:14px 15px;border:1px solid #e5ecee;border-radius:12px;background:#fff}
+.cc-success-meta b{display:block;margin-top:5px;color:#243e47;font-size:14px}
+.cc-success-section{border-top:1px solid #e4ebed;padding-top:22px}
+.cc-success-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:12px}
+.cc-success-section-head h2{margin:5px 0 0;font-size:20px;color:#17313b}
+.cc-success-section-head>span{font-size:12px;color:#74858c}
+.cc-success-products{border:1px solid #e2e9eb;border-radius:14px;overflow:hidden}
+.cc-success-product{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px 16px;border-bottom:1px solid #e8edef}
+.cc-success-product:last-child{border-bottom:0}
+.cc-success-product>div:first-child strong,.cc-success-product>div:first-child span{display:block}
+.cc-success-product strong{color:#213c45;font-size:14px}
+.cc-success-product span{color:#778991;font-size:12px;margin-top:3px}
+.cc-success-product>div:last-child{display:flex;align-items:center;gap:20px;white-space:nowrap}
+.cc-success-product>div:last-child b{color:#17313b;font-size:14px}
+.cc-success-total{display:flex;justify-content:space-between;align-items:center;padding:17px 4px 0;color:#647780}
+.cc-success-total strong{font-size:19px;color:#17313b}
+.cc-success-message{display:flex;gap:13px;margin-top:25px;padding:17px;background:#f5f9fa;border:1px solid #dfe9ec;border-radius:14px}
+.cc-success-message-icon{width:28px;height:28px;flex:0 0 28px;border-radius:50%;display:grid;place-items:center;background:#dcecf1;color:#2c6575;font-weight:800}
+.cc-success-message strong{color:#23434d}
+.cc-success-message p{margin:5px 0 0;color:#667980;line-height:1.55;font-size:13px}
+.cc-success-actions{display:flex;gap:10px;margin-top:25px}
+.cc-success-actions .btn{flex:1;text-align:center;text-decoration:none}
+@media(max-width:800px){
+  .cc-order-success-only{min-height:calc(100vh - 70px);padding:28px 14px 90px;align-items:flex-start}
+  .cc-order-success-card{padding:26px 18px;border-radius:20px}
+  .cc-order-success-card h1{font-size:27px}
+  .cc-success-meta{grid-template-columns:1fr}
+  .cc-success-order-id{align-items:flex-start;flex-direction:column;gap:6px}
+  .cc-success-product{align-items:flex-start}
+  .cc-success-product>div:last-child{flex-direction:column;align-items:flex-end;gap:4px}
+  .cc-success-actions{flex-direction:column}
+}
+</style>
 </head>
 <body class="checkout-page">
 <header><div class="container"><nav>
@@ -88,7 +132,7 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="website.js?v=3.82"></script>
+<script src="website.js?v=3.93"></script>
 <script>
 document.addEventListener("DOMContentLoaded",()=>window.initCleanCoreCheckout?.());
 </script>
