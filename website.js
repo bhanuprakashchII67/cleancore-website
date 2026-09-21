@@ -745,10 +745,17 @@ window.initCleanCoreCheckout=async function(){
         '<div class="cc-success-meta"><div><span>Order date</span><b>'+escSite(placedAt.toLocaleString("en-IN"))+'</b></div><div><span>Status</span><b>'+escSite(order?.status||"New")+'</b></div><div><span>Total</span><b>'+siteMoney(order?.total)+'</b></div></div>'+
         '<div class="cc-success-section"><div class="cc-success-section-head"><div><span class="cc-success-kicker">YOUR ORDER</span><h2>Product details</h2></div><span>'+successItems.length+' item'+(successItems.length===1?"":"s")+'</span></div><div class="cc-success-products">'+successRows+'</div><div class="cc-success-total"><span>Order total</span><strong>'+siteMoney(order?.total)+'</strong></div></div>'+
         '<div class="cc-success-message"><div class="cc-success-message-icon" aria-hidden="true">i</div><div><strong>A message from CleanCore</strong><p>Thank you for choosing CleanCore Chemical & Cleaning. We have received your order and will process it shortly. You can view your order anytime from My Account and download your invoice PDF from My Orders.</p></div></div>'+
-        '<div class="cc-success-actions"><a class="btn btn-primary" href="account.html?v=invoice-pdf-v4">Go to My Account</a><a class="btn btn-secondary" href="products.html">Continue shopping</a></div>'+
+        '<div class="cc-success-actions" role="group" aria-label="Order actions"><a class="btn btn-primary cc-success-nav" data-success-nav="account.html?v=invoice-pdf-v4" href="account.html?v=invoice-pdf-v4">Go to My Account</a><a class="btn btn-secondary cc-success-nav" data-success-nav="products.html" href="products.html">Continue shopping</a></div>'+
       '</section>'+
     '</main>';
     document.body.className="checkout-page";
+    document.querySelectorAll("[data-success-nav]").forEach(a=>{
+      a.addEventListener("click",e=>{
+        e.preventDefault();
+        const href=a.getAttribute("data-success-nav");
+        if(href)window.location.assign(href);
+      },{passive:false});
+    });
     btn.disabled=false;
   });
 };
