@@ -46,14 +46,53 @@
 .cc-success-actions{display:flex;gap:10px;margin-top:25px}
 .cc-success-actions .btn{flex:1;text-align:center;text-decoration:none}
 @media(max-width:800px){
-  .cc-order-success-only{min-height:calc(100vh - 70px);padding:28px 14px 90px;align-items:flex-start}
-  .cc-order-success-card{padding:26px 18px;border-radius:20px}
-  .cc-order-success-card h1{font-size:27px}
-  .cc-success-meta{grid-template-columns:1fr}
-  .cc-success-order-id{align-items:flex-start;flex-direction:column;gap:6px}
-  .cc-success-product{align-items:flex-start}
-  .cc-success-product>div:last-child{flex-direction:column;align-items:flex-end;gap:4px}
-  .cc-success-actions{flex-direction:column}
+  /* Mobile-only order success layout. Desktop styles above remain untouched. */
+  .checkout-page .cc-order-success-only{
+    min-height:calc(100svh - 64px);
+    padding:18px 10px calc(96px + env(safe-area-inset-bottom));
+    align-items:flex-start;
+    background:#f5f8fa;
+  }
+  .checkout-page .cc-order-success-card{
+    width:100%;max-width:none;padding:22px 16px 18px;
+    border:1px solid #e0e8eb;border-radius:18px;
+    box-shadow:0 10px 28px rgba(24,55,67,.08);
+  }
+  .checkout-page .cc-success-icon{width:52px;height:52px;margin:0 auto 14px;font-size:27px}
+  .checkout-page .cc-success-eyebrow,.checkout-page .cc-success-kicker{display:block;text-align:center;font-size:10px;letter-spacing:.13em}
+  .checkout-page .cc-order-success-card h1{margin:7px 0 8px;text-align:center;font-size:26px;line-height:1.12;letter-spacing:-.35px}
+  .checkout-page .cc-success-lead{max-width:320px;margin-inline:auto;text-align:center;font-size:13px;line-height:1.55}
+  .checkout-page .cc-success-order-id{margin:20px 0 10px;padding:14px;align-items:flex-start;flex-direction:column;gap:5px;border-radius:12px}
+  .checkout-page .cc-success-order-id strong{font-size:16px;overflow-wrap:anywhere}
+  .checkout-page .cc-success-meta{grid-template-columns:1fr;gap:7px;margin-bottom:20px}
+  .checkout-page .cc-success-meta>div{padding:12px 13px;border-radius:11px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .checkout-page .cc-success-meta span,.checkout-page .cc-success-meta b{margin:0}
+  .checkout-page .cc-success-meta span{font-size:11px}
+  .checkout-page .cc-success-meta b{font-size:13px;text-align:right}
+  .checkout-page .cc-success-section{padding-top:18px}
+  .checkout-page .cc-success-section-head{align-items:flex-start;margin-bottom:9px}
+  .checkout-page .cc-success-section-head h2{font-size:18px}
+  .checkout-page .cc-success-section-head>span{font-size:11px;text-align:right}
+  .checkout-page .cc-success-products{border-radius:12px}
+  .checkout-page .cc-success-product{padding:13px 12px;gap:10px}
+  .checkout-page .cc-success-product>div:first-child{min-width:0}
+  .checkout-page .cc-success-product strong{font-size:13px;overflow-wrap:anywhere}
+  .checkout-page .cc-success-product span{font-size:11px}
+  .checkout-page .cc-success-product>div:last-child{flex-direction:column;align-items:flex-end;gap:2px;flex:0 0 auto}
+  .checkout-page .cc-success-product>div:last-child b{font-size:13px}
+  .checkout-page .cc-success-total{padding:14px 2px 0;font-size:13px}
+  .checkout-page .cc-success-total strong{font-size:18px}
+  .checkout-page .cc-success-message{margin-top:18px;padding:13px;gap:10px;border-radius:12px}
+  .checkout-page .cc-success-message-icon{width:26px;height:26px;flex-basis:26px}
+  .checkout-page .cc-success-message p{font-size:12px;line-height:1.5}
+  .checkout-page .cc-success-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:18px}
+  .checkout-page .cc-success-actions .btn{width:100%;min-height:50px;border-radius:12px;font-size:14px}
+}
+@media(max-width:380px){
+  .checkout-page .cc-order-success-only{padding-inline:8px}
+  .checkout-page .cc-order-success-card{padding-inline:13px}
+  .checkout-page .cc-success-meta>div{padding-inline:11px}
+  .checkout-page .cc-success-product{padding-inline:10px}
 }
 </style>
 </head>
