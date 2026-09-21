@@ -256,33 +256,39 @@ function injectEnquiryWidget(){
   const root=document.createElement("div");
   root.id="ccEnquiryWidget";
   root.innerHTML=`
-    <button type="button" class="cc-enquiry-tab" id="ccEnquiryOpen" aria-label="Open enquiry form">
-      <span class="cc-enquiry-tab-icon" aria-hidden="true">?</span><span>Enquire</span>
+    <button type="button" class="cc-enquiry-tab ccx-tab" id="ccEnquiryOpen" aria-label="Open enquiry form">
+      <span class="ccx-tab-icon" aria-hidden="true">?</span><span>Enquire</span>
     </button>
-    <div class="cc-enquiry-overlay hidden" id="ccEnquiryOverlay" aria-hidden="true">
-      <section class="cc-enquiry-card" role="dialog" aria-modal="true" aria-labelledby="ccEnquiryTitle">
-        <button type="button" class="cc-enquiry-close" id="ccEnquiryClose" aria-label="Close enquiry">×</button>
-        <div class="eyebrow">QUICK ENQUIRY</div>
-        <h2 id="ccEnquiryTitle">How can we help?</h2>
-        <p class="cc-enquiry-sub">Send your details and our team will contact you.</p>
-        <div class="cc-enquiry-contact-row">
-          <a href="tel:+91 91827 25773"><span class="cc-contact-icon" aria-hidden="true">☎</span> Call us</a>
-          <a href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20have%20an%20enquiry." target="_blank" rel="noopener"><span class="cc-contact-icon cc-wa-icon" aria-hidden="true">◉</span> WhatsApp</a>
-          <a href="mailto:cleancorehyd@gmail.com"><span class="cc-contact-icon" aria-hidden="true">✉</span> Email</a>
+    <div class="ccx-overlay hidden" id="ccEnquiryOverlay" aria-hidden="true">
+      <section class="ccx-dialog" role="dialog" aria-modal="true" aria-labelledby="ccEnquiryTitle">
+        <button type="button" class="ccx-close" id="ccEnquiryClose" aria-label="Close enquiry">×</button>
+        <div class="ccx-head">
+          <span class="ccx-kicker">QUICK ENQUIRY</span>
+          <h2 id="ccEnquiryTitle">Tell us what you need</h2>
+          <p>Send a few details. Our CleanCore team will contact you.</p>
         </div>
-        <form id="ccQuickEnquiryForm" class="cc-enquiry-form" novalidate>
-          <label>Name<input id="ccEnquiryName" type="text" autocomplete="name" placeholder="Your name" required></label>
-          <label>Mobile number<input id="ccEnquiryPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number" required></label>
-          <label>Email address<input id="ccEnquiryEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
-          <label>Message / Note<textarea id="ccEnquiryMessage" rows="4" placeholder="Tell us what you need..."></textarea></label>
-          <p id="ccQuickEnquiryStatus" class="cc-enquiry-status" aria-live="polite"></p>
-          <button class="btn btn-primary cc-wide" type="submit">Send enquiry <span aria-hidden="true">→</span></button>
+        <div class="ccx-contact-strip">
+          <a href="tel:+919182725773"><span>☎</span><b>Call</b></a>
+          <a href="https://wa.me/919182725773?text=Hello%20CleanCore%2C%20I%20have%20an%20enquiry." target="_blank" rel="noopener"><span>◉</span><b>WhatsApp</b></a>
+          <a href="mailto:cleancorehyd@gmail.com"><span>✉</span><b>Email</b></a>
+        </div>
+        <form id="ccQuickEnquiryForm" class="ccx-form" novalidate>
+          <div class="ccx-row ccx-row-2">
+            <label><span>Your name</span><input id="ccEnquiryName" type="text" autocomplete="name" placeholder="Enter your name" required></label>
+            <label><span>Mobile number</span><input id="ccEnquiryPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit number" required></label>
+          </div>
+          <label><span>Email address</span><input id="ccEnquiryEmail" type="email" autocomplete="email" placeholder="name@company.com"></label>
+          <label><span>Message</span><textarea id="ccEnquiryMessage" rows="4" placeholder="Product, quantity, delivery area, or anything else..."></textarea></label>
+          <div class="ccx-submit-row">
+            <p id="ccQuickEnquiryStatus" class="cc-enquiry-status" aria-live="polite"></p>
+            <button class="ccx-submit" type="submit"><span>Send enquiry</span><strong>→</strong></button>
+          </div>
         </form>
       </section>
     </div>`;
   document.body.appendChild(root);
   const overlay=document.getElementById("ccEnquiryOverlay");
-  const open=()=>{overlay.classList.remove("hidden");overlay.setAttribute("aria-hidden","false");document.body.classList.add("cc-modal-open");setTimeout(()=>document.getElementById("ccEnquiryName")?.focus(),50)};
+  const open=()=>{overlay.classList.remove("hidden");overlay.setAttribute("aria-hidden","false");document.body.classList.add("cc-modal-open");setTimeout(()=>document.getElementById("ccEnquiryName")?.focus(),60)};
   const close=()=>{overlay.classList.add("hidden");overlay.setAttribute("aria-hidden","true");document.body.classList.remove("cc-modal-open")};
   document.getElementById("ccEnquiryOpen").addEventListener("click",open);
   document.getElementById("ccEnquiryClose").addEventListener("click",close);
@@ -291,32 +297,21 @@ function injectEnquiryWidget(){
   document.getElementById("ccQuickEnquiryForm").addEventListener("submit",e=>{
     e.preventDefault();
     const status=document.getElementById("ccQuickEnquiryStatus");
-    const btn=e.currentTarget.querySelector("button[type=submit]");
     const name=document.getElementById("ccEnquiryName").value.trim();
     const phone=normalizeSitePhone(document.getElementById("ccEnquiryPhone").value).slice(0,10);
     const email=document.getElementById("ccEnquiryEmail").value.trim();
     const message=document.getElementById("ccEnquiryMessage").value.trim();
     if(!name){status.textContent="Enter your name.";return}
     if(!phoneRE.test(phone)){status.textContent="Enter a valid 10-digit mobile number.";return}
-    if(!validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
-    // Fire the insert immediately and never make the popup wait for the response.
-    // The public enquiry endpoint already records the row; Manager can read it from Supabase.
-    const body=JSON.stringify({name,phone,email:email||null,message:message||null,source:"website",status:"New"});
+    if(email && !validSiteEmail(email)){status.textContent="Enter a valid email address.";return}
+    const payload={name,phone,email:email||null,message:message||null,source:"website",status:"New"};
     const request=fetch(SUPABASE_URL+"/rest/v1/enquiries",{
       method:"POST",
-      headers:{
-        "apikey":SUPABASE_PUBLISHABLE_KEY,
-        "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,
-        "Content-Type":"application/json",
-        "Prefer":"return=minimal"
-      },
-      body,
-      keepalive:true
+      headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify(payload),keepalive:true
     }).catch(()=>{});
-    // Close synchronously; the network request continues in the background.
     status.textContent="Enquiry sent. We will contact you shortly.";
     e.currentTarget.reset();
-    btn.disabled=false;
     close();
     void request;
   });
