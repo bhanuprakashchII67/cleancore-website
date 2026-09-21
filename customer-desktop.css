@@ -334,3 +334,67 @@ header{isolation:isolate!important}
     background:#7be1d9!important;
   }
 }
+
+
+/* ===== NAV v4.43 — centered minimalist reset ===== */
+@media (min-width:801px){
+  header nav .navlinks{
+    position:absolute!important;
+    left:50%!important;
+    top:50%!important;
+    transform:translate(-50%,-50%)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:30px!important;
+    width:max-content!important;
+    max-width:none!important;
+    min-height:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  header nav .navlinks a,
+  header nav .navlinks a:hover,
+  header nav .navlinks a:focus,
+  header nav .navlinks a:active,
+  header nav .navlinks a:visited{
+    position:relative!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:44px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:#526170!important;
+    font-family:Inter,Arial,sans-serif!important;
+    font-size:14px!important;
+    font-weight:700!important;
+    letter-spacing:0!important;
+    transition:color .18s ease!important;
+  }
+  header nav .navlinks a:hover{
+    color:#0b1f33!important;
+    transform:none!important;
+  }
+  header nav .navlinks a:first-child{
+    color:#0b1f33!important;
+  }
+  header nav .navlinks a:first-child:after{
+    content:""!important;
+    position:absolute!important;
+    left:50%!important;
+    bottom:1px!important;
+    width:20px!important;
+    height:2px!important;
+    border-radius:99px!important;
+    background:#16a69a!important;
+    transform:translateX(-50%)!important;
+  }
+}
