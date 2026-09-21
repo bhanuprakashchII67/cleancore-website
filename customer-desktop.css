@@ -659,3 +659,123 @@ header{isolation:isolate!important}
     outline-offset:2px!important;
   }
 }
+
+/* ===== CUSTOMER ACTIONS v4.60 — TRUE MODERN COMPACT UI ===== */
+@media (min-width:801px){
+  header nav .nav-user-actions{
+    gap:5px!important;
+    align-items:center!important;
+  }
+
+  header nav .customer-nav-action{
+    position:relative!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    height:36px!important;
+    min-height:36px!important;
+    padding:0 10px!important;
+    border:1px solid #e4eaee!important;
+    border-radius:9px!important;
+    background:rgba(255,255,255,.96)!important;
+    color:#183046!important;
+    box-shadow:0 2px 7px rgba(11,31,51,.035)!important;
+    transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease!important;
+  }
+
+  header nav .customer-nav-action:hover{
+    transform:translateY(-1px)!important;
+    border-color:#cbd9df!important;
+    background:#f8fbfc!important;
+    box-shadow:0 6px 14px rgba(11,31,51,.07)!important;
+  }
+
+  header nav .customer-nav-action .customer-face,
+  header nav .customer-nav-action .customer-cart-icon{
+    width:16px!important;
+    height:16px!important;
+    min-width:16px!important;
+    flex:0 0 16px!important;
+    display:grid!important;
+    place-items:center!important;
+    color:#456075!important;
+  }
+
+  header nav .customer-nav-action .customer-face svg,
+  header nav .customer-nav-action .customer-cart-icon svg{
+    width:15px!important;
+    height:15px!important;
+    stroke-width:1.75!important;
+  }
+
+  header nav .customer-nav-action .customer-action-label{
+    display:inline!important;
+    font-size:12px!important;
+    font-weight:800!important;
+    line-height:1!important;
+    letter-spacing:-.05px!important;
+    white-space:nowrap!important;
+  }
+
+  header nav .nav-user-actions .account-nav-action{
+    min-width:122px!important;
+  }
+
+  header nav .nav-user-actions .cart-nav-action{
+    min-width:72px!important;
+  }
+
+  header nav .navcta{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:142px!important;
+    height:36px!important;
+    min-height:36px!important;
+    padding:0 13px!important;
+    border:0!important;
+    border-radius:9px!important;
+    background:linear-gradient(180deg,#122b43,#0b1f33)!important;
+    color:#fff!important;
+    box-shadow:0 5px 12px rgba(11,31,51,.10)!important;
+    font-size:12px!important;
+    font-weight:850!important;
+    line-height:1!important;
+    transition:transform .16s ease,box-shadow .16s ease,background .16s ease!important;
+  }
+
+  header nav .navcta:hover{
+    transform:translateY(-1px)!important;
+    background:linear-gradient(180deg,#173853,#0e2941)!important;
+    box-shadow:0 8px 16px rgba(11,31,51,.15)!important;
+  }
+
+  header nav .navcta:focus-visible,
+  header nav .customer-nav-action:focus-visible{
+    outline:2px solid rgba(20,184,166,.24)!important;
+    outline-offset:2px!important;
+  }
+}
+
+/* Mid-size desktop: keep the controls compact rather than shrinking typography excessively. */
+@media (min-width:801px) and (max-width:1100px){
+  header nav .customer-nav-action{
+    height:34px!important;
+    min-height:34px!important;
+    padding:0 8px!important;
+    gap:5px!important;
+  }
+  header nav .customer-nav-action .customer-action-label{font-size:11px!important}
+  header nav .customer-nav-action .customer-face,
+  header nav .customer-nav-action .customer-cart-icon{
+    width:15px!important;height:15px!important;min-width:15px!important;flex-basis:15px!important;
+  }
+  header nav .customer-nav-action .customer-face svg,
+  header nav .customer-nav-action .customer-cart-icon svg{
+    width:14px!important;height:14px!important;
+  }
+  header nav .nav-user-actions .account-nav-action{min-width:110px!important}
+  header nav .nav-user-actions .cart-nav-action{min-width:66px!important}
+  header nav .navcta{width:132px!important;height:34px!important;min-height:34px!important;font-size:11px!important}
+}
