@@ -135,7 +135,7 @@ h1{font-weight:800!important;letter-spacing:-2.8px!important}
   const URL="https://rwfamxkfqslorxcryjrp.supabase.co";
   const KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
   const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
-  fetch(URL+"/rest/v1/website_products?select=id,name,image_urls,mrp,selling_price,unit&active=eq.true&limit=100",{cache:"default",headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+  fetch(URL+"/rest/v1/website_products?select=id,name,image_urls,mrp,selling_price,unit,stock&active=eq.true&limit=100",{cache:"default",headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
    .then(r=>r.ok?r.json():Promise.reject(new Error("Product API request failed")))
    .then(rows=>{
       document.querySelectorAll(".product[data-product]").forEach(card=>{
@@ -144,7 +144,22 @@ h1{font-weight:800!important;letter-spacing:-2.8px!important}
         const urls=Array.isArray(p.image_urls)?p.image_urls.filter(Boolean):[];
         if(urls[0]){box.innerHTML="";const img=document.createElement("img");img.src=urls[0];img.alt=name;img.loading="lazy";img.decoding="async";box.appendChild(img);}
         if(price)price.innerHTML=money(p.selling_price)+" <small>/ "+(p.unit||"5 Litre Can")+"</small>";
-        card.querySelector(".order-now")?.addEventListener("click",()=>{try{localStorage.setItem("cleancore_cart",JSON.stringify([{product_id:p.id,name:p.name,unit:p.unit,price:Number(p.selling_price||0),quantity:1}]));}catch(e){} window.location.href="checkout.html";});
+        const orderBtn=card.querySelector(".order-now");
+        const inStock=Number(p.stock||0)>0;
+        if(orderBtn){
+          orderBtn.disabled=!inStock;
+          orderBtn.textContent=inStock?"Add to Cart":"Out of stock";
+          orderBtn.classList.toggle("btn-primary",inStock);
+          orderBtn.classList.toggle("btn-secondary",!inStock);
+          orderBtn.setAttribute("aria-disabled",inStock?"false":"true");
+        }
+        card.classList.toggle("product-out-of-stock",!inStock);
+        if(!inStock){
+          const badge=document.createElement("div"); badge.className="stock-badge"; badge.textContent="OUT OF STOCK";
+          card.querySelector(".product-body")?.prepend(badge);
+        } else {
+          orderBtn?.addEventListener("click",()=>{try{localStorage.setItem("cleancore_cart",JSON.stringify([{product_id:p.id,name:p.name,unit:p.unit,price:Number(p.selling_price||0),quantity:1}]));}catch(e){} window.location.href="checkout.html";});
+        }
       });
    }).catch(err=>console.error(err));
 
@@ -153,4 +168,4 @@ h1{font-weight:800!important;letter-spacing:-2.8px!important}
 })();
 </script>
 <style>@media(max-width:900px){.navlinks.open{display:flex;position:absolute;left:4%;right:4%;top:68px;flex-direction:column;gap:4px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 44px rgba(11,31,51,.14)}.navlinks.open a{padding:12px 13px}}</style>
-</body></html>
+<style id="cc-home-stock-status">.product-out-of-stock{position:relative}.product-out-of-stock .stock-badge{display:inline-block;align-self:flex-start;margin:10px 20px 0;padding:5px 8px;border-radius:6px;background:#fff0f0;color:#b42318;font-size:10px;font-weight:800;letter-spacing:.7px}.product-out-of-stock .order-now{cursor:not-allowed;opacity:.72}.product-out-of-stock .order-now:disabled{pointer-events:none}</style></body></html>
