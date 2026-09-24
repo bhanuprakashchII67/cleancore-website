@@ -74,50 +74,48 @@
   function orderError(message){ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(message||"Please try again.")+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);}
   function downloadInvoice(invoice,items){
     const JsPDF=window.jspdf?.jsPDF;
-    if(!JsPDF){alert("Invoice PDF service did not load. Please refresh and try again.");return;}
-    const doc=new JsPDF({unit:"mm",format:"a4"}),margin=18;
-    let y=20;
-    const invNo=String(invoice.invoice_no||"Invoice");
-    const customer=String(invoice.customer_name||"");
-    const delivery=String(invoice.delivery_address||"").replace(/\\s*\\|\\s*/g,", ");
+    if(!JsPDF){throw new Error("Invoice PDF service did not load. Please refresh and try again.");}
+    const doc=new JsPDF({unit:"mm",format:"a4"}),margin=16,right=194;
+    let y=18;
     const money2=v=>"₹"+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-    doc.setFontSize(20);doc.setFont(undefined,"bold");doc.text("CleanCore Chemical & Cleaning",margin,y);y+=9;
-    doc.setFontSize(10);doc.setFont(undefined,"normal");doc.text("TAX INVOICE",margin,y);y+=8;
-    doc.line(margin,y,192,y);y+=9;
-    doc.setFontSize(11);doc.setFont(undefined,"bold");doc.text("Invoice No.",margin,y);doc.setFont(undefined,"normal");doc.text(invNo,75,y);y+=6;
-    doc.text("Invoice date",margin,y);doc.text(new Date(invoice.created_at).toLocaleString("en-IN"),75,y);y+=6;
-    doc.text("Document type",margin,y);doc.text(String(invoice.document_type||"SALE"),75,y);y+=10;
-    doc.setFont(undefined,"bold");doc.text("Bill To",margin,y);y+=6;doc.setFont(undefined,"normal");
-    if(customer){doc.text(customer.slice(0,90),margin,y);y+=5;}
-    if(invoice.customer_phone){doc.text("Phone: "+String(invoice.customer_phone),margin,y);y+=5;}
-    if(invoice.customer_email){doc.text("Email: "+String(invoice.customer_email),margin,y);y+=5;}
-    if(delivery){doc.text("Delivery: "+delivery.slice(0,100),margin,y);y+=5;}
-    y+=5;doc.setFont(undefined,"bold");doc.text("Items",margin,y);y+=7;
+    const textWrap=(txt,x,maxWidth,lineGap=5)=>{const lines=doc.splitTextToSize(String(txt||""),maxWidth);doc.text(lines,x,y);y+=lines.length*lineGap;return lines;};
+    const invNo=String(invoice.invoice_no||"Invoice");
+    doc.setFontSize(19);doc.setFont(undefined,"bold");doc.text("CleanCore Chemical & Cleaning",margin,y);y+=8;
+    doc.setFontSize(10);doc.setFont(undefined,"normal");doc.text("TAX INVOICE",margin,y);y+=7;
+    doc.line(margin,y,right,y);y+=9;
+    doc.setFontSize(10.5);doc.setFont(undefined,"bold");doc.text("Invoice No.",margin,y);doc.setFont(undefined,"normal");doc.text(invNo,62,y);y+=5.5;
+    doc.text("Invoice date",margin,y);doc.text(new Date(invoice.created_at).toLocaleString("en-IN"),62,y);y+=5.5;
+    doc.text("Document type",margin,y);doc.text(String(invoice.document_type||"SALE"),62,y);y+=9;
+    doc.setFont(undefined,"bold");doc.text("Bill To",margin,y);y+=5.5;doc.setFont(undefined,"normal");
+    if(invoice.customer_name){textWrap(invoice.customer_name,margin,178);}
+    if(invoice.customer_phone){textWrap("Phone: "+invoice.customer_phone,margin,178);}
+    if(invoice.customer_email){textWrap("Email: "+invoice.customer_email,margin,178);}
+    const delivery=String(invoice.delivery_address||"").replace(/\s*\|\s*/g,", ");
+    if(delivery)textWrap("Delivery: "+delivery,margin,178);
+    y+=4;
+    doc.setFont(undefined,"bold");doc.text("Items",margin,y);y+=6;
     items.forEach((item,index)=>{
-      if(y>265){doc.addPage();y=20;}
-      doc.setFont(undefined,"bold");doc.text(String(index+1)+". "+String(item.product_name||"Product"),margin,y);
-      doc.setFont(undefined,"normal");y+=5;
-      doc.text((item.unit||"")+" × "+String(item.qty??"")+" @ "+money2(item.unit_price),margin+5,y);
-      doc.text(money2(item.line_total),155,y);y+=7;
+      if(y>260){doc.addPage();y=18;}
+      doc.setFont(undefined,"bold");
+      const nameLines=doc.splitTextToSize((index+1)+". "+String(item.product_name||"Product"),105);
+      doc.text(nameLines,margin,y);y+=nameLines.length*5;
+      doc.setFont(undefined,"normal");
+      doc.text(String(item.unit||"")+" × "+String(item.qty??"")+" @ "+money2(item.unit_price),margin+7,y);
+      doc.text(money2(item.line_total),right,y,{align:"right"});y+=7;
     });
-    y+=2;doc.line(margin,y,192,y);y+=8;
-    [["Subtotal",invoice.subtotal],["Discount",invoice.discount],["CGST",invoice.cgst_amount],["SGST",invoice.sgst_amount],["IGST",invoice.igst_amount],["Total",invoice.total]].forEach(([label,value])=>{
+    y+=1;doc.line(margin,y,right,y);y+=7;
+    const totals=[["Subtotal",invoice.subtotal],["Discount",invoice.discount],["CGST",invoice.cgst_amount],["SGST",invoice.sgst_amount],["IGST",invoice.igst_amount],["Total",invoice.total]];
+    totals.forEach(([label,value])=>{
       if(label==="Discount"&&!Number(value||0))return;
-      if(!Number(value||0)&&["CGST","SGST","IGST"].includes(label))return;
-      doc.setFont(undefined,label==="Total"?"bold":"normal");doc.text(label,120,y);doc.text(money2(value),155,y);y+=7;
+      if(["CGST","SGST","IGST"].includes(label)&&!Number(value||0))return;
+      doc.setFont(undefined,label==="Total"?"bold":"normal");
+      doc.text(label,142,y);doc.text(money2(value),right,y,{align:"right"});y+=6.5;
     });
-    y+=2;doc.setFont(undefined,"normal");doc.text("Payment status: "+String(invoice.payment_status||"Unpaid"),margin,y);y+=6;
+    y+=2;doc.setFont(undefined,"normal");doc.text("Payment status: "+String(invoice.payment_status||"Unpaid"),margin,y);y+=5.5;
     doc.text("Bill status: "+String(invoice.bill_status||"Draft"),margin,y);
     const filename=invNo.replace(/[^a-zA-Z0-9_-]/g,"_")+".pdf";
-    const blob=doc.output("blob");
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.href=url;
-    a.download=filename;
-    a.rel="noopener";
-    a.style.display="none";
-    document.body.appendChild(a);
-    a.click();
+    const blob=doc.output("blob"),url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download=filename;a.rel="noopener";a.style.display="none";document.body.appendChild(a);a.click();
     setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1500);
   }
   async function showOrderDetails(order,button){try{button.disabled=true;button.textContent="Loading…";const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",order.id).order("created_at");if(res.error)throw res.error;ordersBox.querySelectorAll(".account-order-details").forEach(x=>x.remove());const lines=(res.data||[]).map(item=>'<div class="account-order-detail-line"><span>'+esc(item.product_name)+'</span><span>'+esc(item.unit||"")+' × '+esc(item.qty??"—")+' @ '+money(item.unit_price)+' = '+money(item.line_total)+'</span></div>').join("");const d=document.createElement("div");d.className="account-order-details";d.innerHTML='<div><b>Order details</b></div>'+lines+'<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(order.subtotal)+'</b></div><div class="account-order-detail-total"><span>GST</span><b>'+money(order.gst_amount)+'</b></div><div class="account-order-detail-total"><span>Total</span><b>'+money(order.total)+'</b></div><div class="account-order-detail-note"><span>Note</span><span>'+esc(order.notes||"No note")+'</span></div>';button.closest(".account-order")?.insertAdjacentElement("afterend",d);button.textContent="Hide details";button.dataset.open="1";}catch(err){orderError(err?.message);}finally{button.disabled=false;}}
