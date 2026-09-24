@@ -24,12 +24,9 @@
 <section class="checkout-card auth-page-card">
 <div class="eyebrow">Customer account</div>
 <h1>Welcome back</h1>
-<p class="cc-muted">Log in with your email address or mobile number and password.</p>
+<p class="cc-muted">Log in with your mobile number and password.</p>
 <form id="loginForm" novalidate>
-<div class="login-method-note">Use either your registered mobile number or email address.</div>
 <label>Mobile number <span class="field-optional">or</span><input id="loginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number (India +91)"></label>
-<div class="login-or"><span>OR</span></div>
-<label>Email ID<input id="loginEmail" type="email" autocomplete="email" placeholder="your@email.com"></label>
 <label>Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
 <div class="forgot-wrap"><button id="forgotToggle" type="button">Forgot password?</button></div>
 <div id="forgotPanel" class="forgot-panel" aria-hidden="true"><h2>Reset your password.</h2><p>Enter the email address saved on your CleanCore account. We’ll send a secure reset link.</p><div id="forgotForm"><label>Email address<input id="forgotEmail" type="text" autocomplete="email" placeholder="you@example.com" required></label><div class="forgot-actions"><button id="forgotCancel" class="btn btn-secondary" type="button">Cancel</button><button id="forgotSend" class="btn btn-primary" type="button">Send reset link</button></div><p id="forgotStatus" class="cc-status" aria-live="polite"></p></div></div>
@@ -79,18 +76,16 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const status=document.getElementById("loginStatus"),btn=document.getElementById("loginButton");
   const phone=normalize(document.getElementById("loginPhone").value);
-  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
   const password=document.getElementById("loginPassword").value;
-  if(!phone&&!email){status.textContent="Enter your mobile number or email address.";return;}
+  if(!phone){status.textContent="Enter your mobile number.";return;}
   if(phone&&!validPhone(phone)){status.textContent="Enter a valid 10-digit mobile number.";return;}
-  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent="Enter a valid email ID.";return;}
   if(!password){status.textContent="Enter your password.";return;}
   btn.disabled=true;status.textContent="Logging in…";
   try{
     const response=await fetch(CUSTOMER_SUPABASE_URL+"/functions/v1/customer-auth",{
       method:"POST",
       headers:{"Content-Type":"application/json","apikey":CUSTOMER_SUPABASE_KEY,"Authorization":"Bearer "+CUSTOMER_SUPABASE_KEY},
-      body:JSON.stringify({action:"login",identifier:phone,email,password,source:getSource()})
+      body:JSON.stringify({action:"login",identifier:phone,password,source:getSource()})
     });
     const raw=await response.text();let data=null;
     try{data=raw?JSON.parse(raw):null}catch(_){}
