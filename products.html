@@ -452,4 +452,43 @@ html body .hero + section{
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+</script><script id="cc-catalog-live-images-20260925">
+(function(){
+  var URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+  var KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+  function load(){
+    var xhr=new XMLHttpRequest();
+    xhr.open("GET",URL+"/rest/v1/website_products?select=seo_slug,image_urls&active=eq.true&limit=100",true);
+    xhr.setRequestHeader("apikey",KEY);
+    xhr.setRequestHeader("Authorization","Bearer "+KEY);
+    xhr.timeout=8000;
+    xhr.onload=function(){
+      if(xhr.status<200||xhr.status>=300)return;
+      try{
+        var rows=JSON.parse(xhr.responseText)||[],bySlug={};
+        rows.forEach(function(p){
+          var urls=Array.isArray(p.image_urls)?p.image_urls.filter(Boolean):[];
+          if(p.seo_slug&&urls.length)bySlug[p.seo_slug]=urls[0];
+        });
+        document.querySelectorAll(".product-link[data-product-url]").forEach(function(card){
+          var href=card.getAttribute("data-product-url")||"",m=href.match(/[?&]slug=([^&]+)/);
+          if(!m)return;
+          var url=bySlug[decodeURIComponent(m[1])];
+          if(!url)return;
+          var old=card.querySelector(".prod-img");
+          if(!old)return;
+          var img=document.createElement("img");
+          img.className="prod-img";
+          img.src=url;
+          img.alt=old.getAttribute("aria-label")||card.querySelector("h3")?.textContent?.trim()||"CleanCore product";
+          img.loading="lazy";
+          img.decoding="async";
+          old.replaceWith(img);
+        });
+      }catch(e){}
+    };
+    xhr.send();
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",load);else load();
+})();
 </script></body></html>
