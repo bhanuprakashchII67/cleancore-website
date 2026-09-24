@@ -853,6 +853,7 @@ document.addEventListener("error",e=>{
   const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const fine=window.matchMedia&&window.matchMedia("(pointer:fine)").matches;
   if(reduce||!fine)return;
+  if(document.body.classList.contains("auth-flat"))return;
   const selector=".product,.box,.contact-card,.request-form,.checkout-card,.checkout-notice,.hero-card,.home-range,.home-account-actions,.home-catalog-cta,.home-proof-item";
   let last=null;
   const reset=el=>{
