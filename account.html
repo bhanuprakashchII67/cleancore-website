@@ -57,14 +57,22 @@
   const orderError=m=>{ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(m||"Please try again.")+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);};
   let db, user, customer, orders=[];
   function renderCustomer(){
-    details.innerHTML=
-      '<div class="account-detail"><b>Full name</b><span>'+esc(customer.name||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Mobile</b><span>'+esc(customer.phone||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Email</b><span>'+esc(customer.email||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Alternate mobile</b><span>'+esc(customer.alternate_phone||"Not added")+'</span></div>'+
-      '<div class="account-detail"><b>Business</b><span>'+esc(customer.business_name||"Not added")+'</span></div>'+
-      '<div class="account-detail account-address-detail"><b>Delivery address</b><span class="account-address-summary">'+
-      ([customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).map(esc).join(", ")||esc(customer.delivery_address||"Not added"))+'</span></div>';
+    const rows=[
+      ["Full name",customer.name],
+      ["Mobile",customer.phone],
+      ["Email",customer.email],
+      ["Alternate mobile",customer.alternate_phone],
+      ["Business",customer.business_name]
+    ];
+    const address=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address;
+    rows.push(["Delivery address",address]);
+    details.innerHTML=rows.map(([label,value])=>{
+      const v=String(value||"Not added");
+      return '<div class="account-detail" style="display:block!important;visibility:visible!important;opacity:1!important;padding:13px 0;border-bottom:1px solid #dfe8eb"><b style="display:block!important;color:#0b1f33;font-size:13px;margin-bottom:3px">'+esc(label)+'</b><span style="display:block!important;color:#647585;font-size:14px;line-height:1.5;white-space:normal">'+esc(v)+'</span></div>';
+    }).join("");
+    details.style.display="block";
+    details.style.visibility="visible";
+    details.style.opacity="1";
   }
   function closeEdit(){editWrap.classList.add("hidden");editWrap.innerHTML="";editButton.classList.remove("hidden");editButton.hidden=false;}
   function openEdit(){
