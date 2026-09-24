@@ -170,7 +170,7 @@ h1{font-weight:800!important;letter-spacing:-2.8px!important}
       const raw=localStorage.getItem("cleancore-customer-auth");
       const session=raw?JSON.parse(raw):null;
       const loggedIn=!!(session?.access_token && session?.user?.id);
-      accountLink.href=loggedIn?"account.html?v=account-nav-v2":"customer-login.html";
+      accountLink.href=loggedIn?"account-v4.html?v=2":"customer-login.html";
       accountLink.setAttribute("aria-label",loggedIn?"My Account":"Login");
       const label=accountLink.querySelector(".customer-action-label");
       if(label)label.textContent=loggedIn?"My Account":"Login";
