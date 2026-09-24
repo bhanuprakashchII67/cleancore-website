@@ -196,7 +196,7 @@ function validSiteEmail(v){const email=String(v||"").trim();return !email||/^[^\
 async function loadPublicProducts(){
   if(!siteDb)return;
   const {data,error}=await siteDb.from("website_products")
-    .select("id,name,unit,selling_price,description,additional_details,image_urls,video_urls,active,stock,seo_title,seo_description,seo_keywords,seo_slug")
+    .select("id,name,unit,mrp,selling_price,description,additional_details,image_urls,video_urls,active,stock,seo_title,seo_description,seo_keywords,seo_slug")
     .eq("active",true).order("name");
   if(error||!Array.isArray(data)||!data.length)return;
   publicProducts=data;
@@ -207,7 +207,7 @@ async function loadPublicProducts(){
       const art=img
         ? '<div class="imgbox"><img class="prod-img" src="'+escSite(img)+'" alt="'+escSite(p.name)+'"></div>'
         : '<div class="imgbox product-placeholder"><div>'+escSite(String(p.name||"").trim().charAt(0).toUpperCase())+'</div></div>';
-      const priceMarkup=location.pathname.toLowerCase().includes("products.html")?'<div class="price">'+siteMoney(p.selling_price)+' <small>/ '+escSite(p.unit)+'</small></div>':"";
+      const priceMarkup=location.pathname.toLowerCase().includes("products.html")?'<div class="price"><span class="cc-mrp">MRP '+siteMoney(p.mrp)+'</span><strong>'+siteMoney(p.selling_price)+'</strong> <small>/ '+escSite(p.unit)+'</small></div>':"";
       const inStock=Number(p.stock||0)>0; const stockMarkup=inStock?'':'<div class="stock-out">Out of stock</div>'; const buttonMarkup=inStock?'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button>':'<button type="button" class="btn btn-secondary order-now" data-product-id="'+escSite(p.id)+'" disabled>Out of stock</button>'; const slug=p.seo_slug||String(p.name||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); const detailUrl="product.html?slug="+encodeURIComponent(slug); return '<article class="product product-link cc-reference-card" data-product-url="'+escSite(detailUrl)+'" tabindex="0" role="link">'+art+'<div class="product-body"><span class="tag">'+escSite(p.unit||"5 Litre Can")+'</span><h3><a class="product-title-link" href="'+detailUrl+'">'+escSite(p.name)+'</a></h3><p>'+escSite(p.description||"Cleaning product for professional business use.")+'</p>'+priceMarkup+(inStock?'':'<div class="cc-reference-stock">OUT OF STOCK</div>')+(inStock?'<button type="button" class="btn btn-primary order-now" data-product-id="'+escSite(p.id)+'">Add to Cart</button>':'<button type="button" class="btn btn-secondary order-now cc-reference-disabled" data-product-id="'+escSite(p.id)+'" disabled>Out of stock</button>')+'</div></article>';
     }).join("");
   });
