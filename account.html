@@ -1,20 +1,14 @@
 <!doctype html>
 <html lang="en">
-<head><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg"><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg">
+<head><link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="logo.svg">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Account | CleanCore</title>
 <link rel="stylesheet" href="style.css?v=1.51">
-<link rel="stylesheet" href="desktop.css?v=4.30" media="(min-width: 801px)">
-<link rel="stylesheet" href="mobile.css?v=2.11" media="(max-width: 800px)">
-
+<link rel="stylesheet" href="desktop.css?v=4.30" media="(min-width:801px)">
+<link rel="stylesheet" href="mobile.css?v=2.11" media="(max-width:800px)">
 <script src="error-monitor.js?v=3.80"></script>
 <link rel="stylesheet" href="customer-desktop.css?v=4.41" media="(min-width:801px)">
 <link rel="stylesheet" href="customer-mobile.css?v=2.12" media="(max-width:800px)">
-<style id="cc-account-details-force-v2">
-#accountDetails{display:block!important;visibility:visible!important;opacity:1!important;min-height:1px!important}
-#accountDetails .account-detail{display:block!important;visibility:visible!important;opacity:1!important}
-#accountDetails .account-detail b,#accountDetails .account-detail span{display:block!important;visibility:visible!important}
-</style>
 </head>
 <body class="checkout-page account-page-compact">
 <header><div class="container"><nav>
@@ -25,12 +19,12 @@
 <a class="navcta" href="contact.html">Request a Quote</a>
 </nav></div></header>
 <main class="checkout-main"><div class="container">
-<div id="accountLoginNotice" class="checkout-notice hidden"><h2>Please log in</h2><p>Login to view your CleanCore account and orders.</p><a class="btn btn-primary" href="customer-login.html">Login</a></div>
+<div id="accountLoginNotice" class="checkout-notice hidden"><h2>Please log in</h2><p>Login to view your CleanCore account and orders.</p><a class="btn btn-primary" href="customer-login.html?next=account.html">Login</a></div>
 <div id="accountContent" class="hidden">
 <div class="checkout-title"><div class="eyebrow">Customer account</div><h1>My Account</h1><p>Your saved details and order history.</p></div>
 <div class="account-grid">
 <section class="checkout-card">
-<div class="checkout-card-head account-head"><span>1</span><div><h2>Customer details</h2><p>Saved for faster checkout.</p></div><button class="account-edit-button" id="accountEditToggle" type="button" aria-label="Edit customer details"><span aria-hidden="true">✎</span><span class="account-edit-label">Edit</span></button></div>
+<div class="checkout-card-head account-head"><span>1</span><div><h2>Customer details</h2><p>Saved for faster checkout.</p></div><button class="account-edit-button" id="accountEditToggle" type="button"><span aria-hidden="true">✎</span><span class="account-edit-label">Edit</span></button></div>
 <div id="accountDetails"></div><div id="accountEditFormWrap" class="account-edit-form-wrap hidden"></div>
 <div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
 </section>
@@ -38,304 +32,253 @@
 <div class="checkout-card-head"><span>2</span><div><h2>My orders</h2><p>Your recent CleanCore website orders.</p></div></div>
 <div id="accountOrders"><div class="cc-loading">Loading orders…</div></div>
 </section>
-</div>
-</div>
-</div></main>
+</div></div></div></main>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
-  const notice=document.getElementById("accountLoginNotice"), content=document.getElementById("accountContent");
-  const details=document.getElementById("accountDetails"), ordersBox=document.getElementById("accountOrders");
-  const editButton=document.getElementById("accountEditToggle"), editWrap=document.getElementById("accountEditFormWrap");
-  const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
+  const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+  const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+  const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+    auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
+  });
+
+  const notice=document.getElementById("accountLoginNotice");
+  const content=document.getElementById("accountContent");
+  const details=document.getElementById("accountDetails");
+  const ordersBox=document.getElementById("accountOrders");
+  const editButton=document.getElementById("accountEditToggle");
+  const editWrap=document.getElementById("accountEditFormWrap");
+
   const esc=v=>String(v??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+  const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
   const phone=v=>String(v||"").replace(/\D/g,"").replace(/^91/,"").slice(-10);
   const emailOK=v=>!v||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  const showNotice=m=>{notice.classList.remove("hidden");notice.querySelector("p").textContent=m;content.classList.add("hidden");};
-  const setNotice=showNotice;
-  const orderError=m=>{ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(m||"Please try again.")+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);};
-  let db, user, customer, orders=[];
+
+  let user=null;
+  let customer=null;
+  let orders=[];
+
+  function setNotice(message){
+    notice.classList.remove("hidden");
+    content.classList.add("hidden");
+    const p=notice.querySelector("p");
+    if(p)p.textContent=message;
+  }
+
   function renderCustomer(){
+    const address=[
+      customer.delivery_shop_no,
+      customer.delivery_colony,
+      customer.delivery_city,
+      customer.delivery_state,
+      customer.delivery_pincode
+    ].filter(Boolean).join(", ") || customer.delivery_address || "Not added";
+
     const rows=[
       ["Full name",customer.name],
       ["Mobile",customer.phone],
       ["Email",customer.email],
       ["Alternate mobile",customer.alternate_phone],
-      ["Business",customer.business_name]
+      ["Business",customer.business_name],
+      ["Delivery address",address]
     ];
-    const address=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address;
-    rows.push(["Delivery address",address]);
-    details.innerHTML=rows.map(([label,value])=>{
-      const v=String(value||"Not added");
-      return '<div class="account-detail" style="display:block!important;visibility:visible!important;opacity:1!important;padding:13px 0;border-bottom:1px solid #dfe8eb"><b style="display:block!important;color:#0b1f33;font-size:13px;margin-bottom:3px">'+esc(label)+'</b><span style="display:block!important;color:#647585;font-size:14px;line-height:1.5;white-space:normal">'+esc(v)+'</span></div>';
-    }).join("");
-    details.style.display="block";
-    details.style.visibility="visible";
-    details.style.opacity="1";
+
+    details.innerHTML=rows.map(([label,value])=>
+      '<div class="account-detail" style="display:block;padding:13px 0;border-bottom:1px solid #dfe8eb">'+
+      '<b style="display:block;color:#0b1f33;font-size:13px;margin-bottom:3px">'+esc(label)+'</b>'+
+      '<span style="display:block;color:#647585;font-size:14px;line-height:1.5;white-space:normal;overflow-wrap:anywhere">'+esc(value||"Not added")+'</span>'+
+      '</div>'
+    ).join("");
   }
-  function closeEdit(){editWrap.classList.add("hidden");editWrap.innerHTML="";editButton.classList.remove("hidden");editButton.hidden=false;}
+
+  function orderError(message){
+    ordersBox.innerHTML=
+      '<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+
+      esc(message||"Please try again.")+
+      '<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';
+    document.getElementById("retryOrders")?.addEventListener("click",loadOrders);
+  }
+
+  async function loadOrders(){
+    ordersBox.innerHTML='<div class="cc-loading">Loading orders…</div>';
+    try{
+      // Customer ownership is enforced in Supabase RLS. Do not depend on a
+      // client-supplied customer id for security.
+      const res=await db.from("website_orders")
+        .select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount,gst_enabled,gst_percent,cgst_percent,cgst_amount,sgst_percent,sgst_amount,igst_percent,igst_amount,place_of_supply,customer_gstin")
+        .eq("customer_id",customer.id)
+        .order("created_at",{ascending:false});
+
+      if(res.error)throw res.error;
+      orders=Array.isArray(res.data)?res.data:[];
+
+      if(!orders.length){
+        ordersBox.innerHTML='<p class="cc-muted">No orders yet.</p>';
+        return;
+      }
+
+      ordersBox.innerHTML=orders.map(o=>
+        '<div class="account-order">'+
+          '<div><b>'+esc(o.order_no||"Order")+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div>'+
+          '<div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div>'+
+          '<div class="account-order-more">'+
+            '<button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button>'+
+          '</div>'+
+        '</div>'
+      ).join("");
+
+      ordersBox.querySelectorAll("[data-order-id]").forEach(button=>{
+        button.addEventListener("click",async()=>{
+          const order=orders.find(x=>x.id===button.dataset.orderId);
+          if(!order)return;
+          try{
+            const res=await db.from("website_order_items")
+              .select("product_name,unit,qty,unit_price,line_total,hsn_code")
+              .eq("order_id",order.id)
+              .order("created_at");
+            if(res.error)throw res.error;
+            const lines=(res.data||[]).map(item=>
+              '<div class="account-order-detail-line"><span>'+esc(item.product_name)+'</span><span>'+
+              esc(item.unit||"")+' × '+esc(item.qty??"—")+' @ '+money(item.unit_price)+' = '+money(item.line_total)+'</span></div>'
+            ).join("");
+            ordersBox.querySelectorAll(".account-order-details").forEach(x=>x.remove());
+            const d=document.createElement("div");
+            d.className="account-order-details";
+            d.innerHTML='<div><b>Order details</b></div>'+lines+
+              '<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(order.subtotal)+'</b></div>'+
+              '<div class="account-order-detail-total"><span>GST</span><b>'+money(order.gst_amount)+'</b></div>'+
+              '<div class="account-order-detail-total"><span>Total</span><b>'+money(order.total)+'</b></div>'+
+              '<div class="account-order-detail-note"><span>Note</span><span>'+esc(order.notes||"No note")+'</span></div>';
+            button.closest(".account-order")?.insertAdjacentElement("afterend",d);
+          }catch(err){orderError(err?.message);}
+        });
+      });
+    }catch(err){
+      console.error("ACCOUNT ORDERS ERROR",err);
+      orderError(err?.message);
+    }
+  }
+
+  function closeEdit(){
+    editWrap.classList.add("hidden");
+    editWrap.innerHTML="";
+    editButton.classList.remove("hidden");
+    editButton.hidden=false;
+  }
+
   function openEdit(){
     const val=k=>customer[k]||"";
-    editWrap.innerHTML='<form id="accountInlineForm" class="account-inline-form">'+
+    editWrap.innerHTML=
+      '<form id="accountInlineForm" class="account-inline-form">'+
       '<div class="account-inline-grid">'+
       '<label>Full name<input id="editName" value="'+esc(val("name"))+'" required></label>'+
       '<label>Mobile<input id="editPhone" inputmode="numeric" maxlength="10" value="'+esc(val("phone"))+'" required></label>'+
       '<label>Email<input id="editEmail" type="email" value="'+esc(val("email"))+'"></label>'+
       '<label>Alternate mobile<input id="editAlternate" inputmode="numeric" maxlength="10" value="'+esc(val("alternate_phone"))+'"></label></div>'+
       '<div class="account-inline-section"><div class="account-inline-title">Delivery address</div><div class="account-inline-grid address-grid">'+
-      '<label>Pincode (Required) *<input id="editPincode" inputmode="numeric" maxlength="6" value="'+esc(val("delivery_pincode"))+'" required></label>'+
-      '<label>State (Required) *<input id="editState" value="'+esc(val("delivery_state"))+'" required></label>'+
-      '<label>City (Required) *<input id="editCity" value="'+esc(val("delivery_city"))+'" required></label>'+
-      '<label class="full-row">House No., Building Name (Required) *<input id="editHouse" value="'+esc(val("delivery_shop_no"))+'" required></label>'+
-      '<label class="full-row">Road name, Area, Colony (Required) *<input id="editColony" value="'+esc(val("delivery_colony")||val("delivery_address"))+'" required></label>'+
-      '</div></div><div class="account-inline-actions"><button class="btn btn-primary" type="submit">Save changes</button><button class="btn btn-secondary" id="editCancel" type="button">Cancel</button></div></form>';
-    editWrap.classList.remove("hidden"); editButton.classList.add("hidden"); editButton.hidden=true;
+      '<label>Pincode *<input id="editPincode" inputmode="numeric" maxlength="6" value="'+esc(val("delivery_pincode"))+'" required></label>'+
+      '<label>State *<input id="editState" value="'+esc(val("delivery_state"))+'" required></label>'+
+      '<label>City *<input id="editCity" value="'+esc(val("delivery_city"))+'" required></label>'+
+      '<label class="full-row">House No., Building Name *<input id="editHouse" value="'+esc(val("delivery_shop_no"))+'" required></label>'+
+      '<label class="full-row">Road name, Area, Colony *<input id="editColony" value="'+esc(val("delivery_colony")||val("delivery_address"))+'" required></label>'+
+      '</div></div>'+
+      '<div class="account-inline-actions"><button class="btn btn-primary" type="submit">Save changes</button><button class="btn btn-secondary" id="editCancel" type="button">Cancel</button></div>'+
+      '</form>';
+
+    editWrap.classList.remove("hidden");
+    editButton.classList.add("hidden");
+    editButton.hidden=true;
+
     document.getElementById("editCancel").onclick=closeEdit;
-    document.getElementById("accountInlineForm").onsubmit=async e=>{
+    document.getElementById("accountInlineForm").onsubmit=async(e)=>{
       e.preventDefault();
-      const name=document.getElementById("editName").value.trim(), p=phone(document.getElementById("editPhone").value);
-      const em=document.getElementById("editEmail").value.trim(), alt=phone(document.getElementById("editAlternate").value);
-      const pin=document.getElementById("editPincode").value.trim(), state=document.getElementById("editState").value.trim(), city=document.getElementById("editCity").value.trim(), house=document.getElementById("editHouse").value.trim(), colony=document.getElementById("editColony").value.trim();
-      if(!name||!/^[6-9]\d{9}$/.test(p)||!emailOK(em)||(alt&&!/^[6-9]\d{9}$/.test(alt))||!/^[0-9]{6}$/.test(pin)||!state||!city||!house||!colony){alert("Please complete all required fields correctly.");return;}
-      const btn=e.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent="Saving…";
+      const name=document.getElementById("editName").value.trim();
+      const p=phone(document.getElementById("editPhone").value);
+      const em=document.getElementById("editEmail").value.trim();
+      const alt=phone(document.getElementById("editAlternate").value);
+      const pin=document.getElementById("editPincode").value.trim();
+      const state=document.getElementById("editState").value.trim();
+      const city=document.getElementById("editCity").value.trim();
+      const house=document.getElementById("editHouse").value.trim();
+      const colony=document.getElementById("editColony").value.trim();
+
+      if(!name||!/^[6-9]\d{9}$/.test(p)||!emailOK(em)||(alt&&!/^[6-9]\d{9}$/.test(alt))||
+         !/^\d{6}$/.test(pin)||!state||!city||!house||!colony){
+        alert("Please complete all required fields correctly.");
+        return;
+      }
+
+      const btn=e.target.querySelector('button[type="submit"]');
+      btn.disabled=true;btn.textContent="Saving…";
       try{
-        const next={name,phone:p,email:em||null,alternate_phone:alt||null,delivery_address:[house,colony,city,state,pin].join(" | "),delivery_shop_no:house,delivery_colony:colony,delivery_city:city,delivery_state:state,delivery_pincode:pin};
-        const res=await db.from("customers").update(next).eq("id",customer.id).eq("auth_user_id",user.id).select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source").single();
+        const res=await db.from("customers").update({
+          name,phone:p,email:em||null,alternate_phone:alt||null,
+          delivery_address:[house,colony,city,state,pin].join(" | "),
+          delivery_shop_no:house,delivery_colony:colony,delivery_city:city,
+          delivery_state:state,delivery_pincode:pin
+        }).eq("id",customer.id).eq("auth_user_id",user.id)
+          .select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source")
+          .single();
         if(res.error)throw res.error;
         customer=res.data;renderCustomer();closeEdit();
-      }catch(err){btn.disabled=false;btn.textContent="Save changes";alert(err?.message||"Unable to save your details.");}
+      }catch(err){
+        btn.disabled=false;btn.textContent="Save changes";
+        alert(err?.message||"Unable to save your details.");
+      }
     };
   }
-  function pdfSafe(v){return String(v??"").replace(/[\u0000-\u001F]/g," ").trim();}
-  function pdfMoney(v){return "Rs. "+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
-  let invoiceFontReady=false;
-  async function loadInvoiceFonts(){
-    if(invoiceFontReady)return true;
-    if(window.__ccInvoiceFontPromise)return window.__ccInvoiceFontPromise;
-    window.__ccInvoiceFontPromise=(async()=>{
-      const toBinary=async url=>{
-        const res=await fetch(url,{cache:"force-cache"});
-        if(!res.ok)throw new Error("Invoice font load failed ("+res.status+").");
-        const bytes=new Uint8Array(await res.arrayBuffer());
-        let out="";
-        const chunk=0x8000;
-        for(let i=0;i<bytes.length;i+=chunk)out+=String.fromCharCode(...bytes.subarray(i,i+chunk));
-        return out;
-      };
-      const [regular,bold]=await Promise.all([
-        toBinary("fonts/Roboto-Regular.ttf?v=2"),
-        toBinary("fonts/Roboto-Bold.ttf?v=2")
-      ]);
-      window.__jspdfInvoiceFonts=window.__jspdfInvoiceFonts||{};
-      window.__jspdfInvoiceFonts.regular=regular;
-      window.__jspdfInvoiceFonts.bold=bold;
-      invoiceFontReady=true;
-      return true;
-    })().catch(err=>{
-      window.__ccInvoiceFontPromise=null;
-      console.warn("Invoice font load failed; using PDF fallback font.",err);
-      return false;
-    });
-    return window.__ccInvoiceFontPromise;
-  }
-  function registerInvoiceFonts(doc){
-    if(!window.__jspdfInvoiceFonts?.regular)return false;
+
+  async function start(){
     try{
-      doc.addFileToVFS("CleanCoreRoboto-Regular.ttf",window.__jspdfInvoiceFonts.regular);
-      doc.addFileToVFS("CleanCoreRoboto-Bold.ttf",window.__jspdfInvoiceFonts.bold);
-      doc.addFont("CleanCoreRoboto-Regular.ttf","CleanCoreRoboto","normal");
-      doc.addFont("CleanCoreRoboto-Bold.ttf","CleanCoreRoboto","bold");
-      doc.setFont("CleanCoreRoboto","normal");
-      return true;
-    }catch(err){console.warn("Invoice font registration failed.",err);return false;}
-  }
-  function invoiceText(doc,value,x,y,size=8,bold=false,maxWidth=0){
-    doc.setFont(invoiceFontReady&&window.__jspdfInvoiceFonts?.regular?"CleanCoreRoboto": "helvetica",invoiceFontReady&&window.__jspdfInvoiceFonts?.regular?(bold?"bold":"normal"):(bold?"bold":"normal"));
-    doc.setFontSize(size);
-    const s=pdfSafe(value);
-    if(maxWidth){const lines=doc.splitTextToSize(s,maxWidth);doc.text(lines,x,y);return y+(lines.length*4.1);}
-    doc.text(s,x,y);return y;
-  }
-  function invoiceRightText(doc,value,x,y,size=8,bold=false){\n    doc.setFont(invoiceFontReady&&window.__jspdfInvoiceFonts?.regular?"CleanCoreRoboto":"helvetica",bold?"bold":"normal");\n    doc.setFontSize(size);\n    doc.text(pdfSafe(value),x,y,{align:"right"});\n  }\n  function invoiceLine(doc,x1,y,x2){doc.setDrawColor(205);doc.line(x1,y,x2,y);}
-  async function downloadBillPdf(order,items,button){
-    if(!window.jspdf?.jsPDF){alert("Bill PDF service did not load. Please refresh the page and try again.");return;}
-    const old=button?.textContent;if(button){button.disabled=true;button.textContent="Preparing bill…";}
-    try{
-      const {jsPDF}=window.jspdf;
-      await loadInvoiceFonts();
-      const doc=new jsPDF({unit:"mm",format:"a4"});
-      const invoiceCustomFont=registerInvoiceFonts(doc);
-      if(!invoiceCustomFont)throw new Error("Invoice font could not be embedded. Please reload the account page and try again.");
-      const L=16,R=194,W=178;
-      let y=14;
-      const business=pdfSafe(customer.business_name||"");
-      const hasBusiness=business&&business.toLowerCase()!=="na";
-      const gstin=pdfSafe(order.customer_gstin||customer.gstin||"");
-      const hasGst=Number(order.gst_amount||0)>0;
-
-      // CleanCore invoice header — matches the requested bill layout.
-      invoiceText(doc,"CleanCore Chemical & Cleaning",L,y,18,true);
-      invoiceText(doc,"Manufacturing & Supply of Cleaning Chemicals",L,y+6,8.5,true);
-      invoiceText(doc,"Srinivasa Colony, Manikonda, Hyderabad, Telangana, India",L,y+11,8);
-      invoiceText(doc,"Phone: +91 91827 25773",L,y+15.5,8);
-      invoiceText(doc,"Email: cleancorehyd@gmail.com",L,y+20,8);
-      invoiceRightText(doc,hasGst?"TAX INVOICE":"INVOICE",R,y+3,15,true);
-      invoiceRightText(doc,"ORIGINAL FOR RECIPIENT",R,y+8,6.8,false);
-      y+=27; invoiceLine(doc,L,y,R); y+=8;
-
-      invoiceText(doc,"Bill No:",L,y,8.5,true);
-      invoiceText(doc,order.invoice_no||order.order_no||"—",L+22,y,8.5);
-      invoiceText(doc,"Date:",L,y+5,8.5,true);
-      invoiceText(doc,order.created_at?new Date(order.created_at).toLocaleDateString("en-IN"):"—",L+22,y+5,8.5);
-      invoiceText(doc,"Place of Supply:",140,y,8.2,true);
-      invoiceText(doc,order.place_of_supply||"Telangana",171,y,8.2,false,23);
-      y+=12;
-
-      // Bill From / Bill To.
-      const top=y,split=104;
-      doc.setFillColor(246,249,249);doc.roundedRect(L,top,W,45,2,2,"F");
-      doc.setDrawColor(220);doc.line(split,top,split,top+45);
-      invoiceText(doc,"BILL FROM",L+4,top+7,8,true);
-      invoiceText(doc,"CleanCore Chemical & Cleaning",L+4,top+13,9,true);
-      invoiceText(doc,"Srinivasa Colony, Manikonda, Hyderabad, Telangana, India",L+4,top+18,7.2,false,78);
-      invoiceText(doc,"Phone: +91 91827 25773",L+4,top+26,7.2);
-      invoiceText(doc,"Email: cleancorehyd@gmail.com",L+4,top+31,7.2);
-
-      invoiceText(doc,"BILL TO",split+5,top+7,8,true);
-      let cy=top+13;
-      if(hasBusiness){invoiceText(doc,"Business Name:",split+5,cy,7.3,true);invoiceText(doc,business,split+34,cy,7.3,false,56);cy+=5;}
-      invoiceText(doc,"Customer Name:",split+5,cy,7.3,true);invoiceText(doc,customer.name||"Customer",split+35,cy,7.3,false,55);cy+=5;
-      invoiceText(doc,"Phone:",split+5,cy,7.3,true);invoiceText(doc,customer.phone||"—",split+20,cy,7.3);cy+=5;
-      if(customer.email){invoiceText(doc,"Email:",split+5,cy,7.3,true);invoiceText(doc,customer.email,split+20,cy,7.3,false,69);cy+=5;}
-      if(hasGst){invoiceText(doc,"GSTIN:",split+5,cy,7.3,true);invoiceText(doc,gstin||"NA",split+20,cy,7.3,false,69);}
-
-      y=top+52;
-      const billAddr=pdfSafe(customer.billing_address||"");
-      const delivery=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||pdfSafe(customer.delivery_address||"—");
-      invoiceText(doc,"Billing Address:",L,y,7.4,true);
-      y=Math.max(y+4.5,invoiceText(doc,billAddr||"—",L+30,y,7.4,false,156)+1);
-      invoiceText(doc,"Delivery Address:",L,y,7.4,true);
-      y=invoiceText(doc,delivery,L+31,y,7.4,false,155)+5;
-
-      // Product table.
-      const rows=Array.isArray(items)?items:[];
-      let tableY=y+2;
-      const drawTableHeader=()=>{
-        doc.setFillColor(236,240,242);doc.rect(L,tableY-5,W,9,"F");
-        invoiceText(doc,"S.No.",L+2,tableY,7.2,true);
-        invoiceText(doc,"Product / Service",L+20,tableY,7.2,true);
-        invoiceText(doc,"HSN / SAC",L+86,tableY,7.2,true);
-        invoiceText(doc,"Qty",L+112,tableY,7.2,true);
-        invoiceText(doc,"Rate",L+132,tableY,7.2,true);
-        invoiceText(doc,"Taxable Value",L+151,tableY,7.2,true);
-      };
-      drawTableHeader();
-      y=tableY+6;
-
-      rows.forEach((it,idx)=>{
-        const name=pdfSafe(it.product_name||"Cleaning product");
-        const lines=doc.splitTextToSize(name,62);
-        const rowH=Math.max(8,lines.length*4.2);
-        if(y+rowH>250){
-          doc.addPage();y=18;invoiceText(doc,"CleanCore Chemical & Cleaning — INVOICE (Continued)",L,y,10,true);
-          tableY=y+9;drawTableHeader();y=tableY+6;
-        }
-        invoiceText(doc,String(idx+1),L+2,y,7.4);
-        doc.setFont("helvetica","normal");doc.setFontSize(7.4);doc.text(lines,L+20,y);
-        invoiceText(doc,it.hsn_code||"—",L+86,y,7.1);
-        invoiceText(doc,String(it.qty??"—"),L+112,y,7.1);
-        invoiceText(doc,pdfMoney(it.unit_price),L+132,y,7.1);
-        invoiceText(doc,pdfMoney(it.line_total),L+151,y,7.1);
-        y+=rowH;
-        invoiceLine(doc,L,y-2,R);y+=3;
-      });
-
-      if(!rows.length){
-        invoiceText(doc,"Item details unavailable",L+20,y,8);
-        y+=9;invoiceLine(doc,L,y-2,R);
+      if(!window.supabase?.createClient){
+        setNotice("Customer account service did not load. Please refresh the page.");
+        return;
       }
 
-      if(y>238){doc.addPage();y=18;}
-      y+=5;
-      const summaryLeft=124;
-      invoiceText(doc,"Subtotal",summaryLeft,y,8);
-      invoiceRightText(doc,pdfMoney(order.subtotal),R-2,y,8);y+=5;
-      if(hasGst){
-        if(Number(order.cgst_amount||0)>0){invoiceText(doc,"CGST ("+Number(order.cgst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.cgst_amount),R-2,y,8);y+=5;}
-        if(Number(order.sgst_amount||0)>0){invoiceText(doc,"SGST ("+Number(order.sgst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.sgst_amount),R-2,y,8);y+=5;}
-        if(Number(order.igst_amount||0)>0){invoiceText(doc,"IGST ("+Number(order.igst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.igst_amount),R-2,y,8);y+=5;}
-        if(!Number(order.cgst_amount||0)&&!Number(order.sgst_amount||0)&&!Number(order.igst_amount||0)){invoiceText(doc,"GST ("+Number(order.gst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.gst_amount),R-2,y,8);y+=5;}
+      const {data,error}=await db.auth.getSession();
+      if(error)throw error;
+
+      user=data?.session?.user||null;
+      if(!user){
+        setNotice("Login to view your CleanCore account and orders.");
+        return;
       }
-      invoiceLine(doc,summaryLeft,y-2,R);y+=4;
-      doc.setFillColor(248,250,251);doc.roundedRect(summaryLeft,y-4,R-summaryLeft,13,2,2,"F");
-      invoiceText(doc,"TOTAL",summaryLeft+5,y+4,10,true);
-      invoiceRightText(doc,pdfMoney(order.total),R-5,y+4,10,true);
-      y+=19;
 
-      invoiceText(doc,"Terms & Conditions",L,y,8.5,true);y+=5;
-      invoiceText(doc,"Goods once sold will not be taken back unless agreed in writing.",L,y,7.2,false,W);y+=4.3;
-      invoiceText(doc,"Payment as per agreed business terms.",L,y,7.2,false,W);y+=4.3;
-      invoiceText(doc,"Subject to Hyderabad, Telangana jurisdiction.",L,y,7.2,false,W);y+=8;
-      invoiceRightText(doc,"For CleanCore Chemical & Cleaning",R-4,y,7.5);
-      invoiceRightText(doc,"Authorised Signature",R-4,y+10,7.5,true);
-      invoiceText(doc,"Thank you for your business.",L,y+10,7.5);
+      // Fetch the customer by the authenticated user's id. The matching RLS
+      // policy now uses (select auth.uid()), avoiding per-row policy re-evaluation
+      // and avoiding the previous policy/function recursion problem.
+      const customerRes=await db.from("customers")
+        .select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source")
+        .eq("auth_user_id",user.id)
+        .is("archived_at",null)
+        .maybeSingle();
 
-      const safeNo=String(order.invoice_no||order.order_no||"bill").replace(/[^a-zA-Z0-9_-]/g,"-");
-      const fileName="CleanCore-Invoice-"+safeNo+".pdf";
-      // v4: force a direct browser download; never open an invoice/print page.
-      const blob=doc.output("blob");
-      const url=URL.createObjectURL(blob);
-      const link=document.createElement("a");link.href=url;link.download=fileName;link.style.display="none";
-      document.body.appendChild(link);link.click();link.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      if(customerRes.error)throw customerRes.error;
+      if(!customerRes.data){
+        setNotice("Your customer profile was not found for this login.");
+        return;
+      }
+
+      customer=customerRes.data;
+      content.classList.remove("hidden");
+      notice.classList.add("hidden");
+      renderCustomer();
+      await loadOrders();
+      editButton.onclick=openEdit;
     }catch(err){
-      console.error("BILL PDF ERROR",err);
-      alert(err?.message||"Unable to generate the bill PDF.");
-    }finally{
-      if(button){button.disabled=false;button.textContent=old||"Download Invoice PDF";}
+      console.error("ACCOUNT LOAD ERROR",err);
+      setNotice(err?.message||"Unable to load your account.");
     }
   }
 
-async function loadOrders(){
-    ordersBox.innerHTML='<div class="cc-loading">Loading orders…</div>';
-    try{
-      const res=await db.from("website_orders").select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount,gst_enabled,gst_percent,cgst_percent,cgst_amount,sgst_percent,sgst_amount,igst_percent,igst_amount,place_of_supply,customer_gstin").eq("customer_id",customer.id).order("created_at",{ascending:false});
-      if(res.error)throw res.error; orders=Array.isArray(res.data)?res.data:[];
-      if(!orders.length){ordersBox.innerHTML='<p class="cc-muted">No orders yet.</p>';return;}
-      ordersBox.innerHTML=orders.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no)+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div><div class="account-order-more"><button type="button" class="link" data-order-id="'+esc(o.id)+'">View details</button><button type="button" class="link account-bill-button" data-bill-id="'+esc(o.id)+'">Download Invoice PDF</button></div></div>').join("");
-      ordersBox.querySelectorAll("[data-order-id]").forEach(b=>b.onclick=async()=>{
-        const o=orders.find(x=>x.id===b.dataset.orderId);if(!o)return;
-        try{const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",o.id).order("created_at");if(res.error)throw res.error;
-          const lines=(res.data||[]).map(i=>'<div class="account-order-detail-line"><span>'+esc(i.product_name)+'</span><span>'+esc(i.unit)+' × '+esc(i.qty)+' @ '+money(i.unit_price)+' = '+money(i.line_total)+'</span></div>').join("");
-          ordersBox.querySelectorAll(".account-order-details").forEach(x=>x.remove());const d=document.createElement("div");d.className="account-order-details";d.dataset.for=o.id;
-          d.innerHTML='<div><b>Order details</b></div>'+lines+'<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(o.subtotal)+'</b></div><div class="account-order-detail-total"><span>GST</span><b>'+money(o.gst_amount)+'</b></div><div class="account-order-detail-total"><span>Total</span><b>'+money(o.total)+'</b></div><div class="account-order-detail-note"><span>Note</span><span>'+esc(o.notes||"No note")+'</span></div>';b.closest(".account-order").insertAdjacentElement("afterend",d);
-        }catch(err){orderError(err?.message);}
-      });
-      ordersBox.querySelectorAll("[data-bill-id]").forEach(b=>b.onclick=async()=>{
-        const o=orders.find(x=>x.id===b.dataset.billId);if(!o)return;
-        const old=b.textContent;b.disabled=true;b.textContent="Preparing…";
-        try{const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",o.id).order("created_at");if(res.error)throw res.error;await downloadBillPdf(o,res.data||[],b);}
-        catch(err){console.error(err);alert(err?.message||"Unable to prepare bill PDF.");b.disabled=false;b.textContent=old;}
-      });
-    }catch(err){console.error(err);orderError(err?.message);}
-  }
-  async function start(){
-    try{
-      if(!window.supabase?.createClient){setNotice("Customer account service did not load. Please refresh the page.");return;}
-      db=window.supabase.createClient("https://rwfamxkfqslorxcryjrp.supabase.co","sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",{auth:{storageKey:"cleancore-customer-auth",storage:window.localStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-      const s=await db.auth.getSession();if(s.error)throw s.error;user=s.data?.session?.user;
-      if(!user){setNotice("Login to view your CleanCore account and orders.");return;}
-      const r=await db.from("customers").select("id,name,phone,email,alternate_phone,business_name,gstin,delivery_address,billing_address,delivery_shop_no,delivery_colony,delivery_city,delivery_state,delivery_pincode,customer_source").eq("auth_user_id",user.id).is("archived_at",null).maybeSingle();
-      if(r.error)throw r.error;if(!r.data){setNotice("Your customer profile was not found for this login.");return;}
-      customer=r.data;content.classList.remove("hidden");renderCustomer();await loadOrders();
-      editButton.onclick=openEdit;
-    }catch(err){console.error("ACCOUNT LOAD ERROR",err);setNotice(err?.message||"Unable to load your account.");}
-  }
-  document.getElementById("accountLogout")?.addEventListener("click",async()=>{if(db)await db.auth.signOut({scope:"local"});location.href="index.html";});
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
+  document.getElementById("accountLogout")?.addEventListener("click",async()=>{
+    try{await db.auth.signOut({scope:"local"});}finally{location.href="customer-login.html";}
+  });
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});
+  else start();
 })();
 </script>
-
-<script src="website.js?v=4.01"></script></body>
-</html>
+<script src="website.js?v=4.05"></script>
+</body></html>
