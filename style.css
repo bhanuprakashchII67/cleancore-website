@@ -1511,4 +1511,17 @@ body.auth-flat .auth-page-card .btn:active{
 body.auth-flat .auth-page-card *{
   animation:none!important;
 }
+body.auth-flat:before,
+body.auth-flat:after{
+  display:none!important;
+  animation:none!important;
+  content:none!important;
+}
+body.auth-flat header,
+body.auth-flat header nav,
+body.auth-flat .customer-nav-action,
+body.auth-flat .auth-switch,
+body.auth-flat .auth-page-card{
+  transition:none!important;
+}
 
