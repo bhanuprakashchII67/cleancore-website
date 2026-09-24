@@ -72,51 +72,77 @@
   function setNotice(message){notice.classList.remove("hidden");content.classList.add("hidden");const p=notice.querySelector("p");if(p)p.textContent=message;}
   function renderCustomer(){const address=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address||"Not added";const rows=[["Full name",customer.name],["Mobile",customer.phone],["Email",customer.email],["Alternate mobile",customer.alternate_phone],["Business",customer.business_name],["Delivery address",address]];details.innerHTML=rows.map(([label,value])=>'<div class="account-detail" style="display:block;padding:13px 0;border-bottom:1px solid #dfe8eb"><b style="display:block;color:#0b1f33;font-size:13px;margin-bottom:3px">'+esc(label)+'</b><span style="display:block;color:#647585;font-size:14px;line-height:1.5;white-space:normal;overflow-wrap:anywhere">'+esc(value||"Not added")+'</span></div>').join("");}
   function orderError(message){ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(message||"Please try again.")+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);}
-  function downloadInvoice(invoice,items){
+  async function downloadInvoice(invoice,items){
     const JsPDF=window.jspdf?.jsPDF;
-    if(!JsPDF){throw new Error("Invoice PDF service did not load. Please refresh and try again.");}
-    const doc=new JsPDF({unit:"mm",format:"a4"}),margin=16,right=194;
-    let y=18;
-    const money2=v=>"₹"+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-    const textWrap=(txt,x,maxWidth,lineGap=5)=>{const lines=doc.splitTextToSize(String(txt||""),maxWidth);doc.text(lines,x,y);y+=lines.length*lineGap;return lines;};
-    const invNo=String(invoice.invoice_no||"Invoice");
-    doc.setFontSize(19);doc.setFont(undefined,"bold");doc.text("CleanCore Chemical & Cleaning",margin,y);y+=8;
-    doc.setFontSize(10);doc.setFont(undefined,"normal");doc.text("TAX INVOICE",margin,y);y+=7;
-    doc.line(margin,y,right,y);y+=9;
-    doc.setFontSize(10.5);doc.setFont(undefined,"bold");doc.text("Invoice No.",margin,y);doc.setFont(undefined,"normal");doc.text(invNo,62,y);y+=5.5;
-    doc.text("Invoice date",margin,y);doc.text(new Date(invoice.created_at).toLocaleString("en-IN"),62,y);y+=5.5;
-    doc.text("Document type",margin,y);doc.text(String(invoice.document_type||"SALE"),62,y);y+=9;
-    doc.setFont(undefined,"bold");doc.text("Bill To",margin,y);y+=5.5;doc.setFont(undefined,"normal");
-    if(invoice.customer_name){textWrap(invoice.customer_name,margin,178);}
-    if(invoice.customer_phone){textWrap("Phone: "+invoice.customer_phone,margin,178);}
-    if(invoice.customer_email){textWrap("Email: "+invoice.customer_email,margin,178);}
-    const delivery=String(invoice.delivery_address||"").replace(/\s*\|\s*/g,", ");
-    if(delivery)textWrap("Delivery: "+delivery,margin,178);
-    y+=4;
-    doc.setFont(undefined,"bold");doc.text("Items",margin,y);y+=6;
-    items.forEach((item,index)=>{
-      if(y>260){doc.addPage();y=18;}
-      doc.setFont(undefined,"bold");
-      const nameLines=doc.splitTextToSize((index+1)+". "+String(item.product_name||"Product"),105);
-      doc.text(nameLines,margin,y);y+=nameLines.length*5;
-      doc.setFont(undefined,"normal");
-      doc.text(String(item.unit||"")+" × "+String(item.qty??"")+" @ "+money2(item.unit_price),margin+7,y);
-      doc.text(money2(item.line_total),right,y,{align:"right"});y+=7;
-    });
-    y+=1;doc.line(margin,y,right,y);y+=7;
-    const totals=[["Subtotal",invoice.subtotal],["Discount",invoice.discount],["CGST",invoice.cgst_amount],["SGST",invoice.sgst_amount],["IGST",invoice.igst_amount],["Total",invoice.total]];
-    totals.forEach(([label,value])=>{
-      if(label==="Discount"&&!Number(value||0))return;
-      if(["CGST","SGST","IGST"].includes(label)&&!Number(value||0))return;
-      doc.setFont(undefined,label==="Total"?"bold":"normal");
-      doc.text(label,142,y);doc.text(money2(value),right,y,{align:"right"});y+=6.5;
-    });
-    y+=2;doc.setFont(undefined,"normal");doc.text("Payment status: "+String(invoice.payment_status||"Unpaid"),margin,y);y+=5.5;
-    doc.text("Bill status: "+String(invoice.bill_status||"Draft"),margin,y);
-    const filename=invNo.replace(/[^a-zA-Z0-9_-]/g,"_")+".pdf";
-    const blob=doc.output("blob"),url=URL.createObjectURL(blob),a=document.createElement("a");
-    a.href=url;a.download=filename;a.rel="noopener";a.style.display="none";document.body.appendChild(a);a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1500);
+    if(!JsPDF)throw new Error("Invoice PDF service did not load. Please refresh and try again.");
+    const escapeHtml=v=>String(v??"").replace(/[&<>\"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[ch]));
+    const moneyExact=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
+    const isQuotation=String(invoice.document_type||"SALE").toUpperCase()==="QUOTATION";
+    const documentLabel=isQuotation?"QUOTATION INVOICE":(Number(invoice.gst_amount||0)>0?"TAX INVOICE":"INVOICE");
+    const intra=Number(invoice.cgst_amount||0)>0||Number(invoice.sgst_amount||0)>0;
+    const cgst=Number(invoice.cgst_amount||0),sgst=Number(invoice.sgst_amount||0),igst=Number(invoice.igst_amount||0);
+    const taxRows=intra
+      ? "<tr><td colspan='5' class='tax-label'>CGST ("+Number(invoice.cgst_percent||0)+"%)</td><td>"+moneyExact(cgst)+"</td></tr><tr><td colspan='5' class='tax-label'>SGST ("+Number(invoice.sgst_percent||0)+"%)</td><td>"+moneyExact(sgst)+"</td></tr>"
+      : (igst>0?"<tr><td colspan='5' class='tax-label'>IGST ("+Number(invoice.igst_percent||0)+"%)</td><td>"+moneyExact(igst)+"</td></tr>":"");
+    const rows=(items||[]).map((it,n)=>"<tr><td>"+(n+1)+"</td><td>"+escapeHtml(it.product_name)+"</td><td>"+escapeHtml(it.hsn_code||"—")+"</td><td>"+it.qty+"</td><td>"+moneyExact(it.unit_price)+"</td><td>"+moneyExact(it.line_total)+"</td></tr>").join("");
+    const taxable=Number(invoice.subtotal||0)-Number(invoice.discount||0);
+    const date=new Date(invoice.created_at);
+    const billingAddress=invoice.billing_address||"—";
+    const deliveryAddress=invoice.delivery_address||"—";
+    const invGstin=String(invoice.gstin||"").trim();
+    const isGstBill=Number(invoice.gst_percent||0)>0||Number(invoice.gst_amount||0)>0;
+    const customerGstin=isGstBill?(invGstin&&invGstin.toLowerCase()!=="na"?invGstin:"NA"):"";
+    const businessName=String(invoice.customer_business||"").trim();
+    const hasBusiness=businessName&&businessName.toLowerCase()!=="na";
+    const metaStatus=isQuotation
+      ? "<b>Document Type:</b> Quotation Invoice"
+      : "<b>Place of Supply:</b> "+escapeHtml(invoice.place_of_supply||"Telangana");
+    const quoteNote=isQuotation
+      ? "<div class='quote-note'><b>QUOTATION ONLY — NOT A SALE / NOT A TAX INVOICE.</b><br>This document is a price quotation and does not record a sale, payment, or stock movement.</div>"
+      : "";
+    const terms=isQuotation
+      ? "<b>Quotation Terms</b><p>Prices are quoted for the listed items and quantities.<br>This quotation is subject to final confirmation before sale.</p>"
+      : "<b>Terms & Conditions</b><p>Goods once sold will not be taken back unless agreed in writing.<br>Payment as per agreed business terms.<br>Subject to Hyderabad, Telangana jurisdiction.</p>";
+    const footerMark=isQuotation?"FOR QUOTATION":"ORIGINAL FOR RECIPIENT";
+    const preview="<div class='invoice-preview'>"+
+      "<div class='inv-header'><div><img class='invoice-logo' src='https://cleancore01.github.io/cleancore-manager/logo.svg' alt='CleanCore logo'><div class='inv-brand'>CleanCore Chemical & Cleaning</div><div class='inv-sub'>Manufacturing & Supply of Cleaning Chemicals</div><div>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India, India</div><div>Phone: +91 91827 25773</div><div>Email: cleancorehyd@gmail.com</div></div><div class='inv-title'><b>"+documentLabel+"</b><span>"+footerMark+"</span></div></div>"+
+      "<div class='inv-meta'><div><b>Bill No:</b> "+escapeHtml(invoice.invoice_no)+"<br><b>Date:</b> "+date.toLocaleDateString("en-IN")+"</div><div>"+metaStatus+"</div></div>"+
+      "<div class='inv-parties'><div><b>BILL FROM</b><p><strong>CleanCore Chemical & Cleaning</strong><br>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India<br>Phone: +91 91827 25773<br>Email: cleancorehyd@gmail.com</p></div><div><b>BILL TO</b><p>"+(hasBusiness?"<b>Business Name:</b> "+escapeHtml(businessName)+"<br>":"")+(invoice.customer_name?"<b>Customer Name:</b> "+escapeHtml(invoice.customer_name)+"<br>":"")+"<b>Phone:</b> "+escapeHtml(invoice.customer_phone||"—")+"<br>"+(invoice.customer_email?"<b>Email:</b> "+escapeHtml(invoice.customer_email)+"<br>":"")+(isGstBill?"<b>GSTIN:</b> "+escapeHtml(customerGstin)+"<br>":"")+"<span class='invoice-address-label'><b>Billing Address:</b></span><br>"+escapeHtml(billingAddress)+"<br><span class='invoice-address-label'><b>Delivery Address:</b></span><br>"+escapeHtml(deliveryAddress)+"</p></div></div>"+
+      "<table class='invoice-items'><thead><tr><th>S.No.</th><th>Product / Service</th><th>HSN / SAC</th><th>Qty</th><th>Rate</th><th>Taxable Value</th></tr></thead><tbody>"+rows+
+      "<tr class='subtotal-row'><td colspan='5'>Subtotal</td><td>"+moneyExact(invoice.subtotal)+"</td></tr>"+(Number(invoice.discount||0)>0?"<tr><td colspan='5' class='tax-label'>Discount</td><td>- "+moneyExact(invoice.discount)+"</td></tr>":"")+"<tr><td colspan='5' class='tax-label'>Taxable Value</td><td>"+moneyExact(taxable)+"</td></tr>"+taxRows+
+      "<tr class='grand-total'><td colspan='5'>TOTAL</td><td>"+moneyExact(invoice.total)+"</td></tr></tbody></table>"+
+      quoteNote+
+      "<div class='amount-words'><b>Total in words:</b> "+escapeHtml(numberToWordsIndianExact(Number(invoice.total||0)))+" ONLY</div>"+
+      "<div class='inv-bottom'><div>"+terms+"</div><div class='signature'><span>For CleanCore Chemical & Cleaning</span><br><br><b>Authorised Signature</b></div></div>"+
+      "</div>";
+    const iframe=document.createElement("iframe");
+    iframe.style.position="fixed";iframe.style.left="-100000px";iframe.style.top="0";iframe.style.width="794px";iframe.style.height="1123px";iframe.style.border="0";iframe.setAttribute("aria-hidden","true");
+    document.body.appendChild(iframe);
+    try{
+      const idoc=iframe.contentDocument;
+      idoc.open();
+      idoc.write("<!doctype html><html><head><meta charset='utf-8'><link rel='stylesheet' href='https://cleancore01.github.io/cleancore-manager/style.css?v=3.8.60-product-popup'><style>html,body{margin:0;background:#fff}body{padding:0}.invoice-preview{display:block!important;max-width:none!important;width:100%!important;box-shadow:none!important}</style></head><body>"+preview+"</body></html>");
+      idoc.close();
+      await new Promise(resolve=>setTimeout(resolve,700));
+      const logo=iframe.contentDocument.querySelector(".invoice-logo");
+      if(logo&&logo.complete===false)await new Promise(resolve=>{logo.addEventListener("load",resolve,{once:true});logo.addEventListener("error",resolve,{once:true});setTimeout(resolve,1200);});
+      const host=iframe.contentDocument.querySelector(".invoice-preview");
+      if(!host)throw new Error("Manager invoice template could not be prepared.");
+      const pdf=new JsPDF({orientation:"portrait",unit:"pt",format:"a4",compress:true});
+      await pdf.html(host,{margin:[24,24,24,24],autoPaging:"text",html2canvas:{scale:1,useCORS:true,backgroundColor:"#ffffff"}});
+      const blob=pdf.output("blob");
+      const url=URL.createObjectURL(blob),a=document.createElement("a");
+      a.href=url;a.download="CleanCore-"+String(invoice.invoice_no||"invoice").replace(/[^a-zA-Z0-9_-]/g,"_")+".pdf";a.rel="noopener";a.style.display="none";
+      document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1500);
+    }finally{iframe.remove();}
+  }
+  function numberToWordsIndianExact(n){
+    n=Math.round(Number(n)||0);if(n===0)return "ZERO RUPEES";
+    const ones=["","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE","TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
+    const tens=["","","TWENTY","THIRTY","FORTY","FIFTY","SIXTY","SEVENTY","EIGHTY","NINETY"];
+    const two=x=>x<20?ones[x]:tens[Math.floor(x/10)]+(x%10?" "+ones[x%10]:"");
+    const part=(x,unit)=>x?two(x)+" "+unit+" ":"";
+    let s="";if(n>=10000000){s+=part(Math.floor(n/10000000),"CRORE");n%=10000000}if(n>=100000){s+=part(Math.floor(n/100000),"LAKH");n%=100000}if(n>=1000){s+=part(Math.floor(n/1000),"THOUSAND");n%=1000}if(n>=100){s+=part(Math.floor(n/100),"HUNDRED");n%=1000}if(n)s+=two(n);return s.trim()+" RUPEES";
   }
   async function showOrderDetails(order,button){try{button.disabled=true;button.textContent="Loading…";const res=await db.from("website_order_items").select("product_name,unit,qty,unit_price,line_total,hsn_code").eq("order_id",order.id).order("created_at");if(res.error)throw res.error;ordersBox.querySelectorAll(".account-order-details").forEach(x=>x.remove());const lines=(res.data||[]).map(item=>'<div class="account-order-detail-line"><span>'+esc(item.product_name)+'</span><span>'+esc(item.unit||"")+' × '+esc(item.qty??"—")+' @ '+money(item.unit_price)+' = '+money(item.line_total)+'</span></div>').join("");const d=document.createElement("div");d.className="account-order-details";d.innerHTML='<div><b>Order details</b></div>'+lines+'<div class="account-order-detail-total"><span>Subtotal</span><b>'+money(order.subtotal)+'</b></div><div class="account-order-detail-total"><span>GST</span><b>'+money(order.gst_amount)+'</b></div><div class="account-order-detail-total"><span>Total</span><b>'+money(order.total)+'</b></div><div class="account-order-detail-note"><span>Note</span><span>'+esc(order.notes||"No note")+'</span></div>';button.closest(".account-order")?.insertAdjacentElement("afterend",d);button.textContent="Hide details";button.dataset.open="1";}catch(err){orderError(err?.message);}finally{button.disabled=false;}}
   async function loadOrders(){ordersBox.innerHTML='<div class="cc-loading">Loading orders…</div>';try{const res=await db.from("website_orders").select("id,order_no,status,total,notes,created_at,invoice_no,invoice_id,subtotal,gst_amount,gst_enabled,gst_percent,cgst_percent,cgst_amount,sgst_percent,sgst_amount,igst_percent,igst_amount,place_of_supply,customer_gstin").eq("customer_id",customer.id).order("created_at",{ascending:false});if(res.error)throw res.error;orders=Array.isArray(res.data)?res.data:[];if(!orders.length){ordersBox.innerHTML='<p class="cc-muted">No orders yet.</p>';return;}ordersBox.innerHTML=orders.map(o=>'<div class="account-order"><div><b>'+esc(o.order_no||"Order")+'</b><span>'+esc(new Date(o.created_at).toLocaleString("en-IN"))+'</span></div><div><b>'+money(o.total)+'</b><span>'+esc(o.status||"New")+'</span></div><div class="account-order-more"><button type="button" class="link order-details-btn" data-order-id="'+esc(o.id)+'">See more</button><button type="button" class="link invoice-btn" data-invoice-id="'+esc(o.id)+'">Download Invoice PDF</button></div></div>').join("");ordersBox.querySelectorAll(".order-details-btn").forEach(button=>button.addEventListener("click",async()=>{const order=orders.find(x=>x.id===button.dataset.orderId);if(!order)return;if(button.dataset.open==="1"){button.closest(".account-order")?.nextElementSibling?.remove();button.dataset.open="0";button.textContent="See more";return;}await showOrderDetails(order,button);}));ordersBox.querySelectorAll(".invoice-btn").forEach(button=>button.addEventListener("click",async()=>{const order=orders.find(x=>x.id===button.dataset.invoiceId);if(!order)return;const old=button.textContent;button.disabled=true;button.textContent="Preparing…";try{if(!order.invoice_id){throw new Error("Manager invoice is not linked to this order yet.");}const invRes=await db.from("invoices").select("id,invoice_no,customer_name,customer_phone,customer_email,gstin,customer_business,billing_address,delivery_address,subtotal,discount,total,created_at,gst_percent,gst_amount,cgst_percent,cgst_amount,sgst_percent,sgst_amount,igst_percent,igst_amount,payment_status,paid_amount,due_amount,due_date,payment_method,place_of_supply,document_type,bill_status,delivery_status,source").eq("id",order.invoice_id).maybeSingle();if(invRes.error)throw invRes.error;if(!invRes.data)throw new Error("Manager invoice was not found.");const itemRes=await db.from("invoice_items").select("product_name,qty,unit_price,line_total,hsn_code").eq("invoice_id",order.invoice_id).order("created_at");if(itemRes.error)throw itemRes.error;downloadInvoice(invRes.data,itemRes.data||[]);}catch(err){console.error("CUSTOMER INVOICE ERROR",err);alert("Invoice download failed: "+(err?.message||"Unknown error"));}finally{button.disabled=false;button.textContent=old;}}));}catch(err){console.error("ACCOUNT ORDERS ERROR",err);orderError(err?.message);}}
