@@ -365,6 +365,19 @@ function injectCustomerUI(){
     a.className="customer-nav-action account-nav-action";
     a.setAttribute("aria-label",customerUser&&customerProfile?"My Account":"Login");
     a.innerHTML='<span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span><span class="customer-action-label">'+(customerUser&&customerProfile?"My Account":"Login")+'</span>';
+    a.addEventListener("click",async e=>{
+      e.preventDefault();
+      if(customerUser&&customerProfile){window.location.href="account.html?v=account-nav-v2";return;}
+      try{
+        const {data}=await siteDb?.auth?.getSession?.()||{data:null};
+        if(data?.session?.user){
+          customerUser=data.session.user;
+          await loadCustomerProfile();
+          if(customerUser&&customerProfile){window.location.href="account.html?v=account-nav-v2";return;}
+        }
+      }catch(_){}
+      window.location.href="customer-login.html";
+    });
     actions.appendChild(a);
   }
   if(!document.getElementById("ccCartLink")){
@@ -378,8 +391,24 @@ function syncMobileAccount(){
   const a=document.getElementById("ccMobileAccountLink");
   if(!a)return;
   const loggedIn=!!(customerUser&&customerProfile);
-  a.href=loggedIn?"account.html?v=3.80":"customer-login.html";
+  a.href=loggedIn?"account.html?v=account-nav-v2":"customer-login.html";
   a.setAttribute("aria-label",loggedIn?"My Account":"Login");
+  if(a.dataset.ccAccountBound!=="1"){
+    a.dataset.ccAccountBound="1";
+    a.addEventListener("click",async e=>{
+      e.preventDefault();
+      if(customerUser&&customerProfile){window.location.href="account.html?v=account-nav-v2";return;}
+      try{
+        const {data}=await siteDb?.auth?.getSession?.()||{data:null};
+        if(data?.session?.user){
+          customerUser=data.session.user;
+          await loadCustomerProfile();
+          if(customerUser&&customerProfile){window.location.href="account.html?v=account-nav-v2";return;}
+        }
+      }catch(_){}
+      window.location.href="customer-login.html";
+    });
+  }
   const label=a.querySelector(".cc-mobile-account-label");if(label)label.textContent=loggedIn?"Account":"Login";
 }
 function injectMobileBar(){
