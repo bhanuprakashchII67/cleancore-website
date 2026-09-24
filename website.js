@@ -362,7 +362,7 @@ function injectCustomerUI(){
     const existing=actions.querySelector(".account-nav-action");
     if(existing){
       existing.id="ccCustomerLink";
-      existing.href=customerUser&&customerProfile?"account-v3.html?v=1":"customer-login.html";
+      existing.href=customerUser&&customerProfile?"account-v4.html?v=1":"customer-login.html";
       existing.setAttribute("aria-label",customerUser&&customerProfile?"My Account":"Login");
       const existingLabel=existing.querySelector(".customer-action-label");
       if(existingLabel)existingLabel.textContent=customerUser&&customerProfile?"My Account":"Login";
@@ -375,13 +375,13 @@ function injectCustomerUI(){
     a.innerHTML='<span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span><span class="customer-action-label">'+(customerUser&&customerProfile?"My Account":"Login")+'</span>';
     a.addEventListener("click",async e=>{
       e.preventDefault();
-      if(customerUser&&customerProfile){window.location.href="account-v3.html?v=1";return;}
+      if(customerUser&&customerProfile){window.location.href="account-v4.html?v=1";return;}
       try{
         const {data}=await siteDb?.auth?.getSession?.()||{data:null};
         if(data?.session?.user){
           customerUser=data.session.user;
           await loadCustomerProfile();
-          if(customerUser&&customerProfile){window.location.href="account-v3.html?v=1";return;}
+          if(customerUser&&customerProfile){window.location.href="account-v4.html?v=1";return;}
         }
       }catch(_){}
       window.location.href="customer-login.html";
@@ -401,7 +401,7 @@ function injectCustomerUI(){
           await loadCustomerProfile();
         }
       }catch(_){}
-      window.location.href=(customerUser&&customerProfile)?"account-v3.html?v=1":"customer-login.html";
+      window.location.href=(customerUser&&customerProfile)?"account-v4.html?v=1":"customer-login.html";
     });
   }
   if(!document.getElementById("ccCartLink")){
@@ -415,19 +415,19 @@ function syncMobileAccount(){
   const a=document.getElementById("ccMobileAccountLink");
   if(!a)return;
   const loggedIn=!!(customerUser&&customerProfile);
-  a.href=loggedIn?"account-v3.html?v=1":"customer-login.html";
+  a.href=loggedIn?"account-v4.html?v=1":"customer-login.html";
   a.setAttribute("aria-label",loggedIn?"My Account":"Login");
   if(a.dataset.ccAccountBound!=="1"){
     a.dataset.ccAccountBound="1";
     a.addEventListener("click",async e=>{
       e.preventDefault();
-      if(customerUser&&customerProfile){window.location.href="account-v3.html?v=1";return;}
+      if(customerUser&&customerProfile){window.location.href="account-v4.html?v=1";return;}
       try{
         const {data}=await siteDb?.auth?.getSession?.()||{data:null};
         if(data?.session?.user){
           customerUser=data.session.user;
           await loadCustomerProfile();
-          if(customerUser&&customerProfile){window.location.href="account-v3.html?v=1";return;}
+          if(customerUser&&customerProfile){window.location.href="account-v4.html?v=1";return;}
         }
       }catch(_){}
       window.location.href="customer-login.html";
