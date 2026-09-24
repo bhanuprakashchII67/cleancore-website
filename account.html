@@ -144,7 +144,7 @@
     if(maxWidth){const lines=doc.splitTextToSize(s,maxWidth);doc.text(lines,x,y);return y+(lines.length*4.1);}
     doc.text(s,x,y);return y;
   }
-  function invoiceLine(doc,x1,y,x2){doc.setDrawColor(205);doc.line(x1,y,x2,y);}
+  function invoiceRightText(doc,value,x,y,size=8,bold=false){\n    doc.setFont(invoiceFontReady&&window.__jspdfInvoiceFonts?.regular?"CleanCoreRoboto":"helvetica",bold?"bold":"normal");\n    doc.setFontSize(size);\n    doc.text(pdfSafe(value),x,y,{align:"right"});\n  }\n  function invoiceLine(doc,x1,y,x2){doc.setDrawColor(205);doc.line(x1,y,x2,y);}
   async function downloadBillPdf(order,items,button){
     if(!window.jspdf?.jsPDF){alert("Bill PDF service did not load. Please refresh the page and try again.");return;}
     const old=button?.textContent;if(button){button.disabled=true;button.textContent="Preparing bill…";}
@@ -154,7 +154,7 @@
       const doc=new jsPDF({unit:"mm",format:"a4"});
       const invoiceCustomFont=registerInvoiceFonts(doc);
       if(!invoiceCustomFont)throw new Error("Invoice font could not be embedded. Please reload the account page and try again.");
-      const L=12,R=198,W=186;
+      const L=16,R=194,W=178;
       let y=14;
       const business=pdfSafe(customer.business_name||"");
       const hasBusiness=business&&business.toLowerCase()!=="na";
@@ -167,22 +167,22 @@
       invoiceText(doc,"Srinivasa Colony, Manikonda, Hyderabad, Telangana, India",L,y+11,8);
       invoiceText(doc,"Phone: +91 91827 25773",L,y+15.5,8);
       invoiceText(doc,"Email: cleancorehyd@gmail.com",L,y+20,8);
-      invoiceText(doc,hasGst?"TAX INVOICE":"INVOICE",R-32,y+3,14,true);
-      invoiceText(doc,"ORIGINAL FOR RECIPIENT",R-33,y+8,7);
+      invoiceRightText(doc,hasGst?"TAX INVOICE":"INVOICE",R,y+3,15,true);
+      invoiceRightText(doc,"ORIGINAL FOR RECIPIENT",R,y+8,6.8,false);
       y+=27; invoiceLine(doc,L,y,R); y+=8;
 
       invoiceText(doc,"Bill No:",L,y,8.5,true);
       invoiceText(doc,order.invoice_no||order.order_no||"—",L+22,y,8.5);
       invoiceText(doc,"Date:",L,y+5,8.5,true);
       invoiceText(doc,order.created_at?new Date(order.created_at).toLocaleDateString("en-IN"):"—",L+22,y+5,8.5);
-      invoiceText(doc,"Place of Supply:",R-58,y,8.5,true);
-      invoiceText(doc,order.place_of_supply||"Telangana",R,y,8.5);
+      invoiceText(doc,"Place of Supply:",140,y,8.2,true);
+      invoiceText(doc,order.place_of_supply||"Telangana",171,y,8.2,false,23);
       y+=12;
 
       // Bill From / Bill To.
-      const top=y,split=105;
-      doc.setFillColor(248,250,251);doc.roundedRect(L,top,W,42,2,2,"F");
-      doc.setDrawColor(220);doc.line(split,top,split,top+42);
+      const top=y,split=104;
+      doc.setFillColor(246,249,249);doc.roundedRect(L,top,W,45,2,2,"F");
+      doc.setDrawColor(220);doc.line(split,top,split,top+45);
       invoiceText(doc,"BILL FROM",L+4,top+7,8,true);
       invoiceText(doc,"CleanCore Chemical & Cleaning",L+4,top+13,9,true);
       invoiceText(doc,"Srinivasa Colony, Manikonda, Hyderabad, Telangana, India",L+4,top+18,7.2,false,78);
@@ -197,7 +197,7 @@
       if(customer.email){invoiceText(doc,"Email:",split+5,cy,7.3,true);invoiceText(doc,customer.email,split+20,cy,7.3,false,69);cy+=5;}
       if(hasGst){invoiceText(doc,"GSTIN:",split+5,cy,7.3,true);invoiceText(doc,gstin||"NA",split+20,cy,7.3,false,69);}
 
-      y=top+49;
+      y=top+52;
       const billAddr=pdfSafe(customer.billing_address||"");
       const delivery=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||pdfSafe(customer.delivery_address||"—");
       invoiceText(doc,"Billing Address:",L,y,7.4,true);
@@ -245,27 +245,27 @@
 
       if(y>238){doc.addPage();y=18;}
       y+=5;
-      const summaryLeft=130;
+      const summaryLeft=124;
       invoiceText(doc,"Subtotal",summaryLeft,y,8);
-      invoiceText(doc,pdfMoney(order.subtotal),R,y,8);y+=5;
+      invoiceRightText(doc,pdfMoney(order.subtotal),R-2,y,8);y+=5;
       if(hasGst){
-        if(Number(order.cgst_amount||0)>0){invoiceText(doc,"CGST ("+Number(order.cgst_percent||0)+"%)",summaryLeft,y,8);invoiceText(doc,pdfMoney(order.cgst_amount),R,y,8);y+=5;}
-        if(Number(order.sgst_amount||0)>0){invoiceText(doc,"SGST ("+Number(order.sgst_percent||0)+"%)",summaryLeft,y,8);invoiceText(doc,pdfMoney(order.sgst_amount),R,y,8);y+=5;}
-        if(Number(order.igst_amount||0)>0){invoiceText(doc,"IGST ("+Number(order.igst_percent||0)+"%)",summaryLeft,y,8);invoiceText(doc,pdfMoney(order.igst_amount),R,y,8);y+=5;}
-        if(!Number(order.cgst_amount||0)&&!Number(order.sgst_amount||0)&&!Number(order.igst_amount||0)){invoiceText(doc,"GST ("+Number(order.gst_percent||0)+"%)",summaryLeft,y,8);invoiceText(doc,pdfMoney(order.gst_amount),R,y,8);y+=5;}
+        if(Number(order.cgst_amount||0)>0){invoiceText(doc,"CGST ("+Number(order.cgst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.cgst_amount),R-2,y,8);y+=5;}
+        if(Number(order.sgst_amount||0)>0){invoiceText(doc,"SGST ("+Number(order.sgst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.sgst_amount),R-2,y,8);y+=5;}
+        if(Number(order.igst_amount||0)>0){invoiceText(doc,"IGST ("+Number(order.igst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.igst_amount),R-2,y,8);y+=5;}
+        if(!Number(order.cgst_amount||0)&&!Number(order.sgst_amount||0)&&!Number(order.igst_amount||0)){invoiceText(doc,"GST ("+Number(order.gst_percent||0)+"%)",summaryLeft,y,8);invoiceRightText(doc,pdfMoney(order.gst_amount),R-2,y,8);y+=5;}
       }
       invoiceLine(doc,summaryLeft,y-2,R);y+=4;
       doc.setFillColor(248,250,251);doc.roundedRect(summaryLeft,y-4,R-summaryLeft,13,2,2,"F");
       invoiceText(doc,"TOTAL",summaryLeft+5,y+4,10,true);
-      invoiceText(doc,pdfMoney(order.total),R-5,y+4,10,true);
+      invoiceRightText(doc,pdfMoney(order.total),R-5,y+4,10,true);
       y+=19;
 
       invoiceText(doc,"Terms & Conditions",L,y,8.5,true);y+=5;
       invoiceText(doc,"Goods once sold will not be taken back unless agreed in writing.",L,y,7.2,false,W);y+=4.3;
       invoiceText(doc,"Payment as per agreed business terms.",L,y,7.2,false,W);y+=4.3;
       invoiceText(doc,"Subject to Hyderabad, Telangana jurisdiction.",L,y,7.2,false,W);y+=8;
-      invoiceText(doc,"For CleanCore Chemical & Cleaning",R-58,y,7.5);
-      invoiceText(doc,"Authorised Signature",R-58,y+10,7.5,true);
+      invoiceRightText(doc,"For CleanCore Chemical & Cleaning",R-4,y,7.5);
+      invoiceRightText(doc,"Authorised Signature",R-4,y+10,7.5,true);
       invoiceText(doc,"Thank you for your business.",L,y+10,7.5);
 
       const safeNo=String(order.invoice_no||order.order_no||"bill").replace(/[^a-zA-Z0-9_-]/g,"-");
