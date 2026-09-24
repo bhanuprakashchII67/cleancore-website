@@ -1463,3 +1463,9 @@ header{isolation:isolate!important}
  .ccx-submit{width:100%!important;height:46px!important;min-height:46px!important}
  .ccx-close{width:34px!important;height:34px!important;top:10px!important;right:10px!important}
 }
+
+/* Public pricing: show MRP and customer selling price; never expose Manager final price. */
+.cc-mrp{display:block;font-size:12px!important;font-weight:700!important;color:#7a8793!important;text-decoration:line-through;margin-bottom:2px}
+.product .price strong{display:inline-block;font-size:20px;font-weight:900;color:#102438}
+.cc-product-buybar .product-price .cc-mrp{display:block;font-size:12px!important;margin-bottom:2px}
+.cc-product-buybar .product-price strong{display:inline-block;font-size:23px;font-weight:900;color:#0b1f33}
