@@ -31,7 +31,14 @@
 <div class="account-grid">
 <section class="checkout-card">
 <div class="checkout-card-head account-head"><span>1</span><div><h2>Customer details</h2><p>Saved for faster checkout.</p></div><button class="account-edit-button" id="accountEditToggle" type="button" aria-label="Edit customer details"><span aria-hidden="true">✎</span><span class="account-edit-label">Edit</span></button></div>
-<div id="accountDetails"></div><div id="accountEditFormWrap" class="account-edit-form-wrap hidden"></div>
+<div id="accountDetails" style="display:block!important;visibility:visible!important">
+<div data-field="name" style="display:block!important;padding:10px 0;border-bottom:1px solid #dfe8eb"><b style="display:block;color:#0b1f33;font-size:13px">Full name</b><span style="display:block;color:#647585;font-size:14px;margin-top:3px">Loading...</span></div>
+<div data-field="phone" style="display:block!important;padding:10px 0;border-bottom:1px solid #dfe8eb"><b style="display:block;color:#0b1f33;font-size:13px">Mobile</b><span style="display:block;color:#647585;font-size:14px;margin-top:3px">Loading...</span></div>
+<div data-field="email" style="display:block!important;padding:10px 0;border-bottom:1px solid #dfe8eb"><b style="display:block;color:#0b1f33;font-size:13px">Email</b><span style="display:block;color:#647585;font-size:14px;margin-top:3px">Loading...</span></div>
+<div data-field="alternate_phone" style="display:block!important;padding:10px 0;border-bottom:1px solid #dfe8eb"><b style="display:block;color:#0b1f33;font-size:13px">Alternate mobile</b><span style="display:block;color:#647585;font-size:14px;margin-top:3px">Loading...</span></div>
+<div data-field="business_name" style="display:block!important;padding:10px 0;border-bottom:1px solid #dfe8eb"><b style="display:block;color:#0b1f33;font-size:13px">Business</b><span style="display:block;color:#647585;font-size:14px;margin-top:3px">Loading...</span></div>
+<div data-field="delivery_address" style="display:block!important;padding:10px 0;border-bottom:1px solid #dfe8eb"><b style="display:block;color:#0b1f33;font-size:13px">Delivery address</b><span style="display:block;color:#647585;font-size:14px;margin-top:3px">Loading...</span></div>
+</div><div id="accountEditFormWrap" class="account-edit-form-wrap hidden"></div>
 <div class="account-actions"><a class="btn btn-primary" href="checkout.html">Go to cart</a><button class="btn btn-secondary" id="accountLogout" type="button">Logout</button></div>
 </section>
 <section class="checkout-card">
@@ -57,22 +64,13 @@
   const orderError=m=>{ordersBox.innerHTML='<div class="cc-status" role="alert"><b>Orders could not be loaded.</b><br>'+esc(m||"Please try again.")+'<br><button type="button" class="btn btn-secondary" id="retryOrders" style="margin-top:10px">Retry</button></div>';document.getElementById("retryOrders")?.addEventListener("click",loadOrders);};
   let db, user, customer, orders=[];
   function renderCustomer(){
-    const rows=[
-      ["Full name",customer.name],
-      ["Mobile",customer.phone],
-      ["Email",customer.email],
-      ["Alternate mobile",customer.alternate_phone],
-      ["Business",customer.business_name]
-    ];
-    const address=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address;
-    rows.push(["Delivery address",address]);
-    details.innerHTML=rows.map(([label,value])=>{
-      const v=String(value||"Not added");
-      return '<div class="account-detail" style="display:block!important;visibility:visible!important;opacity:1!important;padding:13px 0;border-bottom:1px solid #dfe8eb"><b style="display:block!important;color:#0b1f33;font-size:13px;margin-bottom:3px">'+esc(label)+'</b><span style="display:block!important;color:#647585;font-size:14px;line-height:1.5;white-space:normal">'+esc(v)+'</span></div>';
-    }).join("");
-    details.style.display="block";
-    details.style.visibility="visible";
-    details.style.opacity="1";
+    const address=[customer.delivery_shop_no,customer.delivery_colony,customer.delivery_city,customer.delivery_state,customer.delivery_pincode].filter(Boolean).join(", ")||customer.delivery_address||"Not added";
+    const values={name:customer.name||"Not added",phone:customer.phone||"Not added",email:customer.email||"Not added",alternate_phone:customer.alternate_phone||"Not added",business_name:customer.business_name||"Not added",delivery_address:address};
+    Object.keys(values).forEach(key=>{
+      const row=details.querySelector('[data-field="'+key+'"]');
+      const span=row?.querySelector("span");
+      if(span)span.textContent=values[key];
+    });
   }
   function closeEdit(){editWrap.classList.add("hidden");editWrap.innerHTML="";editButton.classList.remove("hidden");editButton.hidden=false;}
   function openEdit(){
@@ -337,5 +335,5 @@ async function loadOrders(){
 })();
 </script>
 
-<script src="website.js?v=4.02"></script></body>
+<script src="website.js?v=4.03"></script></body>
 </html>
