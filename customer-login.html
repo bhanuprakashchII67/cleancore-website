@@ -10,7 +10,24 @@
 <link rel="stylesheet" href="customer-desktop.css?v=4.40" media="(min-width:801px)">
 <link rel="stylesheet" href="customer-mobile.css?v=2.11" media="(max-width:800px)"><style>.recovery-status{color:#8a5a00!important;background:#fff7df;border:1px solid #f0d58a;padding:12px 14px;border-radius:12px}.recovery-status::before{content:"Recovery: ";font-weight:800}.forgot-wrap{display:flex;justify-content:flex-end;margin-top:-6px;margin-bottom:10px}.forgot-wrap button{border:0;background:none;color:#0d746e;font:800 13px/1.2 Inter,Arial,sans-serif;padding:4px 0;cursor:pointer}.forgot-wrap button:hover{text-decoration:underline;color:#075f59}.forgot-panel{display:none;margin:10px 0 14px;padding:15px;border:1px solid #dbe7e9;border-radius:14px;background:#f7fbfb}.forgot-panel.open{display:block}.forgot-panel h2{font-size:16px;margin:0 0 4px;color:#0b1f33}.forgot-panel p{font-size:12px;margin:0 0 10px;color:#66727d}.forgot-panel label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#233347}.forgot-panel input{width:100%;box-sizing:border-box;border:1px solid #d6e1e7;border-radius:10px;padding:10px 12px;background:#fff}.forgot-actions{display:flex;gap:8px;margin-top:10px}.forgot-actions button{flex:1}</style>
 <script src="error-monitor.js?v=3.80"></script>
-</head>
+<style>
+/* Login page: flat 2D form only */
+.auth-page-card,
+.auth-page-card:hover,
+.auth-page-card:focus-within{
+  box-shadow:none!important;
+  transform:none!important;
+  filter:none!important;
+}
+.auth-page-card input,
+.auth-page-card button,
+.auth-page-card .btn{
+  box-shadow:none!important;
+  transform:none!important;
+  filter:none!important;
+  transition:none!important;
+}
+</style></head>
 <body class="checkout-page">
 <header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
@@ -26,7 +43,7 @@
 <h1>Welcome back</h1>
 <p class="cc-muted">Log in with your mobile number and password.</p>
 <form id="loginForm" novalidate>
-<label>Mobile number <span class="field-optional">or</span><input id="loginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number (India +91)"></label>
+<label>Mobile number<input id="loginPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number (India +91)"></label>
 <label>Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password" required></label>
 <div class="forgot-wrap"><button id="forgotToggle" type="button">Forgot password?</button></div>
 <div id="forgotPanel" class="forgot-panel" aria-hidden="true"><h2>Reset your password.</h2><p>Enter the email address saved on your CleanCore account. We’ll send a secure reset link.</p><div id="forgotForm"><label>Email address<input id="forgotEmail" type="text" autocomplete="email" placeholder="you@example.com" required></label><div class="forgot-actions"><button id="forgotCancel" class="btn btn-secondary" type="button">Cancel</button><button id="forgotSend" class="btn btn-primary" type="button">Send reset link</button></div><p id="forgotStatus" class="cc-status" aria-live="polite"></p></div></div>
