@@ -502,44 +502,99 @@ html,body{max-width:100%;overflow-x:hidden}
 <footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div><a href="tel:+91 91827 25773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer>
 <script>
 (function(){
-const SUPABASE_URL="https://rwfamxkfqslorxcryjrp.supabase.co";
-const SUPABASE_KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
-const esc=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const slug=new URLSearchParams(location.search).get("slug")||"",root=document.getElementById("productRoot");
-const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(n||0));
-const detailsOf=v=>{if(!v)return[];if(typeof v==="string"){try{v=JSON.parse(v)}catch{return [["Details",v]]}}if(Array.isArray(v))return v.map((x,i)=>[i+1,x]);if(typeof v==="object")return Object.entries(v);return[]};
-async function load(){
- if(!slug){root.innerHTML='<div class="eyebrow">Product</div><h1>Product not found</h1><p><a href="products.html">Back to products</a></p>';return;}
- const controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),8000);
- let data=null,error=null;
- try{
-   const url=SUPABASE_URL+"/rest/v1/website_products?select=id%2Cname%2Cunit%2Cmrp%2Cselling_price%2Cdescription%2Cadditional_details%2Cimage_urls%2Cactive%2Cstock%2Cseo_title%2Cseo_description%2Cseo_keywords%2Cseo_slug&active=eq.true&seo_slug=eq."+encodeURIComponent(slug)+"&limit=1";
-   const response=await fetch(url,{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Accept":"application/json"},signal:controller.signal,cache:"no-store"});
-   if(!response.ok) throw new Error("Product API HTTP "+response.status);
-   const rows=await response.json();
-   data=Array.isArray(rows)&&rows.length?rows[0]:null;
- }catch(e){error=e}finally{clearTimeout(timeout)}
- if(error||!data){
-   root.innerHTML='<div class="eyebrow">Product</div><h1>Product unavailable</h1><p>We could not load this product right now. Please refresh once or return to <a href="products.html">Products</a>.</p>';
-   return;
- }
- const title=data.seo_title||data.name+" in Hyderabad | CleanCore",desc=data.seo_description||"Buy "+data.name+" from CleanCore Chemical & Cleaning in Hyderabad.";
- document.title=title;
- document.querySelector('meta[name="description"]')?.setAttribute("content",desc);
- document.querySelector('meta[property="og:title"]')?.setAttribute("content",title);
- document.querySelector('meta[property="og:description"]')?.setAttribute("content",desc);
- document.querySelector('meta[name="twitter:title"]')?.setAttribute("content",title);
- document.querySelector('meta[name="twitter:description"]')?.setAttribute("content",desc);
- document.getElementById("canonicalLink").setAttribute("href",location.href.split("#")[0]);
- const images=Array.isArray(data.image_urls)?data.image_urls.filter(Boolean):[],stock=Number(data.stock||0),details=detailsOf(data.additional_details);
- document.getElementById("productSchema").textContent=JSON.stringify({"@context":"https://schema.org","@type":"Product","name":data.name,"brand":{"@type":"Brand","name":"CleanCore"},"description":data.description||desc,"image":images,"offers":{"@type":"Offer","url":location.href.split("#")[0],"priceCurrency":"INR","price":Number(data.selling_price||0).toFixed(2),"availability":stock>0?"https://schema.org/InStock":"https://schema.org/OutOfStock","seller":{"@type":"Organization","name":"CleanCore Chemical & Cleaning"}}});
- const mainImg=images[0]?'<img id="mainProductImg" src="'+esc(images[0])+'" alt="'+esc(data.name)+' - CleanCore commercial cleaning product">':'<div style="font-size:5rem;font-weight:900">'+esc(String(data.name).charAt(0))+'</div>';
- const thumbs=images.length>1?'<div class="product-thumbs-side">'+images.map((u,i)=>'<button type="button" class="product-thumb '+(i===0?"active":"")+'" data-img="'+esc(u)+'" aria-label="View product image '+(i+1)+'"><img src="'+esc(u)+'" alt=""></button>').join("")+'</div>':"";const additionalDetails=details.map(([k,v])=>k==="Details"?String(v??""):(String(k??"").trim()+": "+String(v??"").trim())).filter(Boolean).join("\n\n");
- const packOptions='<option value="5 Litre Can">5 Litre Can</option>';
-root.innerHTML='<div class="product-detail-grid cc-product-layout"><div class="product-gallery cc-product-gallery"><div class="product-detail-image cc-product-image">'+mainImg+'</div>'+thumbs+'</div><div class="product-detail-copy cc-product-info"><div class="eyebrow">CleanCore · Hyderabad</div><h1>'+esc(data.name)+'</h1><p class="lead">'+esc(data.seo_description||data.description||"Commercial cleaning product for professional use in Hyderabad.")+'</p><div class="product-meta cc-product-meta"><span>'+esc(data.unit||"5 Litre Can")+'</span><span>Commercial use</span><span>Hyderabad supply</span></div><div class="cc-product-buybar"><div class="product-price"><span class="cc-mrp">MRP '+money(data.mrp)+'</span><strong>'+money(data.selling_price)+'</strong> <small>/ '+esc(data.unit||"5 Litre Can")+'</small></div><div class="product-stock '+(stock>0?"in":"out")+'"><span class="cc-stock-dot"></span>'+(stock>0?"In stock · "+stock+" available":"Out of stock")+'</div></div><div class="product-actions cc-product-actions"><div class="product-purchase"><label class="product-quantity-label" for="productQty">Quantity</label><div class="product-buy-row"><select id="productQty" class="product-quantity-select" aria-label="Quantity"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select><select id="productUnit" class="product-unit-select" aria-label="Pack size">'+packOptions+'</select><button type="button" class="btn btn-primary product-buy-btn" id="productBuyBtn">'+(stock>0?"Add to cart":"Currently unavailable")+'</button></div></div><a class="btn btn-secondary cc-back-products" href="products.html">Back to Products</a></div><div class="product-detail-panel cc-product-details"><h2>Product details</h2><p>'+esc(data.description||data.seo_description||"CleanCore commercial cleaning product for professional cleaning requirements.")+'</p></div>'+(additionalDetails?'<div class="product-detail-panel cc-product-details"><h2>Additional details</h2><p>'+esc(additionalDetails)+'</p></div>':"")</div></div>'; const main=root.querySelector("#mainProductImg");root.querySelectorAll(".product-thumb").forEach(b=>b.addEventListener("click",()=>{if(main){main.src=b.dataset.img;root.querySelectorAll(".product-thumb").forEach(x=>x.classList.remove("active"));b.classList.add("active")}}));const buy=root.querySelector("#productBuyBtn");const qty=root.querySelector("#productQty");const unit=root.querySelector("#productUnit");if(stock<=0&&buy){buy.disabled=true;buy.textContent="Out of Stock";}if(buy){buy.addEventListener("click",()=>{if(Number(data.stock||0)<=0)return;const quantity=Math.max(1,Math.min(Number(qty?.value||1),Number(data.stock||0)));let cart=[];try{cart=JSON.parse(localStorage.getItem("cleancore_cart")||"[]");if(!Array.isArray(cart))cart=[];}catch(_){cart=[];}const existing=cart.find(x=>x.product_id===data.id);if(existing)existing.quantity+=quantity;else cart.push({product_id:data.id,name:data.name,unit:unit?.value||data.unit,price:Number(data.selling_price||0),quantity});localStorage.setItem("cleancore_cart",JSON.stringify(cart));window.location.href="checkout.html";});}
-}
-load().catch(e=>{root.innerHTML='<div class="eyebrow">Product</div><h1>Product details unavailable</h1><p>Please return to the product catalogue and try again.</p>';});
+  var URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+  var KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+  var root=document.getElementById("productRoot");
+  var slug=(new URLSearchParams(window.location.search).get("slug")||"").trim();
+
+  function esc(v){
+    return String(v==null?"":v).replace(/[&<>"]/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];
+    });
+  }
+  function money(v){
+    return new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(v||0));
+  }
+  function details(v){
+    if(!v) return "";
+    if(typeof v==="string"){
+      try{v=JSON.parse(v);}catch(e){return v;}
+    }
+    if(Array.isArray(v)){
+      return v.map(function(x){return String(x==null?"":x);}).filter(Boolean).join("\n\n");
+    }
+    if(typeof v==="object"){
+      return Object.keys(v).map(function(k){return k+": "+String(v[k]==null?"":v[k]);}).filter(Boolean).join("\n\n");
+    }
+    return String(v);
+  }
+  function fail(){
+    root.innerHTML='<div class="eyebrow">Product</div><h1>Product unavailable</h1><p>We could not load this product. Please go back to <a href="products.html">Products</a>.</p>';
+  }
+  function render(data){
+    var images=Array.isArray(data.image_urls)?data.image_urls.filter(Boolean):[];
+    var stock=Number(data.stock||0);
+    var extra=details(data.additional_details);
+    var main=images.length
+      ? '<img id="mainProductImg" src="'+esc(images[0])+'" alt="'+esc(data.name)+' - CleanCore commercial cleaning product">'
+      : '<div style="font-size:5rem;font-weight:900">'+esc(String(data.name||"P").charAt(0))+'</div>';
+    var thumbs=images.length>1
+      ? '<div class="product-thumbs-side">'+images.map(function(u,i){
+          return '<button type="button" class="product-thumb '+(i===0?"active":"")+'" data-img="'+esc(u)+'"><img src="'+esc(u)+'" alt=""></button>';
+        }).join("")+'</div>'
+      : "";
+    root.innerHTML=
+      '<div class="product-detail-grid cc-product-layout">'+
+        '<div class="product-gallery cc-product-gallery"><div class="product-detail-image cc-product-image">'+main+'</div>'+thumbs+'</div>'+
+        '<div class="product-detail-copy cc-product-info">'+
+          '<div class="eyebrow">CleanCore · Hyderabad</div>'+
+          '<h1>'+esc(data.name)+'</h1>'+
+          '<p class="lead">'+esc(data.seo_description||data.description||"Commercial cleaning product for professional use in Hyderabad.")+'</p>'+
+          '<div class="product-meta cc-product-meta"><span>'+esc(data.unit||"5 Litre Can")+'</span><span>Commercial use</span><span>Hyderabad supply</span></div>'+
+          '<div class="cc-product-buybar"><div class="product-price"><span class="cc-mrp">MRP '+money(data.mrp)+'</span><strong>'+money(data.selling_price)+'</strong> <small>/ '+esc(data.unit||"5 Litre Can")+'</small></div><div class="product-stock '+(stock>0?"in":"out")+'"><span class="cc-stock-dot"></span>'+(stock>0?"In stock · "+stock+" available":"Out of stock")+'</div></div>'+
+          '<div class="product-actions cc-product-actions"><div class="product-purchase"><label class="product-quantity-label">Quantity</label><div class="product-buy-row"><select id="productQty" class="product-quantity-select"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><select id="productUnit" class="product-unit-select"><option>'+esc(data.unit||"5 Litre Can")+'</option></select><button type="button" class="btn btn-primary product-buy-btn" id="productBuyBtn">'+(stock>0?"Add to cart":"Out of Stock")+'</button></div></div><a class="btn btn-secondary cc-back-products" href="products.html">Back to Products</a></div>'+
+          '<div class="product-detail-panel cc-product-details"><h2>Product details</h2><p>'+esc(data.description||data.seo_description||"CleanCore commercial cleaning product for professional cleaning requirements.")+'</p></div>'+
+          (extra?'<div class="product-detail-panel cc-product-details"><h2>Additional details</h2><p>'+esc(extra)+'</p></div>':"")+
+        '</div>'+
+      '</div>';
+    var img=root.querySelector("#mainProductImg");
+    root.querySelectorAll(".product-thumb").forEach(function(btn){
+      btn.addEventListener("click",function(){
+        if(img){img.src=btn.getAttribute("data-img");root.querySelectorAll(".product-thumb").forEach(function(x){x.classList.remove("active");});btn.classList.add("active");}
+      });
+    });
+    var buy=root.querySelector("#productBuyBtn");
+    if(buy&&stock>0){
+      buy.addEventListener("click",function(){
+        var qty=Math.max(1,Number(root.querySelector("#productQty").value||1));
+        var cart=[];try{cart=JSON.parse(localStorage.getItem("cleancore_cart")||"[]");}catch(e){}
+        if(!Array.isArray(cart))cart=[];
+        var found=cart.find(function(x){return x.product_id===data.id;});
+        if(found)found.quantity+=qty;
+        else cart.push({product_id:data.id,name:data.name,unit:data.unit,price:Number(data.selling_price||0),quantity:qty});
+        localStorage.setItem("cleancore_cart",JSON.stringify(cart));
+        window.location.href="checkout.html";
+      });
+    }
+  }
+  if(!slug){fail();return;}
+  var xhr=new XMLHttpRequest();
+  xhr.open("GET",URL+"/rest/v1/website_products?select=id,name,unit,mrp,selling_price,description,additional_details,image_urls,active,stock,seo_title,seo_description,seo_slug&active=eq.true&seo_slug=eq."+encodeURIComponent(slug)+"&limit=1",true);
+  xhr.setRequestHeader("apikey",KEY);
+  xhr.setRequestHeader("Authorization","Bearer "+KEY);
+  xhr.timeout=8000;
+  xhr.onload=function(){
+    if(xhr.status<200||xhr.status>=300){fail();return;}
+    try{
+      var rows=JSON.parse(xhr.responseText);
+      if(!rows.length){fail();return;}
+      document.title=(rows[0].seo_title||rows[0].name+" in Hyderabad | CleanCore");
+      render(rows[0]);
+    }catch(e){fail();}
+  };
+  xhr.onerror=function(){fail();};
+  xhr.ontimeout=function(){fail();};
+  xhr.send();
 })();
 </script>
 
