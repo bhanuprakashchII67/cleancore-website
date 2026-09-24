@@ -274,7 +274,17 @@
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setCurrentNav);
   else setCurrentNav();
 })();
-</script></head><body><header><div class="container"><nav>
+</script><style id="cc-products-gap-only-v1">
+/* Products page ONLY: remove the large vertical gaps around the catalogue */
+.hero{
+  min-height:0 !important;
+  padding-top:28px !important;
+  padding-bottom:18px !important;
+}
+.hero + section{
+  padding-top:0 !important;
+}
+</style></head><body><header><div class="container"><nav>
 <a class="brand" href="index.html"><img class="site-logo" src="logo.svg?v=3.83" alt="CleanCore logo"><div>CleanCore <span>Chemical & Cleaning</span></div></a>
 <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
 <div class="navlinks" id="navMenu"><a href="index.html">Home</a><a href="products.html" class="cc-nav-current">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
