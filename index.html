@@ -561,44 +561,43 @@
 (function(){
   var URL="https://rwfamxkfqslorxcryjrp.supabase.co";
   var KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
-  function load(){
+  var rows=null;
+  function apply(){
+    if(!rows)return;
+    document.querySelectorAll(".product-grid .product").forEach(function(card){
+      var name=(card.querySelector("h3")?.textContent||"").trim();
+      var p=rows.find(function(x){return (x.name||"").trim()===name});
+      if(!p)return;
+      var urls=Array.isArray(p.image_urls)?p.image_urls.filter(Boolean):[];
+      var box=card.querySelector(".imgbox");
+      if(urls.length&&box){
+        var old=box.querySelector(".prod-img");
+        if(!old||old.tagName.toLowerCase()!=="img"||old.src!==urls[0]){
+          var img=document.createElement("img");
+          img.className="prod-img";
+          img.src=urls[0];
+          img.alt=name;
+          img.loading="lazy";
+          img.decoding="async";
+          box.replaceChildren(img);
+        }
+      }
+      var price=card.querySelector(".price");
+      if(price&&p.selling_price!=null)price.innerHTML="₹"+Number(p.selling_price).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})+" <small>/ "+(p.unit||"5 Litre Can")+"</small>";
+    });
+  }
+  function fetchProducts(){
     var xhr=new XMLHttpRequest();
-    xhr.open("GET",URL+"/rest/v1/website_products?select=name,seo_slug,image_urls,mrp,selling_price,unit&active=eq.true&limit=100",true);
+    xhr.open("GET",URL+"/rest/v1/website_products?select=name,image_urls,mrp,selling_price,unit&active=eq.true&limit=100",true);
     xhr.setRequestHeader("apikey",KEY);
     xhr.setRequestHeader("Authorization","Bearer "+KEY);
-    xhr.timeout=8000;
-    xhr.onload=function(){
-      if(xhr.status<200||xhr.status>=300)return;
-      try{
-        var rows=JSON.parse(xhr.responseText)||[],bySlug={};
-        rows.forEach(function(p){
-          var urls=Array.isArray(p.image_urls)?p.image_urls.filter(Boolean):[];
-          if(p.seo_slug)bySlug[p.seo_slug]=p;
-        });
-        document.querySelectorAll(".product-grid>.product").forEach(function(card){
-          var name=card.querySelector("h3")?.textContent?.trim()||"";
-          var p=rows.find(function(x){return x.name===name});
-          if(!p)return;
-          var urls=Array.isArray(p.image_urls)?p.image_urls.filter(Boolean):[];
-          var old=card.querySelector(".prod-img");
-          if(old&&urls.length){
-            var img=document.createElement("img");
-            img.className="prod-img";
-            img.src=urls[0];
-            img.alt=name;
-            img.loading="lazy";
-            img.decoding="async";
-            old.replaceWith(img);
-          }
-          var price=card.querySelector(".price");
-          if(price&&Number.isFinite(Number(p.selling_price))){
-            price.innerHTML="₹"+Number(p.selling_price).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})+" <small>/ "+(p.unit||"5 Litre Can")+"</small>";
-          }
-        });
-      }catch(e){}
-    };
+    xhr.onload=function(){if(xhr.status>=200&&xhr.status<300){try{rows=JSON.parse(xhr.responseText)||[];apply();}catch(e){}}};
     xhr.send();
   }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",load);else load();
+  fetchProducts();
+  var observer=new MutationObserver(apply);
+  observer.observe(document.body,{childList:true,subtree:true});
+  setTimeout(function(){observer.disconnect();},15000);
+  setInterval(apply,1000);
 })();
 </script></body></html>
