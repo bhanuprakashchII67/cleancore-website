@@ -359,6 +359,14 @@ function injectCustomerUI(){
   const {actions}=shared;
   actions.classList.add("cc-nav-actions-ready");
   if(!document.getElementById("ccCustomerLink")){
+    const existing=actions.querySelector(".account-nav-action");
+    if(existing){
+      existing.id="ccCustomerLink";
+      existing.href=customerUser&&customerProfile?"account.html?v=account-nav-v2":"customer-login.html";
+      existing.setAttribute("aria-label",customerUser&&customerProfile?"My Account":"Login");
+      const existingLabel=existing.querySelector(".customer-action-label");
+      if(existingLabel)existingLabel.textContent=customerUser&&customerProfile?"My Account":"Login";
+    }else{
     const a=document.createElement("a");
     a.id="ccCustomerLink";
     a.href=customerUser&&customerProfile?"account.html?v=3.80":"customer-login.html";
@@ -379,6 +387,22 @@ function injectCustomerUI(){
       window.location.href="customer-login.html";
     });
     actions.appendChild(a);
+    }
+  }
+  const accountLink=document.getElementById("ccCustomerLink");
+  if(accountLink&&accountLink.dataset.ccAccountBound!=="1"){
+    accountLink.dataset.ccAccountBound="1";
+    accountLink.addEventListener("click",async e=>{
+      e.preventDefault();
+      try{
+        const {data}=await siteDb?.auth?.getSession?.()||{data:null};
+        if(data?.session?.user){
+          customerUser=data.session.user;
+          await loadCustomerProfile();
+        }
+      }catch(_){}
+      window.location.href=(customerUser&&customerProfile)?"account.html?v=account-nav-v2":"customer-login.html";
+    });
   }
   if(!document.getElementById("ccCartLink")){
     const cart=document.createElement("a");
