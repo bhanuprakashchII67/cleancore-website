@@ -375,3 +375,41 @@ header{isolation:isolate!important}
   .product-grid .cc-reference-card p{font-size:14px!important}
   .product-grid .cc-reference-card .order-now{height:52px!important;min-height:52px!important}
 }
+
+/* AUTH FLAT MODE — no 3D/4D visual effects */
+body.auth-flat .auth-page-card,
+body.auth-flat .auth-page-card:hover,
+body.auth-flat .auth-page-card:focus-within,
+body.auth-flat .auth-page-card.cc-tilt-active,
+body.auth-flat .auth-page-card.cc-tilt-reset{
+  transform:none!important;
+  transform-style:flat!important;
+  perspective:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  transition:none!important;
+  animation:none!important;
+}
+body.auth-flat .auth-page-card:before,
+body.auth-flat .auth-page-card:after{
+  display:none!important;
+  content:none!important;
+  box-shadow:none!important;
+}
+body.auth-flat .auth-page-card .btn,
+body.auth-flat .auth-page-card .btn:hover,
+body.auth-flat .auth-page-card .btn:focus,
+body.auth-flat .auth-page-card .btn:active,
+body.auth-flat .auth-page-card button,
+body.auth-flat .auth-page-card button:hover,
+body.auth-flat .auth-page-card button:focus,
+body.auth-flat .auth-page-card button:active{
+  transform:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  transition:none!important;
+  animation:none!important;
+}
+body.auth-flat .auth-page-card *{
+  animation:none!important;
+}
