@@ -1,5 +1,5 @@
 (()=>{if(window.__ccErrorMonitorInstalled)return;window.__ccErrorMonitorInstalled=true;
-const URL="https://rwfamxkfqslorxcryjrp.supabase.co",KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",VERSION="3.7.14";
+const URL="https://rwfamxkfqslorxcryjrp.supabase.co",KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO",VERSION="3.97.0";
 const read=()=>{try{const q=JSON.parse(localStorage.getItem("cc_error_queue")||"[]");return Array.isArray(q)?q:[]}catch{return[]}};
 const write=q=>{try{localStorage.setItem("cc_error_queue",JSON.stringify(q.slice(-50)))}catch{}};
 const recent=new Map();
