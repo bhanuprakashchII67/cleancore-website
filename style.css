@@ -1469,3 +1469,46 @@ header{isolation:isolate!important}
 .product .price strong{display:inline-block;font-size:20px;font-weight:900;color:#102438}
 .cc-product-buybar .product-price .cc-mrp{display:block;font-size:12px!important;margin-bottom:2px}
 .cc-product-buybar .product-price strong{display:inline-block;font-size:23px;font-weight:900;color:#0b1f33}
+
+/* ===== AUTH PAGES: FLAT 2D ONLY =====
+   Login/signup must not inherit the site's 3D depth, tilt, lift, glow or motion effects.
+*/
+body.auth-flat .auth-page-card,
+body.auth-flat .auth-page-card:hover,
+body.auth-flat .auth-page-card:focus-within,
+body.auth-flat .auth-page-card.cc-tilt-active,
+body.auth-flat .auth-page-card.cc-tilt-reset{
+  transform:none!important;
+  transform-style:flat!important;
+  perspective:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  transition:none!important;
+  will-change:auto!important;
+}
+body.auth-flat .auth-page-card:before,
+body.auth-flat .auth-page-card:after{
+  display:none!important;
+  content:none!important;
+}
+body.auth-flat .auth-page-card input,
+body.auth-flat .auth-page-card input:hover,
+body.auth-flat .auth-page-card input:focus,
+body.auth-flat .auth-page-card button,
+body.auth-flat .auth-page-card button:hover,
+body.auth-flat .auth-page-card button:active,
+body.auth-flat .auth-page-card .btn,
+body.auth-flat .auth-page-card .btn:hover,
+body.auth-flat .auth-page-card .btn:active{
+  transform:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  transition:none!important;
+}
+body.auth-flat .auth-page-card .btn:active{
+  transform:none!important;
+}
+body.auth-flat .auth-page-card *{
+  animation:none!important;
+}
+
