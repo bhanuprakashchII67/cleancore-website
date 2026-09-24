@@ -24,9 +24,8 @@
 <section class="checkout-card auth-page-card">
 <div class="eyebrow">Customer account</div>
 <h1>Create your account</h1>
-<p class="cc-muted">Create your account with email, mobile number and password.</p>
+<p class="cc-muted">Create your account with mobile number and password.</p>
 <form id="signupForm" novalidate>
-<label>Email ID<input id="signupEmail" type="email" autocomplete="email" placeholder="your@email.com" required></label>
 <label>Mobile number<input id="signupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number (India +91)" required></label>
 <label>Password<input id="signupPassword" type="password" minlength="6" maxlength="20" autocomplete="new-password" placeholder="Create a password" required></label>
 <p id="signupStatus" class="cc-status" aria-live="polite"></p>
@@ -60,7 +59,7 @@ document.getElementById("signupForm").addEventListener("submit",async e=>{
     const response=await fetch(CUSTOMER_SUPABASE_URL+"/functions/v1/customer-auth",{
       method:"POST",
       headers:{"Content-Type":"application/json","apikey":CUSTOMER_SUPABASE_KEY,"Authorization":"Bearer "+CUSTOMER_SUPABASE_KEY},
-      body:JSON.stringify({action:"signup",phone,email:document.getElementById("signupEmail").value.trim().toLowerCase(),password,source:getSource()})
+      body:JSON.stringify({action:"signup",phone,password,source:getSource()})
     });
     const raw=await response.text();let data=null;
     try{data=raw?JSON.parse(raw):null}catch(_){}
