@@ -78,7 +78,7 @@ h1{font-weight:800!important;letter-spacing:-2.8px!important}
 <a class="brand" href="index.html"><img src="logo.svg" alt="CleanCore"><div class="brand-text">CleanCore <span>Chemical & Cleaning</span></div></a>
 <div class="navlinks" id="navMenu"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="industries.html">Industries</a><a href="contact.html">Contact</a></div>
 <div class="nav-user-actions" aria-label="Customer actions">
-<a class="customer-nav-action account-nav-action" href="customer-login.html" aria-label="Login">
+<a id="ccHomeAccountLink" class="customer-nav-action account-nav-action" href="customer-login.html" aria-label="Login">
 <span class="customer-face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 19c.7-3.2 2.8-5 6.5-5s5.8 1.8 6.5 5"></path></svg></span>
 <span class="customer-action-label">Account</span>
 </a>
@@ -163,6 +163,19 @@ h1{font-weight:800!important;letter-spacing:-2.8px!important}
         }
       });
    }).catch(err=>console.error(err));
+
+  const accountLink=document.getElementById("ccHomeAccountLink");
+  if(accountLink){
+    try{
+      const raw=localStorage.getItem("cleancore-customer-auth");
+      const session=raw?JSON.parse(raw):null;
+      const loggedIn=!!(session?.access_token && session?.user?.id);
+      accountLink.href=loggedIn?"account.html?v=account-nav-v2":"customer-login.html";
+      accountLink.setAttribute("aria-label",loggedIn?"My Account":"Login");
+      const label=accountLink.querySelector(".customer-action-label");
+      if(label)label.textContent=loggedIn?"My Account":"Login";
+    }catch(_){}
+  }
 
   const button=document.getElementById("menuToggle"),menu=document.getElementById("navMenu");
   button?.addEventListener("click",()=>{const open=!menu.classList.contains("open");menu.classList.toggle("open",open);button.setAttribute("aria-expanded",open?"true":"false");});
