@@ -109,4 +109,53 @@ footer{background:#071725;color:#9eadb7;padding:25px 0}.footer-row{display:flex;
 })();
 </script>
 <style>@media(max-width:900px){.navlinks.open{display:flex;position:absolute;left:4%;right:4%;top:68px;flex-direction:column;gap:4px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 44px rgba(11,31,51,.14)}.navlinks.open a{padding:12px 13px}}</style>
-</body></html>
+</body></html><style id="cc-home-range-redesign-20260925">
+/* Keep brand on the left; replace the heavy navy hero panel with a lighter service card. */
+@media (min-width:901px){
+  header .brand{position:relative!important;left:0!important;margin-right:auto!important}
+}
+.home-range{
+  background:rgba(255,255,255,.88)!important;
+  color:#0b1f33!important;
+  border:1px solid #d7e5e7!important;
+  border-radius:26px!important;
+  padding:28px!important;
+  box-shadow:0 18px 50px rgba(11,31,51,.09)!important;
+  position:relative!important;
+  overflow:hidden!important;
+}
+.home-range:before{
+  content:"";
+  position:absolute!important;
+  width:180px!important;height:180px!important;
+  right:-70px!important;top:-80px!important;
+  border-radius:50%!important;
+  background:rgba(20,184,166,.09)!important;
+  pointer-events:none!important;
+}
+.home-range-top{position:relative!important;z-index:1!important;margin-bottom:14px!important}
+.home-range-kicker{color:#0d9488!important}
+.home-range h2{color:#0b1f33!important;font-size:28px!important;max-width:360px!important}
+.home-range-badge{
+  background:#e7f8f5!important;
+  color:#087f76!important;
+  border:1px solid #c7ebe6!important;
+}
+.home-range-list{position:relative!important;z-index:1!important}
+.home-range-item{
+  color:#183044!important;
+  border-top-color:#e4ecee!important;
+  padding:12px 0!important;
+}
+.home-range-item small{color:#718296!important}
+.home-range-dot{background:#16b8aa!important}
+.home-range-footer{
+  position:relative!important;z-index:1!important;
+  border-top-color:#e1eaec!important;
+  color:#718296!important;
+}
+.home-range-footer strong{color:#0b1f33!important}
+@media(max-width:900px){
+  .home-range{padding:22px!important}
+}
+</style>
