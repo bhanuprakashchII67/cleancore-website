@@ -557,4 +557,48 @@
     </div>
   </div>
 </div></section><section class="band"><div class="container"><div class="section-head"><div class="eyebrow">Built for B2B</div><h2>Supply for professional cleaning requirements.</h2></div><div class="three"><div class="box"><h3>Business supply</h3><p>Focused on commercial and professional cleaning requirements.</p></div><div class="box"><h3>Simple ordering</h3><p>Choose a product, confirm quantity and contact us directly.</p></div><div class="box"><h3>Hyderabad</h3><p>Serving businesses and cleaning operations across Hyderabad.</p></div></div></div></section>
-<section class="contact"><div class="container contact-grid"><div><div class="eyebrow" style="color:#72d5cd">Need a quote?</div><h2>Tell us what your business needs.</h2><p>Contact CleanCore for product information, availability and business supply enquiries.</p><div class="buttons" style="margin-top:25px"><a class="btn btn-primary" href="tel:+91 91827 25773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773">WhatsApp</a></div></div><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Service Area</strong>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div class="contact-line"><strong>Products</strong>Cleaning liquids for professional use</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div><a href="tel:+91 91827 25773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="website.js?v=3.97"></script></body></html>
+<section class="contact"><div class="container contact-grid"><div><div class="eyebrow" style="color:#72d5cd">Need a quote?</div><h2>Tell us what your business needs.</h2><p>Contact CleanCore for product information, availability and business supply enquiries.</p><div class="buttons" style="margin-top:25px"><a class="btn btn-primary" href="tel:+91 91827 25773">Call +91 91827 25773</a><a class="btn btn-secondary" href="https://wa.me/919182725773">WhatsApp</a></div></div><div class="contact-card"><div class="contact-line"><strong>Phone / WhatsApp</strong>+91 91827 25773</div><div class="contact-line"><strong>Service Area</strong>Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div class="contact-line"><strong>Products</strong>Cleaning liquids for professional use</div><div class="contact-line"><strong>Email</strong><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></div></section><footer><div class="container footer-row"><div><strong>CleanCore Chemical & Cleaning</strong><br>Professional cleaning chemicals · Srinivasa Colony, Manikonda, Hyderabad, Telangana, India</div><div><a href="tel:+91 91827 25773">+91 91827 25773</a><br><a href="mailto:cleancorehyd@gmail.com">cleancorehyd@gmail.com</a></div></div></footer><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="website.js?v=3.97"></script><script id="cc-home-live-images-20260925">
+(function(){
+  var URL="https://rwfamxkfqslorxcryjrp.supabase.co";
+  var KEY="sb_publishable_tzfe2xVn6OAwF-Mh5_u_zQ_a_bAW7tO";
+  function load(){
+    var xhr=new XMLHttpRequest();
+    xhr.open("GET",URL+"/rest/v1/website_products?select=name,seo_slug,image_urls,mrp,selling_price,unit&active=eq.true&limit=100",true);
+    xhr.setRequestHeader("apikey",KEY);
+    xhr.setRequestHeader("Authorization","Bearer "+KEY);
+    xhr.timeout=8000;
+    xhr.onload=function(){
+      if(xhr.status<200||xhr.status>=300)return;
+      try{
+        var rows=JSON.parse(xhr.responseText)||[],bySlug={};
+        rows.forEach(function(p){
+          var urls=Array.isArray(p.image_urls)?p.image_urls.filter(Boolean):[];
+          if(p.seo_slug)bySlug[p.seo_slug]=p;
+        });
+        document.querySelectorAll(".product-grid>.product").forEach(function(card){
+          var name=card.querySelector("h3")?.textContent?.trim()||"";
+          var p=rows.find(function(x){return x.name===name});
+          if(!p)return;
+          var urls=Array.isArray(p.image_urls)?p.image_urls.filter(Boolean):[];
+          var old=card.querySelector(".prod-img");
+          if(old&&urls.length){
+            var img=document.createElement("img");
+            img.className="prod-img";
+            img.src=urls[0];
+            img.alt=name;
+            img.loading="lazy";
+            img.decoding="async";
+            old.replaceWith(img);
+          }
+          var price=card.querySelector(".price");
+          if(price&&Number.isFinite(Number(p.selling_price))){
+            price.innerHTML="₹"+Number(p.selling_price).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})+" <small>/ "+(p.unit||"5 Litre Can")+"</small>";
+          }
+        });
+      }catch(e){}
+    };
+    xhr.send();
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",load);else load();
+})();
+</script></body></html>
